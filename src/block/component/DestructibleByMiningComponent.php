@@ -6,15 +6,15 @@ use pocketmine\nbt\tag\ShortTag;
 
 final class DestructibleByMiningComponent implements BlockComponent {
 
-	/** Seconds to destroy with base equipment */
+	/*  Number of seconds required to destroy the block using base equipment. */
 	private float $secondsToDestroy;
 	/**
 	 * @var array<int, array{
-	 *   destroy_speed: float,
-	 *   item: string|array{
-	 *     MolangVersion?: int,
-	 *     tags?: string
-	 *   }
+	 *     destroy_speed: float,
+	 *     item: string|array{
+	 *         MolangVersion: ShortTag,
+	 *         Tags: string
+	 *     }
 	 * }>
 	 */
 	private array $itemSpecificSpeeds = [];
@@ -45,10 +45,12 @@ final class DestructibleByMiningComponent implements BlockComponent {
 	}
 
 	/**
-	 * Adds an item-specific destroy speed using item tags (Molang).
+	 * Adds an item-specific destroy speed using a Molang tag expression.
+	 * 
+	 * Example:
+	 * q.all_tags('minecraft:is_pickaxe', 'minecraft:wooden_tier')
 	 * @param float $destroySpeed
-	 * @param string $tags Molang tag expression
-	 * @param int $molangVersion
+	 * @param string $tags
 	 */
 	public function addItemSpeedByTags(
 		float $destroySpeed,
@@ -69,6 +71,9 @@ final class DestructibleByMiningComponent implements BlockComponent {
 
 	/**
 	 * Adds an item-specific destroy speed using an item identifier.
+	 *
+	 * Example:
+	 * minecraft:diamond_pickaxe
 	 * @param float $destroySpeed
 	 * @param string $itemId
 	 */

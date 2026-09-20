@@ -13,7 +13,6 @@ trait BlockStatesTrait {
 	/**
 	 * Adds a state to the block.
 	 * @param BlockState $state
-	 * @return void
 	 */
 	public function addState(BlockState $state): void {
 		$this->states[$state->getName()] = $state;

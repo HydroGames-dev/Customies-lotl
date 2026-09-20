@@ -1,10 +1,10 @@
-name: Customies
-description: A PocketMine-MP plugin that implements support for custom blocks, items and entities.
+name: Customies-Axolotl
+description: A Axolotl-MP plugin that implements support for custom blocks, items and entities.
 
 main: customiesdevs\customies\Customies
 src-namespace-prefix: customiesdevs\customies
-version: 1.5.20
-api: 5.43.0
+version: 1.5.40
+api: 5.49.0
 
 authors:
   - DenielWorld

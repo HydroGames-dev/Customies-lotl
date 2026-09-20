@@ -57,7 +57,7 @@ final class TransformationComponent implements BlockComponent {
 			90 => 1, // West
 			180 => 2, // South
 			270, -90 => 3, // East
-			default => 0 // North By Default
+			default => 0, // North By Default
 		};
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace customiesdevs\customies\block\permutations\traits;
+namespace customiesdevs\customies\block\permutations\states;
 
 use customiesdevs\customies\block\component\TransformationComponent;
 use customiesdevs\customies\block\permutations\BlockPermutation;
@@ -45,7 +45,7 @@ trait LogRotationTrait {
 			new BlockPermutation(
 				"q.block_state('minecraft:block_face') == 'north' || q.block_state('minecraft:block_face') == 'south'",
 				new TransformationComponent(new Vector3(90, 0, 0))
-			)
+			),
 		]);
 	}
 
@@ -54,31 +54,33 @@ trait LogRotationTrait {
 	}
 
 	public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool {
-		$this->axis = match($face) {
+		$this->axis = match($face){
 			0, 1 => Axis::Y,  // down, up
 			2, 3 => Axis::Z,  // north, south
 			4, 5 => Axis::X,  // west, east
-			default => Axis::Y
+			default => Axis::Y,
 		};
 		return parent::place($tx, $item, $blockReplace, $blockClicked, $face, $clickVector, $player);
 	}
 
 	public function serializeState(BlockStateWriter $out): void {
-		$rotation = match($this->axis) {
-			Axis::X => "east",
-			Axis::Y => "up",
-			Axis::Z => "north",
-			default => "down"
-		};
-		$out->writeString("minecraft:block_face", $rotation);
+		$out->writeString(
+			"minecraft:block_face",
+			match($this->axis){
+				Axis::X => "east",
+				Axis::Y => "up",
+				Axis::Z => "north",
+				default => "up",
+			}
+		);
 	}
 
 	public function deserializeState(BlockStateReader $in): void {
-		$this->axis = match($in->readString("minecraft:block_face")) {
+		$this->axis = match($in->readString("minecraft:block_face")){
 			"east", "west" => Axis::X,
 			"up", "down" => Axis::Y,
 			"north", "south" => Axis::Z,
-			default => Axis::Y
+			default => Axis::Y,
 		};
 	}
 }

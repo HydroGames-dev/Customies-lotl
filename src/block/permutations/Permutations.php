@@ -6,6 +6,7 @@ namespace customiesdevs\customies\block\permutations;
 use customiesdevs\customies\block\states\BlockState;
 use Exception;
 use function array_map;
+use function array_product;
 use function count;
 use function current;
 use function next;
@@ -22,7 +23,7 @@ class Permutations {
 		$properties = self::getCartesianProduct(
 			array_map(static fn(BlockState $blockProperty) => $blockProperty->getValues(), $block->getStates())
 		)[$meta] ?? null;
-		if($properties === null) {
+		if($properties === null){
 			throw new Exception("Unable to calculate permutations from block meta: " . $meta);
 		}
 		return $properties;
@@ -37,7 +38,7 @@ class Permutations {
 			array_map(static fn(BlockState $blockProperty) => $blockProperty->getValues(), $block->getStates())
 		);
 		foreach($properties as $meta => $permutations){
-			if($permutations === $block->getCurrentStates()) {
+			if($permutations === $block->getCurrentStates()){
 				return $meta;
 			}
 		}

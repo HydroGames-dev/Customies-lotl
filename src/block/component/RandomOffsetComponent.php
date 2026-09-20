@@ -2,8 +2,10 @@
 
 namespace customiesdevs\customies\block\component;
 
+use pocketmine\block\utils\RandomOffsetGenerator;
 use pocketmine\math\Vector3;
 
+# TODO: Not sure of this
 final class RandomOffsetComponent implements BlockComponent {
 
 	private Vector3 $min;
@@ -11,18 +13,18 @@ final class RandomOffsetComponent implements BlockComponent {
 	private Vector3 $steps;
 
 	/**
-	 * @param Vector3 $min Minimum offset per axis (x, y, z)
-	 * @param Vector3 $max Maximum offset per axis (x, y, z)
-	 * @param Vector3 $steps Steps per axis (x, y, z)
+	 * @param Vector3|null $min Minimum offset per axis (x, y, z)
+	 * @param Vector3|null $max Maximum offset per axis (x, y, z)
+	 * @param Vector3|null $steps Steps per axis (x, y, z)
 	 */
 	public function __construct(
-		Vector3 $min = new Vector3(0.0, 0.0, 0.0),
-		Vector3 $max = new Vector3(0.0, 0.0, 0.0),
-		?Vector3 $steps = new Vector3(0, 0, 0)
+		?Vector3 $min = null,
+		?Vector3 $max = null,
+		?Vector3 $steps = null
 	) {
-		$this->min = $min;
-		$this->max = $max;
-		$this->steps = $steps;
+		$this->min = $min ?? new Vector3(0.0, 0.0, 0.0);
+		$this->max = $max ?? new Vector3(0.0, 0.0, 0.0);
+		$this->steps = $steps ?? new Vector3(0, 0, 0);
 	}
 
 	public function getName(): string {
@@ -44,6 +46,23 @@ final class RandomOffsetComponent implements BlockComponent {
 				"range" => ["min" => $this->min->z, "max" => $this->max->z]
 			],
 		];
+	}
+
+	/**
+	 * Computes the horizontal (XZ) random offset vector applied at a given block position.
+	 * @param int $x Block world position X
+	 * @param int $z Block world position Z
+	 * @return Vector3 Offset vector with calculated X and Z, Y set to 0.0
+	 */
+	public function getOffset(int $x, int $z): Vector3 {
+		[$offsetX, $offsetZ] = RandomOffsetGenerator::horizontal(
+			$x,
+			$z,
+			$this->min->x,
+			$this->max->x,
+			(int) $this->steps->x
+		);
+		return new Vector3($offsetX, 0.0, $offsetZ);
 	}
 
 	public function setMin(Vector3 $min): self {

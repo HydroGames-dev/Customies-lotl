@@ -11,7 +11,7 @@ use pocketmine\utils\SingletonTrait;
 final class Customies extends PluginBase {
 	use SingletonTrait;
 
-	public function onLoad(): void{
+	public function onLoad(): void {
 		self::setInstance($this);
 	}
 

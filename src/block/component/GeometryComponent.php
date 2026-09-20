@@ -11,12 +11,12 @@ final class GeometryComponent implements BlockComponent {
 	/** A geometry that uses the full cube shape to render the block, similar to the geometry used for vanilla solid blocks. */
 	public const GEOMETRY_FULL_BLOCK = "minecraft:geometry.full_block";
 
-	private string $identifier;
 	private array $boneVisibility = [];
+	private array|bool $uvLock;
 	private string $culling;
 	private string $cullingLayer;
 	private string $cullingShape;
-	private array|bool $uvLock;
+	private string $identifier;
 
 	/**
 	 * The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: "minecraft:geometry.full_block" or "minecraft:geometry.cross".
@@ -35,12 +35,12 @@ final class GeometryComponent implements BlockComponent {
 		CullingShape|string $cullingShape = CullingShape::SHAPE_EMPTY,
 		array|bool $uvLock = false
 	) {
-		$this->identifier = $identifier;
+		$this->boneVisibility = $boneVisibility;
 		$this->culling = $culling;
 		$this->cullingLayer = $cullingLayer;
 		$this->cullingShape = is_string($cullingShape) ? $cullingShape : $cullingShape->value;
+		$this->identifier = $identifier;
 		$this->uvLock = $uvLock;
-		$this->boneVisibility = $boneVisibility;
 	}
 
 	public function getName(): string {

@@ -11,7 +11,6 @@ interface BlockComponents {
 	 * Add component adds a component to the block that can be returned in the getComponents() method to be sent over
 	 * the network.
 	 * @param BlockComponent $component
-	 * @return void
 	 */
 	public function addComponent(BlockComponent $component): void;
 

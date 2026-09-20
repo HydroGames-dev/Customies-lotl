@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace customiesdevs\customies\block\permutations\traits;
+namespace customiesdevs\customies\block\permutations\states;
 
 use customiesdevs\customies\block\component\TransformationComponent;
 use customiesdevs\customies\block\permutations\BlockPermutation;
@@ -28,7 +28,7 @@ trait FacingDirectionRotationTrait {
 
 	protected function initStates(): void {
 		$this->addState(new BlockState("minecraft:facing_direction",
-			["down", "up", "north", "south", "east", "west"]
+			["down", "up", "north", "south", "west", "east"]
 		));
 	}
 
@@ -73,25 +73,27 @@ trait FacingDirectionRotationTrait {
 	public function serializeState(BlockStateWriter $out): void {
 		$out->writeString(
 			"minecraft:facing_direction",
-			match ($this->facing) {
+			match($this->facing){
 				Facing::DOWN => "down",
 				Facing::UP => "up",
 				Facing::NORTH => "north",
 				Facing::SOUTH => "south",
 				Facing::WEST => "west",
 				Facing::EAST => "east",
+				default => "north",
 			}
 		);
 	}
 
 	public function deserializeState(BlockStateReader $in): void {
-		$this->facing = match ($in->readString("minecraft:facing_direction")) {
-			"down" => Facing::UP,
-			"up" => Facing::DOWN,
+		$this->facing = match($in->readString("minecraft:facing_direction")){
+			"down" => Facing::DOWN,
+			"up" => Facing::UP,
 			"north" => Facing::NORTH,
 			"south" => Facing::SOUTH,
 			"west" => Facing::WEST,
 			"east" => Facing::EAST,
+			default => Facing::NORTH,
 		};
 	}
 }

@@ -13,14 +13,6 @@ final class WearableComponent implements ItemComponent {
 	public const SLOT_WEAPON_MAIN_HAND = "slot.weapon.mainhand";
 	public const SLOT_WEAPON_OFF_HAND = "slot.weapon.offhand";
 
-	public const SLOT_HOTBAR = "slot.hotbar";
-	public const SLOT_INVENTORY = "slot.inventory";
-	public const SLOT_ENDERCHEST = "slot.enderchest";
-	public const SLOT_SADDLE = "slot.saddle";
-	public const SLOT_ARMOR = "slot.armor";
-	public const SLOT_CHEST = "slot.chest";
-	public const SLOT_EQUIPPABLE = "slot.equippable";
-
 	private string $slot;
 	private int $protection;
 	private bool $hidePlayerLocation;

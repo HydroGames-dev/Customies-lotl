@@ -58,7 +58,7 @@ final class CustomiesItemFactory {
 		'hover_text_color', // String
 		'liquid_clipped', // Byte
 		'max_stack_size', // Int
-		'minecraft:icon', // String
+		'minecraft:icon', // Compound|String
 		'mining_speed', // Float
 		'should_despawn', // Byte
 		'stacked_by_data', // Byte
@@ -66,7 +66,7 @@ final class CustomiesItemFactory {
 		'use_duration', // Int
 	];
 
-	/** @var ItemTypeEntry[] */
+	/** @var array<string, ItemTypeEntry> */
 	private array $itemTableEntries = [];
 
 	/**
@@ -79,7 +79,7 @@ final class CustomiesItemFactory {
 	 */
 	public function get(string $identifier, int $amount = 1): Item {
 		$item = StringToItemParser::getInstance()->parse($identifier);
-		if($item === null) {
+		if($item === null){
 			throw new InvalidArgumentException("Custom item " . $identifier . " is not registered");
 		}
 		return $item->setCount($amount);
@@ -109,7 +109,7 @@ final class CustomiesItemFactory {
 		CreativeInventoryInfo $creativeInfo = new CreativeInventoryInfo(CreativeInventoryInfo::CATEGORY_EQUIPMENT)
 	): void {
 		$item = $itemFunc();
-		if(!$item instanceof Item) {
+		if(!$item instanceof Item){
 			throw new InvalidArgumentException("Class returned from closure is not a Item");
 		}
 		$itemId = $item->getTypeId();
@@ -139,12 +139,9 @@ final class CustomiesItemFactory {
 	 * Creates the CompoundTag for an item, including components and default properties.
 	 */
 	private function createItemNbt(Item $item, string $identifier, int $itemId, CreativeInventoryInfo $creativeInfo): CompoundTag {
-		if(!($item instanceof ItemComponents)) {
-			return CompoundTag::create();
-		}
 		// Initialize item_properties with defaults
 		$propertiesTag = CompoundTag::create();
-		foreach(self::PROPERTY_DEFAULTS as $name => $default) {
+		foreach(self::PROPERTY_DEFAULTS as $name => $default){
 			$propertiesTag->setTag($name, NBT::getTagType($default));
 		}
 		// Set creative info
@@ -154,34 +151,36 @@ final class CustomiesItemFactory {
 		$tags = [];
 		$componentsTag = CompoundTag::create();
 		// Process each component
-		foreach($item->getComponents() as $component) {
-			$name = $component->getName();
-			$value = $component->getValue();
-			$tag = NBT::getTagType($value);
-			// Icon goes to item_properties
-			if($name === 'minecraft:icon') {
-				$propertiesTag->setTag('minecraft:icon', $tag);
-				continue;
-			}
-			// Tags go to item_tags
-			if($name === 'minecraft:tags') {
-				$tags = $value['tags'] ?? [];
-				$componentsTag->setTag('minecraft:tags', $tag);
-				continue;
-			}
-			// Components with property mappings also update item_properties
-			$mapping = $component->getPropertyMapping();
-			if($mapping !== null) {
-				foreach($mapping as $prop => $propValue) {
-					if($prop === "use_duration"){
-						$propertiesTag->setTag("use_duration", NBT::getTagType((int) round($propValue * 20)));
-						continue;
-					}
-					$propertiesTag->setTag($prop, NBT::getTagType($propValue));
+		if($item instanceof ItemComponents){
+			foreach($item->getComponents() as $component){
+				$name = $component->getName();
+				$value = $component->getValue();
+				$tag = NBT::getTagType($value);
+				// Icon goes to item_properties
+				if($name === 'minecraft:icon'){
+					$propertiesTag->setTag('minecraft:icon', $tag);
+					continue;
 				}
+				// Tags go to item_tags
+				if($name === 'minecraft:tags'){
+					$tags = $value['tags'] ?? [];
+					$componentsTag->setTag('minecraft:tags', $tag);
+					continue;
+				}
+				// Components with property mappings also update item_properties
+				$mapping = $component->getPropertyMapping();
+				if($mapping !== null){
+					foreach($mapping as $prop => $propValue){
+						if($prop === "use_duration"){
+							$propertiesTag->setTag("use_duration", NBT::getTagType((int) round($propValue * 20)));
+							continue;
+						}
+						$propertiesTag->setTag($prop, NBT::getTagType($propValue));
+					}
+				}
+				// All components go to components tag
+				$componentsTag->setTag($name, $tag);
 			}
-			// All components go to components tag
-			$componentsTag->setTag($name, $tag);
 		}
 		$propertiesTag = NBT::sortCompoundTag($propertiesTag, self::PROPERTY_ORDER);
 		$components = CompoundTag::create()
@@ -207,19 +206,20 @@ final class CustomiesItemFactory {
 		$reflection = new ReflectionClass($dictionary);
 
 		$intToString = $reflection->getProperty("intToStringIdMap");
-		/** @var int[] $value */
-		$value = $intToString->getValue($dictionary);
-		$intToString->setValue($dictionary, $value + [$itemId => $identifier]);
+		/** @var array<int, string> $intToStringValue */
+		$intToStringValue = $intToString->getValue($dictionary);
+		$intToString->setValue($dictionary, $intToStringValue + [$itemId => $identifier]);
 
 		$stringToInt = $reflection->getProperty("stringToIntMap");
-		/** @var int[] $value */
-		$value = $stringToInt->getValue($dictionary);
-		$stringToInt->setValue($dictionary, $value + [$identifier => $itemId]);
+		 /** @var array<string, int> $stringToIntValue */
+		$stringToIntValue = $stringToInt->getValue($dictionary);
+		$stringToInt->setValue($dictionary, $stringToIntValue + [$identifier => $itemId]);
 
 		$itemTypes = $reflection->getProperty("itemTypes");
-		$value = $itemTypes->getValue($dictionary);
-		$value[] = $entry;
-		$itemTypes->setValue($dictionary, $value);
+		 /** @var ItemTypeEntry[] $itemTypesValue */
+		$itemTypesValue = $itemTypes->getValue($dictionary);
+		$itemTypesValue[] = $entry;
+		$itemTypes->setValue($dictionary, $itemTypesValue);
 	}
 
 	/**
@@ -232,6 +232,7 @@ final class CustomiesItemFactory {
 		$itemId = $block->getIdInfo()->getBlockTypeId();
 		StringToItemParser::getInstance()->registerBlock($identifier, fn() => clone $block);
 		$entry = new ItemTypeEntry($identifier, $itemId, false, 2, new CacheableNbt(CompoundTag::create()));
+
 		$this->itemTableEntries[] = $entry;
 		$this->registerCustomItemMapping($identifier, $itemId, $entry);
 
@@ -239,8 +240,8 @@ final class CustomiesItemFactory {
 		$reflection = new ReflectionClass($blockItemIdMap);
 
 		$itemToBlockId = $reflection->getProperty("itemToBlockId");
-		/** @var string[] $value */
-		$value = $itemToBlockId->getValue($blockItemIdMap);
-		$itemToBlockId->setValue($blockItemIdMap, $value + [$identifier => $identifier]);
+		 /** @var array<string, string> $itemToBlockIdValue */
+		$itemToBlockIdValue = $itemToBlockId->getValue($blockItemIdMap);
+		$itemToBlockId->setValue($blockItemIdMap, $itemToBlockIdValue + [$identifier => $identifier]);
 	}
 }

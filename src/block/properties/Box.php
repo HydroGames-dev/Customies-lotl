@@ -35,20 +35,17 @@ final class Box {
 	 */
 	public function __construct(Vector3 $origin, Vector3 $size) {
 		// Clamp origin
-		$originX = max(-8, min(7, $origin->x));
-		$originY = max(0, min(23, $origin->y));
-		$originZ = max(-8, min(7, $origin->z));
-		
+		$originX = max(-8.0, min(8.0, $origin->x));
+		$originY = max(0.0, min(24.0, $origin->y));
+		$originZ = max(-8.0, min(8.0, $origin->z));
 		// Clamp size
-		$sizeX = max(1, min(16, $size->x));
-		$sizeY = max(1, min(24, $size->y));
-		$sizeZ = max(1, min(16, $size->z));
-		
+		$sizeX = max(1, min(16.0, $size->x));
+		$sizeY = max(1, min(24.0, $size->y));
+		$sizeZ = max(1, min(16.0, $size->z));
 		// Clamp to ensure origin + size is valid
-		$sizeX = min($sizeX, 8 - $originX);
-		$sizeY = min($sizeY, 24 - $originY);
-		$sizeZ = min($sizeZ, 8 - $originZ);
-		
+		$sizeX = min($sizeX, 8.0 - $originX);
+		$sizeY = min($sizeY, 24.0 - $originY);
+		$sizeZ = min($sizeZ, 8.0 - $originZ);
 		$this->origin = new Vector3($originX, $originY, $originZ);
 		$this->size = new Vector3($sizeX, $sizeY, $sizeZ);
 	}
@@ -86,8 +83,6 @@ final class Box {
 	/**
 	 * Converts the box into the Bedrock NBT array format.
 	 *
-	 * Coordinates are converted from block-relative space into
-	 * client-expected values (X and Z shifted by +8).
 	 * @return array{
 	 *     minX: float,
 	 *     minY: float,

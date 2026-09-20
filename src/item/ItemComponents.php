@@ -11,7 +11,6 @@ interface ItemComponents {
 	 * Adds a component to the item
 	 * 
 	 * @param ItemComponent $component
-	 * @return void
 	 */
 	public function addComponent(ItemComponent $component): void;
 

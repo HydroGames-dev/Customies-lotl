@@ -5,7 +5,6 @@ namespace customiesdevs\customies\block\states;
 
 /**
  * Represents a block state property with a name and array of possible values.
- * Automatically detects the value type (bool, int, string) for serialization.
  */
 class BlockState {
 
@@ -37,6 +36,14 @@ class BlockState {
 	 */
 	public function getValues(): array {
 		return $this->values;
+	}
+
+	public static function range(string $name, int $min, int $max): self {
+		return new self($name, range($min, $max));
+	}
+
+	public static function bool(string $name): self {
+		return new self($name, [false, true]);
 	}
 
 	/**

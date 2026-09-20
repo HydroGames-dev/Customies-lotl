@@ -9,6 +9,7 @@ use customiesdevs\customies\block\component\BlockTagsComponent;
 use customiesdevs\customies\block\permutations\BlockPermutation;
 use customiesdevs\customies\block\permutations\BlockPermutations;
 use customiesdevs\customies\block\permutations\Permutations;
+use customiesdevs\customies\block\traits\BlockTraits;
 use customiesdevs\customies\item\CreativeInventoryInfo;
 use customiesdevs\customies\item\CustomiesItemFactory;
 use customiesdevs\customies\task\AsyncRegisterBlocksTask;
@@ -30,16 +31,13 @@ use pocketmine\world\format\io\GlobalBlockStateHandlers;
 use RuntimeException;
 use function array_map;
 use function array_reverse;
-use function hash;
-use function strcmp;
-use function usort;
 
 final class CustomiesBlockFactory {
 	use SingletonTrait;
 
 	/**
 	 * @var Closure[]
-	 * @phpstan-var array<string, array{(Closure(int): Block), (Closure(BlockStateWriter): Block), (Closure(Block): BlockStateReader)}>
+	 * @phpstan-var array<string, array{(Closure(): Block), (Closure(BlockStateWriter): Block), (Closure(Block): BlockStateReader)}>
 	 */
 	private array $blockFuncs = [];
 	/** @var BlockPaletteEntry[] */
@@ -87,9 +85,8 @@ final class CustomiesBlockFactory {
 	 * @param Closure $blockFunc A closure that returns a new instance of the block to register.
 	 * @param string $identifier The unique identifier for the block (e.g. "namespace:block_name").
 	 * @param CreativeInventoryInfo $creativeInfo Creative inventory information for the block. Default set to `Construction` Category.
-	 * @param (Closure(BlockStateWriter): Block)|null $serializer Optional closure that takes a BlockStateWriter and returns it after writing the block state.
-	 * @param (Closure(Block): BlockStateReader)|null $deserializer Optional closure that takes a BlockStateReader and returns a new instance of the block after reading the state.
-	 * @throws InvalidArgumentException If the blockFunc does not return a Block instance.
+	 * @param (Closure(Block): BlockStateWriter)|null $serializer Optional closure that takes a BlockStateWriter and returns it after writing the block state.
+	 * @param (Closure(BlockStateReader): Block)|null $deserializer Optional closure that takes a BlockStateReader and returns a new instance of the block after reading the state.
 	 */
 	public function registerBlock(
 		Closure $blockFunc,
@@ -123,7 +120,21 @@ final class CustomiesBlockFactory {
 				$componentsTag->setTag($component->getName(), $tag);
 			}
 		}
+		if($block instanceof BlockTraits){
+			$block->initializeTraits();
+			$traits = [];
+			foreach($block->getTraits() as $trait){
+				$traits[] = $trait->toNBT();
+			}
+			if($traits !== []){
+				$nbtTag->setTag("traits", new ListTag($traits));
+			}
+		}
 		// Creative NBT
+		// Configures the block behavior in inventory and menu category
+		// category - The creative inventory or recipe book tab that the block is placed into. Default to none
+		// group - the expandable group that the block is a part of. Must be a namespace and can use vanilla ones
+		// is_hidden_in_commands - Is the block hidden from use in commands
 		$nbtTag->setTag("menu_category", 
 			CompoundTag::create()
 				->setString("category", $creativeInfo->getCategory())
@@ -133,6 +144,9 @@ final class CustomiesBlockFactory {
 		// Adds States/Permutation to Block
 		if($block instanceof BlockPermutations){
 			$blockNames = $blockValues = $blockProperties = [];
+			if($block instanceof BlockTraits){
+				$block->initializeTraits();
+			}
 			foreach($block->getStates() as $state){
 				$blockNames[] = $state->getName();
 				$blockValues[] = $state->getValues();
@@ -158,6 +172,7 @@ final class CustomiesBlockFactory {
 				);
 			}
 			$serializer ??= static function (BlockPermutations $b) use ($identifier): BlockStateWriter {
+				assert($b instanceof BlockPermutations);
 				$writer = BlockStateWriter::create($identifier);
 				$b->serializeState($writer);
 				return $writer;
@@ -175,7 +190,7 @@ final class CustomiesBlockFactory {
 					->setString(BlockStateData::TAG_NAME, $identifier)
 					->setTag(BlockStateData::TAG_STATES, CompoundTag::create())
 			);
-			$serializer ??= static fn() => new BlockStateWriter($identifier);
+			$serializer ??= static fn(Block $b) => new BlockStateWriter($identifier);
 			$deserializer ??= static fn(BlockStateReader $in) => $block;
 		}
 		GlobalBlockStateHandlers::getSerializer()->map($block, $serializer);
@@ -183,20 +198,19 @@ final class CustomiesBlockFactory {
 		// The 'minecraft:on_player_placing' component is required for the client to predict block placement, making
 		// it a smoother experience for the end-user.
 		$componentsTag->setTag("minecraft:on_player_placing", CompoundTag::create());
-		$nbtTag->setTag("blockTags", new ListTag(array_map(static fn(string $tag) => new StringTag($tag), $blockTags)));
-		$nbtTag->setTag("components", $componentsTag);
+		$nbtTag->setTag("blockTags", new ListTag(array_map(static fn(string $tag) => new StringTag($tag), array_values($blockTags))));
 		$nbtTag->setInt("molangVersion", 13);
 		// Registers the block to creative inventory
 		CreativeInventoryInfo::registerCreativeInfo($block, $creativeInfo);
 		$this->blockPaletteEntries[] = new BlockPaletteEntry($identifier, new CacheableNbt($nbtTag));
 		$this->blockFuncs[$identifier] = [$blockFunc, $serializer, $deserializer];
-		// 1.20.60 added a new "block_id" field which depends on the order of the block palette entries. Every time we
-		// insert a new block, we need to re-sort the block palette entries to keep in sync with the client.
-		usort($this->blockPaletteEntries, static function(BlockPaletteEntry $a, BlockPaletteEntry $b): int {
-			return strcmp(hash("fnv164", $a->getName()), hash("fnv164", $b->getName()));
-		});
+
 		foreach($this->blockPaletteEntries as $i => $entry){
 			$root = $entry->getStates()->getRoot();
+			// ->setByte("can_dampen_vibrations", 0)
+			// ->setByte("can_occlude_vibrations", 0)
+			// ->setFloat("translucency", 0.8)
+			// ->setByte("requires_correct_tool_for_drops", 0)
 			$root->setTag("vanilla_block_data", CompoundTag::create()->setInt("block_id", 10000 + $i));
 			$this->blockPaletteEntries[$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
 		}

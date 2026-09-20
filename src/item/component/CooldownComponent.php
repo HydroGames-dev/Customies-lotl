@@ -5,12 +5,6 @@ namespace customiesdevs\customies\item\component;
 
 final class CooldownComponent implements ItemComponent {
 
-	public const CATEGORY_SHIELD = "shield";
-	public const CATEGORY_PEARL = "ender_pearl";
-	public const CATEGORY_HORN = "goat_horn";
-	public const CATEGORY_WINDCHARGE = "wind_charge";
-	public const CATEGORY_CHORUS = "chorusfruit";
-
 	/** 
 	 * Causes the cooldown to start when the player attacks while holding the item and
 	 * prevents the item from being used to attack while the cooldown is active. 
@@ -21,6 +15,13 @@ final class CooldownComponent implements ItemComponent {
 	 * prevents the item from being used while the cooldown is active.
 	 */
 	public const TYPE_USE = "use";
+
+	public const CATEGORY_CHORUS = "chorusfruit";
+	public const CATEGORY_HORN = "goat_horn";
+	public const CATEGORY_PEARL = "ender_pearl";
+	public const CATEGORY_SHIELD = "shield";
+	public const CATEGORY_SPEAR = "spear";
+	public const CATEGORY_WINDCHARGE = "wind_charge";
 
 	private string $category;
 	private float $duration;

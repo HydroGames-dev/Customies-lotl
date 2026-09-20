@@ -54,6 +54,8 @@ final class FoodComponent implements ItemComponent {
 	private array $removeEffects = [];
 
 	/**
+	 * NOTE: This is only Client Side, it won't staturate your food bar.
+	 * 
 	 * Sets the item as a food component, allowing it to be edible to the player.
 	 * @param bool $canAlwaysEat Whether the player can always eat this food, even when not hungry. Default is false.
 	 * @param int $nutrition The amount of hunger points this food item restores when eaten. Default is 0.

@@ -29,7 +29,7 @@ final class CollisionBoxComponent implements BlockComponent {
 			$boxes[] = $box->toNbtArray();
 		}
 		// if no boxes are defined we add a default full block box
-		if($this->enabled && empty($boxes)){
+		if($this->enabled && $boxes === []){
 			$boxes[] = Box::defaultBox()->toNbtArray();
 		}
 		// no collision
@@ -46,7 +46,6 @@ final class CollisionBoxComponent implements BlockComponent {
 	 * Adds a single collision box.
 	 * @param Box $box
 	 * The collision box to add.
-	 * @return $this
 	 */
 	public function addBox(Box $box): self {
 		if(count($this->boxes) === 1){
@@ -60,7 +59,6 @@ final class CollisionBoxComponent implements BlockComponent {
 	 * Adds multiple collision boxes.
 	 * @param Box[] $boxes
 	 * An array of collision boxes to add.
-	 * @return $this
 	 * @throws \InvalidArgumentException If any element in the array is not an instance of Box.
 	 */
 	public function addBoxes(array $boxes): self {

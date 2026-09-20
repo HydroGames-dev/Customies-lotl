@@ -14,7 +14,7 @@ final class MaxStackSizeComponent implements ItemComponent {
 	 * @param int $maxStackSize Max Size, Default is set to `64`
 	 */
 	public function __construct(int $maxStackSize = 64) {
-		if($maxStackSize < 1 || $maxStackSize > 64) {
+		if($maxStackSize < 1 || $maxStackSize > 64){
 			throw new \InvalidArgumentException("Max stack size must be between 1 and 64, $maxStackSize given.");
 		}
 		$this->maxStackSize = $maxStackSize;

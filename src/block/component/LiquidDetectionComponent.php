@@ -58,10 +58,10 @@ final class LiquidDetectionComponent implements BlockComponent {
 		bool $liquidClipping = false
 	) {
 		$this->canContainLiquid = $canContainLiquid;
+		$this->liquidClipping = $liquidClipping;
 		$this->liquidType = $liquidType;
 		$this->onLiquidTouches = $onLiquidTouches;
 		$this->stopsLiquidFlowingFromDirection = $stopsLiquidFlowingFromDirection;
-		$this->liquidClipping = $liquidClipping;
 	}
 
 	public function getName(): string {

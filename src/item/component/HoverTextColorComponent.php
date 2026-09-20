@@ -3,41 +3,43 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\item\component;
 
+use pocketmine\utils\TextFormat;
+
 final class HoverTextColorComponent implements ItemComponent {
 
 	private string $hoverTextColor;
 
 	/** @var array<string, string> */
 	private const COLOR_CODE_MAP = [
-		'black' => '§0',
-		'dark_blue' => '§1',
-		'dark_green' => '§2',
-		'dark_aqua' => '§3',
-		'dark_red' => '§4',
-		'dark_purple' => '§5',
-		'gold' => '§6',
-		'gray' => '§7',
-		'dark_gray' => '§8',
-		'blue' => '§9',
-		'green' => '§a',
-		'aqua' => '§b',
-		'red' => '§c',
-		'light_purple' => '§d',
-		'yellow' => '§e',
-		'white' => '§f',
-		'minecoin_gold' => '§g',
-		'material_quartz' => '§h',
-		'material_iron' => '§i',
-		'material_netherite' => '§j',
-		'material_redstone' => '§m',
-		'material_copper' => '§n',
-		'material_gold' => '§p',
-		'material_emerald' => '§q',
-		'material_diamond' => '§s',
-		'material_lapis' => '§t',
-		'material_amethyst' => '§u',
-		'material_resin' => '§v',
-		'party_blue_color' => '§w',
+		'black' => TextFormat::BLACK,
+		'dark_blue' => TextFormat::DARK_BLUE,
+		'dark_green' => TextFormat::DARK_GREEN,
+		'dark_aqua' => TextFormat::DARK_AQUA,
+		'dark_red' => TextFormat::DARK_RED,
+		'dark_purple' => TextFormat::DARK_PURPLE,
+		'gold' => TextFormat::GOLD,
+		'gray' => TextFormat::GRAY,
+		'dark_gray' => TextFormat::DARK_GRAY,
+		'blue' => TextFormat::BLUE,
+		'green' => TextFormat::GREEN,
+		'aqua' => TextFormat::AQUA,
+		'red' => TextFormat::RED,
+		'light_purple' => TextFormat::LIGHT_PURPLE,
+		'yellow' => TextFormat::YELLOW,
+		'white' => TextFormat::WHITE,
+		'minecoin_gold' => TextFormat::MINECOIN_GOLD,
+		'material_quartz' => TextFormat::MATERIAL_QUARTZ,
+		'material_iron' => TextFormat::MATERIAL_IRON,
+		'material_netherite' => TextFormat::MATERIAL_NETHERITE,
+		'material_redstone' => TextFormat::MATERIAL_REDSTONE,
+		'material_copper' => TextFormat::MATERIAL_COPPER,
+		'material_gold' => TextFormat::MATERIAL_GOLD,
+		'material_emerald' => TextFormat::MATERIAL_EMERALD,
+		'material_diamond' => TextFormat::MATERIAL_DIAMOND,
+		'material_lapis' => TextFormat::MATERIAL_LAPIS,
+		'material_amethyst' => TextFormat::MATERIAL_AMETHYST,
+		'material_resin' => TextFormat::MATERIAL_RESIN,
+		'party_blue' => TextFormat::PARTY_BLUE,
 	];
 
 	/**

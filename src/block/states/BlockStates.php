@@ -11,7 +11,6 @@ interface BlockStates {
 	/**
 	 * Adds a state to the block.
 	 * @param BlockState $trait
-	 * @return void
 	 */
 	public function addState(BlockState $trait): void;
 

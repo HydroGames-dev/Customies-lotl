@@ -29,7 +29,7 @@ final class CreativeInventoryInfo {
 	const GROUP_AXE = "itemGroup.name.axe";
 	const GROUP_BANNER = "itemGroup.name.banner";
 	const GROUP_BANNER_PATTERN = "itemGroup.name.banner_pattern";
-	const GROUP_BAR = "itemGroup.name.bars";
+	const GROUP_BARS = "itemGroup.name.bars";
 	const GROUP_BED = "itemGroup.name.bed";
 	const GROUP_BOAT = "itemGroup.name.boat";
 	const GROUP_BOOTS = "itemGroup.name.boots";
@@ -44,7 +44,7 @@ final class CreativeInventoryInfo {
 	const GROUP_CONCRETE = "itemGroup.name.concrete";
 	const GROUP_CONCRETE_POWDER = "itemGroup.name.concretePowder";
 	const GROUP_COOKED_FOOD = "itemGroup.name.cookedFood";
-	const GROUP_COOPPER = "itemGroup.name.copper";
+	const GROUP_COPPER = "itemGroup.name.copper";
 	const GROUP_CORAL = "itemGroup.name.coral";
 	const GROUP_CORAL_DECORATIONS = "itemGroup.name.coral_decorations";
 	const GROUP_CROP = "itemGroup.name.crop";
@@ -60,7 +60,7 @@ final class CreativeInventoryInfo {
 	const GROUP_GLASS_PANE = "itemGroup.name.glassPane";
 	const GROUP_GLAZED_TERRACOTTA = "itemGroup.name.glazedTerracotta";
 	const GROUP_GOAT_HORN = "itemGroup.name.goatHorn";
-	const GROUP_GOLEM_STATUE = "itemGroup.name.copper_golem_statue";
+	const GROUP_COPPER_GOLEM_STATUE = "itemGroup.name.copper_golem_statue";
 	const GROUP_GRASS = "itemGroup.name.grass";
 	const GROUP_HANGING_SIGN = "itemGroup.name.hanging_sign";
 	const GROUP_HARNESSES = "itemGroup.name.harnesses";
@@ -73,13 +73,13 @@ final class CreativeInventoryInfo {
 	const GROUP_LIGHTNING_ROD = "itemGroup.name.lightning_rod";
 	const GROUP_LINGERING_POTION = "itemGroup.name.lingeringPotion";
 	const GROUP_LOG = "itemGroup.name.log";
-	const GROUP_MINECRAFT = "itemGroup.name.minecart";
+	const GROUP_MINECART = "itemGroup.name.minecart";
 	const GROUP_MISC_FOOD = "itemGroup.name.miscFood";
-	const GROUP_MOB_EGGS = "itemGroup.name.mobEgg";
+	const GROUP_MOB_EGG = "itemGroup.name.mobEgg";
 	const GROUP_MONSTER_STONE_EGG = "itemGroup.name.monsterStoneEgg";
 	const GROUP_MUSHROOM = "itemGroup.name.mushroom";
 	const GROUP_NAUTILUS_ARMOR = "itemGroup.name.nautilus_armor";
-	const GROUP_NETHERWART_BLOCK = "itemGroup.name.netherWartBlock";
+	const GROUP_NETHER_WART_BLOCK = "itemGroup.name.netherWartBlock";
 	const GROUP_OMINOUS_BOTTLE = "itemGroup.name.ominousBottle";
 	const GROUP_ORE = "itemGroup.name.ore";
 	const GROUP_PERMISSION = "itemGroup.name.permission";
@@ -101,7 +101,7 @@ final class CreativeInventoryInfo {
 	const GROUP_SIGN = "itemGroup.name.sign";
 	const GROUP_SKULL = "itemGroup.name.skull";
 	const GROUP_SLAB = "itemGroup.name.slab";
-	const GROUP_SLASH_POTION = "itemGroup.name.splashPotion";
+	const GROUP_SPLASH_POTION = "itemGroup.name.splashPotion";
 	const GROUP_SMITHING_TEMPLATES = "itemGroup.name.smithing_templates";
 	const GROUP_SPEAR = "itemGroup.name.spear";
 	const GROUP_STAINED_CLAY = "itemGroup.name.stainedClay";
@@ -146,7 +146,7 @@ final class CreativeInventoryInfo {
 	 * @return int
 	 */
 	public function getNumericCategory(): int {
-		return match ($this->category) {
+		return match($this->category){
 			self::CATEGORY_CONSTRUCTION => 1,
 			self::CATEGORY_NATURE => 2,
 			self::CATEGORY_EQUIPMENT => 3,
@@ -165,7 +165,6 @@ final class CreativeInventoryInfo {
 
 	/**
 	 * Loads all existing creative groups from the Creative Inventory.
-	 * @return void
 	 */
 	public static function load(): void {
 		if(self::$groups !== null){
@@ -194,7 +193,6 @@ final class CreativeInventoryInfo {
 	/**
 	 * Sets a CreativeGroup instance in the internal list.
 	 * @param CreativeGroup $group
-	 * @return void
 	 */
 	public static function set(CreativeGroup $group): void {
 		self::load();
@@ -211,7 +209,7 @@ final class CreativeInventoryInfo {
 	}
 
 	/**
-	 * Registers the Item/Bloxk in the creative inventory based on the provided CreativeInventoryInfo.
+	 * Registers the Item/Block in the creative inventory based on the provided CreativeInventoryInfo.
 	 * @param Item|Block $type The item/block to register
 	 * @param CreativeInventoryInfo $creativeInfo The creative inventory information
 	 */
@@ -219,6 +217,10 @@ final class CreativeInventoryInfo {
 		Item|Block $type,
 		CreativeInventoryInfo $creativeInfo
 	): void {
+		// temporary workaround 
+		if(\pmmp\thread\Thread::getCurrentThread() instanceof \pmmp\thread\Worker){
+			return;
+		}
 		if(
 			$creativeInfo->getCategory() === self::CATEGORY_ALL || 
 			$creativeInfo->getCategory() === self::CATEGORY_COMMANDS
@@ -227,8 +229,7 @@ final class CreativeInventoryInfo {
 		}
 		$group = null;
 		if($creativeInfo->getGroup() !== CreativeInventoryInfo::NONE){
-			$group = CreativeInventoryInfo::get($creativeInfo->getGroup())
-			?? new CreativeGroup(
+			$group = CreativeInventoryInfo::get($creativeInfo->getGroup()) ?? new CreativeGroup(
 				new Translatable($creativeInfo->getGroup()),
 				$type instanceof Block ? $type->asItem() : $type
 			);

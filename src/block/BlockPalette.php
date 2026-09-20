@@ -23,7 +23,7 @@ final class BlockPalette {
 	use SingletonTrait;
 
 	/** @var BlockStateDictionaryEntry[] */
-	private array $states;
+	private array $states = [];
 	/** @var BlockStateDictionaryEntry[] */
 	private array $customStates = [];
 
@@ -64,29 +64,31 @@ final class BlockPalette {
 	 * Inserts the provided state in to the correct position of the palette.
 	 * @param CompoundTag $state
 	 * @param int $meta
-	 * @return void
 	 */
 	public function insertState(CompoundTag $state, int $meta = 0): void {
-		if(($name = $state->getString(BlockStateData::TAG_NAME, "")) === "") {
+		if(($name = $state->getString(BlockStateData::TAG_NAME, "")) === ""){
 			throw new RuntimeException("Block state must contain a StringTag called 'name'");
 		}
-		if(($properties = $state->getCompoundTag(BlockStateData::TAG_STATES)) === null) {
+		if(($properties = $state->getCompoundTag(BlockStateData::TAG_STATES)) === null){
 			throw new RuntimeException("Block state must contain a CompoundTag called 'states'");
 		}
-		$this->sortWith($entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta));
+		// $this->sortWith($entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta));
+		// $this->customStates[] = $entry;
+		$entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta);
 		$this->customStates[] = $entry;
+		$this->sortWith($entry);
 	}
 
 	/**
 	 * Sorts the palette's block states in the correct order, also adding the provided state to the array.
 	 * @param BlockStateDictionaryEntry $newState
-	 * @return void
 	 */
 	private function sortWith(BlockStateDictionaryEntry $newState): void {
 		// To sort the block palette we first have to split the palette up in to groups of states. We only want to sort
 		// using the name of the block, and keeping the order of the existing states.
+		/** @var array<string, BlockStateDictionaryEntry[]> $states */
 		$states = [];
-		foreach($this->getStates() as $state){
+		foreach($this->states as $state){
 			$states[$state->getStateName()][] = $state;
 		}
 		// Append the new state we are sorting with at the end to preserve existing order.
@@ -102,7 +104,7 @@ final class BlockPalette {
 			// With the sorted list of names, we can now go back and add all the states for each block in the correct order.
 			foreach($states[$name] as $state){
 				$sortedStates[$stateId] = $state;
-				if(count($states[$name]) === 1) {
+				if(count($states[$name]) === 1){
 					$stateDataToStateIdLookup[$name] = $stateId;
 				}else{
 					$stateDataToStateIdLookup[$name][$state->getRawStateProperties()] = $stateId;

@@ -14,7 +14,7 @@ final class BundleInteractionComponent implements ItemComponent {
 	 * @throws \InvalidArgumentException if the number of viewable slots is not between 1 and 64.
 	 */
 	public function __construct(int $numViewableSlots = 12) {
-		if($numViewableSlots < 1 || $numViewableSlots > 64) {
+		if($numViewableSlots < 1 || $numViewableSlots > 64){
 			throw new \InvalidArgumentException("Number of viewable-slots must be between 1 and 64, $numViewableSlots given");
 		}
 		$this->numViewableSlots = $numViewableSlots;

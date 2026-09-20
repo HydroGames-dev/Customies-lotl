@@ -66,9 +66,7 @@ final class EnchantableComponent implements ItemComponent {
 	 * @throws \InvalidArgumentException if the value is not between 0 and 32767.
 	 */
 	public function __construct(string $slot = self::SLOT_NONE, int $value = 0) {
-		if($value < 0 || $value > 32767){
-			throw new \InvalidArgumentException("Enchantable value must be between 0 and 32767, $value given");
-		}
+		self::validate($value);
 		$this->slot = $slot;
 		$this->value = $value;
 	}
@@ -86,5 +84,11 @@ final class EnchantableComponent implements ItemComponent {
 
 	public function getPropertyMapping(): ?array {
 		return ['enchantable_slot' => (string) $this->slot, 'enchantable_value' => (int) $this->value];
+	}
+
+	private static function validate(int $value): void {
+		if($value < 0 || $value > 32767){
+			throw new \InvalidArgumentException("Enchantable value must be between 0 and 32767, $value given");
+		}
 	}
 }

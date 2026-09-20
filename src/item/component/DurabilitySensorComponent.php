@@ -67,7 +67,6 @@ final class DurabilitySensorComponent implements ItemComponent {
 	 * @param int $durability The durability threshold at which the effects are triggered. Must be >= 0.
 	 * @param ParticleType|null $particleType The type of particle effect to emit when the threshold is reached. If null, no particle effect is emitted.
 	 * @param SoundEvent|null $soundEvent The sound event to play when the threshold is reached. If null, no sound is played.
-	 * @return $this
 	 */
 	public function addDurabilityThreshold(
 		int $durability,

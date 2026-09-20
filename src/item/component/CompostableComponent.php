@@ -15,7 +15,7 @@ final class CompostableComponent implements ItemComponent {
 	 * @throws \InvalidArgumentException if the composting chance is not between 1 and 100.
 	 */
 	public function __construct(int $compostingChance) {
-		if($compostingChance < 1 || $compostingChance > 100) {
+		if($compostingChance < 1 || $compostingChance > 100){
 			throw new \InvalidArgumentException("Composting chance must be between 1 and 100, $compostingChance given");
 		}
 		$this->compostingChance = $compostingChance;

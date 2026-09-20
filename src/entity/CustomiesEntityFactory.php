@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\entity;
 
-use Closure;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
@@ -14,6 +13,7 @@ use pocketmine\network\mcpe\protocol\AvailableActorIdentifiersPacket;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
+use Closure;
 use ReflectionClass;
 
 final class CustomiesEntityFactory {
@@ -36,7 +36,6 @@ final class CustomiesEntityFactory {
 	 * Updates the AvailableActorIdentifiersPacket to include the new entity.
 	 * @param string $identifier example: "customies:my_entity"
 	 * @param string $behaviourId
-	 * @return void
 	 */
 	private function updateStaticPacketCache(string $identifier, string $behaviourId): void {
 		$instance = StaticPacketCache::getInstance();

@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\task;
 
-use Closure;
 use customiesdevs\customies\block\CustomiesBlockFactory;
 use pmmp\thread\ThreadSafeArray;
 use pocketmine\block\Block;
 use pocketmine\data\bedrock\block\convert\BlockStateReader;
 use pocketmine\data\bedrock\block\convert\BlockStateWriter;
 use pocketmine\scheduler\AsyncTask;
+use Closure;
 
 final class AsyncRegisterBlocksTask extends AsyncTask {
 

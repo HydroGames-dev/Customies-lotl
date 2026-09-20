@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace customiesdevs\customies\block\permutations\traits;
+namespace customiesdevs\customies\block\permutations\states;
 
 use customiesdevs\customies\block\component\TransformationComponent;
 use customiesdevs\customies\block\permutations\BlockPermutation;
@@ -67,21 +67,23 @@ trait CardinalDirectionRotationTrait {
 	public function serializeState(BlockStateWriter $out): void {
 		$out->writeString(
 			"minecraft:cardinal_direction",
-			match($this->facing) {
+			match($this->facing){
 				Facing::NORTH => "north",
 				Facing::SOUTH => "south",
 				Facing::WEST => "west",
 				Facing::EAST => "east",
+				default => "north",
 			}
 		);
 	}
 
 	public function deserializeState(BlockStateReader $in): void {
-		$this->facing = match($in->readString("minecraft:cardinal_direction")) {
+		$this->facing = match($in->readString("minecraft:cardinal_direction")){
 			"north" => Facing::NORTH,
 			"south" => Facing::SOUTH,
 			"west" => Facing::WEST,
 			"east" => Facing::EAST,
+			default => Facing::NORTH,
 		};
 	}
 }
