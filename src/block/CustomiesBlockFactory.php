@@ -199,6 +199,7 @@ final class CustomiesBlockFactory {
 		// it a smoother experience for the end-user.
 		$componentsTag->setTag("minecraft:on_player_placing", CompoundTag::create());
 		$nbtTag->setTag("blockTags", new ListTag(array_map(static fn(string $tag) => new StringTag($tag), array_values($blockTags))));
+		$nbtTag->setTag("components", $componentsTag);
 		$nbtTag->setInt("molangVersion", 13);
 		// Registers the block to creative inventory
 		CreativeInventoryInfo::registerCreativeInfo($block, $creativeInfo);

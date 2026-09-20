@@ -72,11 +72,8 @@ final class BlockPalette {
 		if(($properties = $state->getCompoundTag(BlockStateData::TAG_STATES)) === null){
 			throw new RuntimeException("Block state must contain a CompoundTag called 'states'");
 		}
-		// $this->sortWith($entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta));
-		// $this->customStates[] = $entry;
-		$entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta);
+		$this->sortWith($entry = new BlockStateDictionaryEntry($name, $properties->getValue(), $meta));
 		$this->customStates[] = $entry;
-		$this->sortWith($entry);
 	}
 
 	/**
