@@ -12,7 +12,7 @@ interface BlockComponent {
 	public function getName(): string;
 
 	/**
-	 * The value of this component, as it would appear in a block JSON.
+	 * Component payload for client NBT; some keys differ from behavior-pack JSON.
 	 * @return mixed
 	 */
 	public function getValue(): mixed;

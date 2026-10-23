@@ -3,6 +3,7 @@
 namespace customiesdevs\customies\block\component;
 
 use pocketmine\nbt\tag\ByteTag;
+use customiesdevs\customies\util\ComponentValidation;
 
 final class LiquidDetectionComponent implements BlockComponent {
 
@@ -57,11 +58,17 @@ final class LiquidDetectionComponent implements BlockComponent {
 		array $stopsLiquidFlowingFromDirection = [],
 		bool $liquidClipping = false
 	) {
+		if($liquidType !== self::LIQUID_WATER){
+			throw new \InvalidArgumentException('Only water liquid detection is supported');
+		}
+		if(!in_array($onLiquidTouches, [self::BLOCKING, self::BROKEN, self::POPPED, self::NO_REACTION], true)){
+			throw new \InvalidArgumentException('Invalid liquid reaction');
+		}
 		$this->canContainLiquid = $canContainLiquid;
 		$this->liquidClipping = $liquidClipping;
 		$this->liquidType = $liquidType;
 		$this->onLiquidTouches = $onLiquidTouches;
-		$this->stopsLiquidFlowingFromDirection = $stopsLiquidFlowingFromDirection;
+		$this->stopsLiquidFlowingFromDirection = ComponentValidation::faces($stopsLiquidFlowingFromDirection);
 	}
 
 	public function getName(): string {

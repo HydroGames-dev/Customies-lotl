@@ -12,7 +12,7 @@ interface ItemComponent {
 	public function getName(): string;
 
 	/**
-	 * The value of this component, as it would appear in an item JSON.
+	 * Component payload for client NBT. Explicit Tag values preserve wire types.
 	 * @return mixed
 	 */
 	public function getValue(): mixed;

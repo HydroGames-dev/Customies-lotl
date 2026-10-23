@@ -12,6 +12,8 @@ use pocketmine\data\bedrock\item\SavedItemData;
 use pocketmine\item\Item;
 use pocketmine\item\StringToItemParser;
 use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\convert\TypeConverter;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
@@ -185,7 +187,7 @@ final class CustomiesItemFactory {
 		$propertiesTag = NBT::sortCompoundTag($propertiesTag, self::PROPERTY_ORDER);
 		$components = CompoundTag::create()
 			->setTag('item_properties', $propertiesTag)
-			->setTag('item_tags', NBT::getTagType($tags))
+			->setTag('item_tags', new ListTag(array_map(static fn(string $tag) => new StringTag($tag), array_values($tags))))
 			->merge($componentsTag);
 
 		return CompoundTag::create()
@@ -233,7 +235,7 @@ final class CustomiesItemFactory {
 		StringToItemParser::getInstance()->registerBlock($identifier, fn() => clone $block);
 		$entry = new ItemTypeEntry($identifier, $itemId, false, 2, new CacheableNbt(CompoundTag::create()));
 
-		$this->itemTableEntries[] = $entry;
+		$this->itemTableEntries[$identifier] = $entry;
 		$this->registerCustomItemMapping($identifier, $itemId, $entry);
 
 		$blockItemIdMap = BlockItemIdMap::getInstance();

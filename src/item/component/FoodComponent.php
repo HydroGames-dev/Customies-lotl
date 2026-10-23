@@ -165,6 +165,9 @@ final class FoodComponent implements ItemComponent {
 		if($amplifier < 0){
 			throw new \InvalidArgumentException("Effect amplifier must be >= 0");
 		}
+		if(!is_finite($chance) || $chance < 0 || $chance > 1){
+			throw new \InvalidArgumentException('Effect chance must be between 0 and 1');
+		}
 		$this->effects[] = [
 			"name" => $effect->getName(),
 			"id" => $effect->getId(),

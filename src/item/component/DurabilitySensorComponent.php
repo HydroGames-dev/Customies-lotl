@@ -11,8 +11,8 @@ final class DurabilitySensorComponent implements ItemComponent {
 	/**
 	 * @var array<int, array{
 	 *     durability: int,
-	 *     particle_type: ?ParticleType,
-	 *     sound_event: ?SoundEvent
+	 *     particle_type?: string,
+	 *     sound_event?: string
 	 * }>
 	 */
 	private array $durabilityThresholds = [];
@@ -30,8 +30,8 @@ final class DurabilitySensorComponent implements ItemComponent {
 			$durabilityThresholds = [$durabilityThresholds];
 		}
 		foreach($durabilityThresholds as $threshold){
-			if(!is_array($threshold)){
-				throw new \InvalidArgumentException("Durability threshold must be an array");
+			if(!is_array($threshold) || !isset($threshold['durability']) || !is_int($threshold['durability'])){
+				throw new \InvalidArgumentException('Durability threshold must contain an integer durability');
 			}
 			$this->addDurabilityThreshold(
 				$threshold['durability'],
@@ -46,16 +46,10 @@ final class DurabilitySensorComponent implements ItemComponent {
 	}
 
 	public function getValue(): array {
-		return [
-			"durability_thresholds" => array_map(
-				fn(array $threshold) => [
-					"durability" => $threshold["durability"],
-					"particle_type" => $threshold["particle_type"],
-					"sound_event" => $threshold["sound_event"]
-				],
-				$this->durabilityThresholds
-			)
-		];
+		if($this->durabilityThresholds === []){
+			throw new \InvalidArgumentException('At least one durability threshold is required');
+		}
+		return ['durability_thresholds' => $this->durabilityThresholds];
 	}
 
 	public function getPropertyMapping(): ?array {
@@ -79,11 +73,14 @@ final class DurabilitySensorComponent implements ItemComponent {
 		if($particleType === null && $soundEvent === null){
 			throw new \InvalidArgumentException("At least one of particle_type or sound_event must be specified");
 		}
-		$this->durabilityThresholds[] = [
-			"durability" => $durability,
-			"particle_type" => $particleType->value,
-			"sound_event" => $soundEvent->value
-		];
+		$threshold = ['durability' => $durability];
+		if($particleType !== null){
+			$threshold['particle_type'] = $particleType->value;
+		}
+		if($soundEvent !== null){
+			$threshold['sound_event'] = $soundEvent->value;
+		}
+		$this->durabilityThresholds[] = $threshold;
 		return $this;
 	}
 }

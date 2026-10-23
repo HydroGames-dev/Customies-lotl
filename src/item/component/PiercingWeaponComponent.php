@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\item\component;
 
+use customiesdevs\customies\util\ComponentValidation;
+
 final class PiercingWeaponComponent implements ItemComponent {
 
 	/** @var array The reach of the weapon in creative mode */
@@ -14,17 +16,20 @@ final class PiercingWeaponComponent implements ItemComponent {
 
 	/**
 	 * The piercing weapon component defines the behavior of piercing weapons, which can hit multiple entities in a single attack.
-	 * @param array $creativeReach The reach of the weapon in creative mode
+	 * @param array|null $creativeReach The reach of the weapon in creative mode
 	 * @param float $hitboxMargin The margin added to the hitbox of the weapon
 	 * @param array $reach The reach of the weapon in survival mode
 	 */
 	public function __construct(
-		array $creativeReach = ['max' => 7.5, 'min' => 2.0],
-		float $hitboxMargin = 0.25,
-		array $reach = ['max' => 4.5, 'min' => 2.0]
+		?array $creativeReach = null,
+		float $hitboxMargin = 0.0,
+		array $reach = ['max' => 3.0, 'min' => 0.0]
 	) {
-		$this->creativeReach = self::validateRange($creativeReach, 'creative_reach');
+		$this->creativeReach = self::validateRange($creativeReach ?? $reach, 'creative_reach');
 		$this->reach = self::validateRange($reach, 'reach');
+		if(!is_finite($hitboxMargin)){
+			throw new \InvalidArgumentException('hitboxMargin must be finite');
+		}
 		$this->hitboxMargin = $hitboxMargin;
 	}
 
@@ -45,13 +50,7 @@ final class PiercingWeaponComponent implements ItemComponent {
 	}
 
 	private static function validateRange(array $range, string $name): array {
-		if(!isset($range['max'], $range['min'])){
-			throw new \InvalidArgumentException("$name must contain min and max values");
-		}
-		return [
-			'max' => (float) $range['max'],
-			'min' => (float) $range['min']
-		];
+		return ComponentValidation::floatRange($range, $name);
 	}
 
 	private static function rangeToArray(array $range): array {

@@ -16,6 +16,8 @@ The usage guides have been moved to the [Customies Wiki](https://github.com/Cust
 
 Follow this Wiki https://github.com/nk-archives/Customies/wiki
 
+Component wrappers track the Mojang item **1.26.30** and block **1.26.20** schema catalogs. See [component updates and migration notes](docs/components.md) for new components, changed defaults, server behavior requirements, and verification commands.
+
 [![Mojang Item Docs](https://img.shields.io/badge/📖-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponentlist?view=minecraft-bedrock-stable)
 [![Mojang Block Docs](https://img.shields.io/badge/📖-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable)
 

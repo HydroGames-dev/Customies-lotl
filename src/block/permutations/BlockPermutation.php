@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\permutations;
 
 use customiesdevs\customies\block\component\BlockComponent;
+use customiesdevs\customies\block\component\RedstoneConsumerComponent;
 
 class BlockPermutation {
 
@@ -14,7 +15,11 @@ class BlockPermutation {
 	public function __construct(
 		private readonly string $condition,
 		private readonly BlockComponent $components
-	) {}
+	) {
+		if($components instanceof RedstoneConsumerComponent){
+			throw new \InvalidArgumentException('minecraft:redstone_consumer cannot be used in block permutations');
+		}
+	}
 
 	/**
 	 * Gets the condition string for this permutation.

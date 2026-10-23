@@ -31,6 +31,9 @@ final class DamageAbsorptionComponent implements ItemComponent {
 	}
 
 	public function getValue(): array {
+		if($this->absorbableCauses === []){
+			throw new \InvalidArgumentException('At least one absorbable damage cause is required');
+		}
 		return [
 			'absorbable_causes' => array_map(
 				static fn (DamageCause $cause) => $cause->value,
@@ -49,10 +52,11 @@ final class DamageAbsorptionComponent implements ItemComponent {
 	 */
 	public function addCause(DamageCause|string $cause): self {
 		if(is_string($cause)){
-			$cause = DamageCause::tryFrom($cause);
-			if($cause === null){
+			$parsedCause = DamageCause::tryFrom($cause);
+			if($parsedCause === null){
 				throw new \InvalidArgumentException("Invalid damage cause: {$cause}");
 			}
+			$cause = $parsedCause;
 		}
 		if(!in_array($cause, $this->absorbableCauses, true)){
 			$this->absorbableCauses[] = $cause;

@@ -16,7 +16,7 @@ final class DyeableComponent implements ItemComponent {
 	 * @param string $hex Hex color code (e.g. "#175882")
 	 * @throws \InvalidArgumentException If the hex code is invalid
 	 */
-	public function __construct(string $hex) {
+	public function __construct(string $hex = '#ffffff') {
 		$this->rgb = self::hexToRgb($hex);
 	}
 
@@ -42,8 +42,10 @@ final class DyeableComponent implements ItemComponent {
 	 * @throws \InvalidArgumentException If the hex code is invalid
 	 */
 	private static function hexToRgb(string $hex): array {
+		if(preg_match('/^#?[0-9a-fA-F]{6}$/D', $hex) !== 1){
+			throw new \InvalidArgumentException("Invalid hex color: {$hex}");
+		}
 		$hex = ltrim($hex, '#');
-		if(strlen($hex) !== 6) throw new \InvalidArgumentException("Invalid hex color: {$hex}");
 		return [
 			hexdec(substr($hex, 0, 2)),
 			hexdec(substr($hex, 2, 2)),

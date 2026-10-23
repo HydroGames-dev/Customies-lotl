@@ -22,6 +22,9 @@ final class StorageItemComponent implements ItemComponent {
 		bool $allowNestedStorageItems = true,
 		int $maxSlots = 64
 	) {
+		if($maxSlots < 0 || $maxSlots > 64){
+			throw new \InvalidArgumentException('maxSlots must be between 0 and 64');
+		}
 		$this->allowNestedStorageItems = $allowNestedStorageItems;
 		$this->maxSlots = $maxSlots;
 	}

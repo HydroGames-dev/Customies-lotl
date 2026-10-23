@@ -24,10 +24,16 @@ final class UseModifiersComponent implements ItemComponent {
 	public function __construct(
 		float $movementModifier = 1.0,
 		float $useDuration = 0.0,
-		bool $emitVibrations = false,
+		bool $emitVibrations = true,
 		SoundEvent|string|null $startSound = null,
-		string $startUsing = 'always'
+		string $startUsing = 'if_first'
 	) {
+		if(!is_finite($movementModifier) || $movementModifier < 0 || $movementModifier > 1){
+			throw new \InvalidArgumentException('movementModifier must be between 0 and 1');
+		}
+		if(!is_finite($useDuration) || $useDuration < 0){
+			throw new \InvalidArgumentException('useDuration must be finite and >= 0');
+		}
 		if(!in_array($startUsing, ['always', 'if_first'], true)){
 			throw new \InvalidArgumentException('startUsing must be either "always" or "if_first", got "' . $startUsing . '"');
 		}

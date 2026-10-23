@@ -10,15 +10,13 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\nbt\tag\Tag;
-use function array_keys;
+use function array_is_list;
 use function array_map;
-use function count;
 use function is_array;
 use function is_bool;
 use function is_float;
 use function is_int;
 use function is_string;
-use function range;
 
 final class NBT {
 
@@ -56,7 +54,9 @@ final class NBT {
 	 * @throws \InvalidArgumentException If any value cannot be converted to a Tag
 	 */
 	private static function getArrayTag(array $array): Tag {
-		if(array_keys($array) === range(0, count($array) - 1)){
+		// Empty arrays remain compounds for marker components (e.g. replaceable).
+		// Callers requiring an empty list must supply an explicit ListTag.
+		if($array !== [] && array_is_list($array)){
 			return new ListTag(array_map(function($value){
 				$tag = self::getTagType($value);
 				if($tag === null){

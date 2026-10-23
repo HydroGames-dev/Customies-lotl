@@ -12,6 +12,9 @@ final class StorageWeightModifierComponent implements ItemComponent {
 	 * @param int $weightInStorageItem The weight of this item when inside another Storage Item. Default is 4. 0 means item is not allowed in another Storage Item.
 	 */
 	public function __construct(int $weightInStorageItem = 4) {
+		if($weightInStorageItem < 0){
+			throw new \InvalidArgumentException('weightInStorageItem must be >= 0');
+		}
 		$this->weightInStorageItem = $weightInStorageItem;
 	}
 
