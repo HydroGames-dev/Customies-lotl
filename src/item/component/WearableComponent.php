@@ -24,6 +24,9 @@ final class WearableComponent implements ItemComponent {
 	 * @param bool $hidePlayerLocation Determines whether the Player's location is hidden on Locator Maps and the Locator Bar when the wearable item is worn. Default is false.
 	 */
 	public function __construct(string $slot, int $protection = 0, bool $hidePlayerLocation = false) {
+		if($protection < 0){
+			throw new \InvalidArgumentException('protection must be >= 0');
+		}	
 		$this->slot = $slot;
 		$this->protection = $protection;
 		$this->hidePlayerLocation = $hidePlayerLocation;

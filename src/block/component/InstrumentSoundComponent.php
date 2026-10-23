@@ -32,6 +32,9 @@ final class InstrumentSoundComponent implements BlockComponent {
 		SoundEvent|string|null $upNote = "note.harp",
 		SoundEvent|string|null $downNote = "note.none"
 	) {
+		if($upNote === null && $downNote === null){
+			throw new \InvalidArgumentException('At least one instrument face must be defined');
+		}
 		$this->upNote = $upNote instanceof SoundEvent ? (string) $upNote->value : $upNote;
 		$this->downNote = $downNote instanceof SoundEvent ? (string) $downNote->value : $downNote;
 	}
@@ -41,9 +44,9 @@ final class InstrumentSoundComponent implements BlockComponent {
 	}
 
 	public function getValue(): array {
-		return [
+		return array_filter([
 			"up" => $this->upNote,
 			"down" => $this->downNote
-		];
+		], static fn(?string $sound): bool => $sound !== null);
 	}
 }
