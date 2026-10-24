@@ -1,0 +1,173 @@
+{
+  "resource_pack_name": "CustomiesShowcase",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "showcase_prism_lamp": {
+      "textures": "textures/blocks/showcase_prism_lamp"
+    },
+    "showcase_machine": {
+      "textures": "textures/blocks/showcase_machine"
+    },
+    "showcase_orienter": {
+      "textures": "textures/blocks/showcase_orienter"
+    },
+    "showcase_face_marker": {
+      "textures": "textures/blocks/showcase_face_marker"
+    },
+    "showcase_slab": {
+      "textures": "textures/blocks/showcase_slab"
+    },
+    "showcase_cable": {
+      "textures": "textures/blocks/showcase_cable"
+    },
+    "showcase_corner_stairs": {
+      "textures": "textures/blocks/showcase_corner_stairs"
+    },
+    "showcase_totem": {
+      "textures": "textures/blocks/showcase_totem"
+    },
+    "showcase_bench": {
+      "textures": "textures/blocks/showcase_bench"
+    },
+    "showcase_rotor": {
+      "textures": "textures/blocks/showcase_rotor"
+    },
+    "showcase_phase_block": {
+      "textures": "textures/blocks/showcase_phase_block"
+    },
+    "showcase_ice_tile": {
+      "textures": "textures/blocks/showcase_ice_tile"
+    },
+    "showcase_glow_flower": {
+      "textures": "textures/blocks/showcase_glow_flower"
+    },
+    "showcase_machine_front": {
+      "textures": "textures/blocks/showcase_machine_front"
+    },
+    "showcase_orienter_front": {
+      "textures": "textures/blocks/showcase_orienter_front"
+    },
+    "showcase_face_marker_front": {
+      "textures": "textures/blocks/showcase_face_marker_front"
+    },
+    "showcase_lamp_on": {
+      "textures": "textures/blocks/showcase_lamp_on"
+    },
+    "showcase_totem_mid": {
+      "textures": "textures/blocks/showcase_totem_mid"
+    },
+    "showcase_totem_top": {
+      "textures": "textures/blocks/showcase_totem_top"
+    },
+    "showcase_phase_blue": {
+      "textures": "textures/blocks/showcase_phase_blue"
+    },
+    "showcase_phase_ghost": {
+      "textures": "textures/blocks/showcase_phase_ghost"
+    },
+    "showcase_lab": {
+      "textures": "textures/blocks/showcase_lab"
+    },
+    "showcase_lab_block_block_entity": {
+      "textures": "textures/blocks/showcase_lab_block_block_entity"
+    },
+    "showcase_lab_block_block_tags": {
+      "textures": "textures/blocks/showcase_lab_block_block_tags"
+    },
+    "showcase_lab_block_chest_obstruction": {
+      "textures": "textures/blocks/showcase_lab_block_chest_obstruction"
+    },
+    "showcase_lab_block_collision_box": {
+      "textures": "textures/blocks/showcase_lab_block_collision_box"
+    },
+    "showcase_lab_block_connection_rule": {
+      "textures": "textures/blocks/showcase_lab_block_connection_rule"
+    },
+    "showcase_lab_block_crafting_table": {
+      "textures": "textures/blocks/showcase_lab_block_crafting_table"
+    },
+    "showcase_lab_block_destructible_by_explosion": {
+      "textures": "textures/blocks/showcase_lab_block_destructible_by_explosion"
+    },
+    "showcase_lab_block_destructible_by_mining": {
+      "textures": "textures/blocks/showcase_lab_block_destructible_by_mining"
+    },
+    "showcase_lab_block_destruction_particles": {
+      "textures": "textures/blocks/showcase_lab_block_destruction_particles"
+    },
+    "showcase_lab_block_display_name": {
+      "textures": "textures/blocks/showcase_lab_block_display_name"
+    },
+    "showcase_lab_block_embedded_visual": {
+      "textures": "textures/blocks/showcase_lab_block_embedded_visual"
+    },
+    "showcase_lab_block_entity_fall_on": {
+      "textures": "textures/blocks/showcase_lab_block_entity_fall_on"
+    },
+    "showcase_lab_block_flammable": {
+      "textures": "textures/blocks/showcase_lab_block_flammable"
+    },
+    "showcase_lab_block_flower_pottable": {
+      "textures": "textures/blocks/showcase_lab_block_flower_pottable"
+    },
+    "showcase_lab_block_friction": {
+      "textures": "textures/blocks/showcase_lab_block_friction"
+    },
+    "showcase_lab_block_geometry": {
+      "textures": "textures/blocks/showcase_lab_block_geometry"
+    },
+    "showcase_lab_block_instrument_sound": {
+      "textures": "textures/blocks/showcase_lab_block_instrument_sound"
+    },
+    "showcase_lab_block_item_visual": {
+      "textures": "textures/blocks/showcase_lab_block_item_visual"
+    },
+    "showcase_lab_block_leashable": {
+      "textures": "textures/blocks/showcase_lab_block_leashable"
+    },
+    "showcase_lab_block_light_dampening": {
+      "textures": "textures/blocks/showcase_lab_block_light_dampening"
+    },
+    "showcase_lab_block_light_emission": {
+      "textures": "textures/blocks/showcase_lab_block_light_emission"
+    },
+    "showcase_lab_block_liquid_detection": {
+      "textures": "textures/blocks/showcase_lab_block_liquid_detection"
+    },
+    "showcase_lab_block_map_color": {
+      "textures": "textures/blocks/showcase_lab_block_map_color"
+    },
+    "showcase_lab_block_material_instances": {
+      "textures": "textures/blocks/showcase_lab_block_material_instances"
+    },
+    "showcase_lab_block_movable": {
+      "textures": "textures/blocks/showcase_lab_block_movable"
+    },
+    "showcase_lab_block_placement_filter": {
+      "textures": "textures/blocks/showcase_lab_block_placement_filter"
+    },
+    "showcase_lab_block_precipitation_interactions": {
+      "textures": "textures/blocks/showcase_lab_block_precipitation_interactions"
+    },
+    "showcase_lab_block_random_offset": {
+      "textures": "textures/blocks/showcase_lab_block_random_offset"
+    },
+    "showcase_lab_block_replaceable": {
+      "textures": "textures/blocks/showcase_lab_block_replaceable"
+    },
+    "showcase_lab_block_selection_box": {
+      "textures": "textures/blocks/showcase_lab_block_selection_box"
+    },
+    "showcase_lab_block_sound": {
+      "textures": "textures/blocks/showcase_lab_block_sound"
+    },
+    "showcase_lab_block_support": {
+      "textures": "textures/blocks/showcase_lab_block_support"
+    },
+    "showcase_lab_block_transformation": {
+      "textures": "textures/blocks/showcase_lab_block_transformation"
+    }
+  }
+}

@@ -18,7 +18,7 @@ final class ProjectileComponent implements ItemComponent {
 	 * @param float $minimumCriticalPower Specifies how long a player must charge a projectile for it to critically hit
 	 * @param string $projectileEntity Which entity is to be fired as a projectile
 	 */
-	public function __construct(float $minimumCriticalPower = 0, string $projectileEntity) {
+	public function __construct(float $minimumCriticalPower, string $projectileEntity) {
 		$this->minimumCriticalPower = $minimumCriticalPower;
 		$this->projectileEntity = $projectileEntity;
 	}

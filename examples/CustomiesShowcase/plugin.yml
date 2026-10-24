@@ -1,0 +1,18 @@
+name: CustomiesShowcase
+main: customiesdevs\showcase\ShowcasePlugin
+src-namespace-prefix: customiesdevs\showcase
+version: 1.0.0
+api: 5.49.0
+load: POSTWORLD
+depend: [Customies-Axolotl]
+author: HydroGames-dev
+description: Playable Customies examples and a complete component laboratory.
+commands:
+  cshow:
+    description: Browse, give, and inspect Customies showcase specimens
+    usage: "/cshow <list|give|kit|inspect> [id/page] [amount]"
+    permission: customiesshowcase.command
+permissions:
+  customiesshowcase.command:
+    default: op
+    description: Access showcase inventory and diagnostics
