@@ -84,6 +84,7 @@ check($lamp->getLightLevel() === 15,'Powered lamp server light');
 $ghost = CustomiesBlockFactory::getInstance()->get('showcase:phase_block');
 $ghost->getState('showcase:phase')->setCurrentValue(2);
 check($ghost->getCollisionBoxes() === [],'Ghost server collision');
+require __DIR__.'/lore.php';
 require __DIR__.'/breaking.php';
 file_put_contents(dirname(__DIR__).'/component-coverage.json',json_encode($coverage,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n");
 echo 'PASS: '.count($coverage['block']).' block components, '.count($coverage['item']).' item components, '.count(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries()).' blocks, '.count($items)." items; every block state round-trips.\n";

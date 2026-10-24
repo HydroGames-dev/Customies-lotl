@@ -1,7 +1,7 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.0.1 / bundled Customies 1.5.41 includes the slab/bench selection-box fix.
+Showcase 1.0.2 adds descriptive lore to all specimens; bundled Customies 1.5.41 includes the slab/bench selection-box fix.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
 **46 blocks + 52 items**, including 23 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
@@ -20,6 +20,19 @@ requires DevTools; the provided PHAR works without DevTools. A separate behavior
 is not required: Customies registers block and item definitions with the server.
 The pack's minimum engine version is 1.26.50. 1.26.52/1.26.60 depend on host protocol
 support; those clients have not been tested here.
+
+## Descriptions and lore
+
+Every one of the 98 specimens has purpose-specific lore. Playable examples explain
+how to use them and give key values; laboratory examples explain their metadata
+and identify behavior that needs additional server support. The same descriptions
+appear in creative inventory, command kits, block drops, and inspector output.
+Prism batch/quality details append to its description. All descriptions are kept
+in `src/SpecimenDescriptions.php` for editing.
+
+Lore persists with saved item stacks. Existing inventory stacks keep their saved
+lore; obtain fresh specimens with `/cshow kit` or `/cshow give` after updating.
+Placed blocks gain the new description when inspected or broken into an item.
 
 ## Commands
 

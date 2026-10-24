@@ -194,6 +194,10 @@ final class ShowcaseBlock extends TraitBlock {
 		return true;
 	}
 
+	public function asItem(): Item {
+		return parent::asItem()->setLore(SpecimenDescriptions::block($this->specimen));
+	}
+
 	public function getDrops(Item $item): array {
 		if(($this->getState(MultiBlockTrait::PART)?->getCurrentValue() ?? 0) !== 0){ return []; }
 		return parent::getDrops($item);

@@ -85,6 +85,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 			}else{
 				$item = $sender->getInventory()->getItemInHand();
 				$sender->sendMessage($item->getName().' | server type '.$item->getTypeId().' | stack '.$item->getMaxStackSize());
+				$sender->sendMessage(implode("\n", $item->getLore()));
 				$sender->sendMessage('Components: '.($item instanceof ItemComponents ? implode(', ',array_map(static fn($c) => $c->getName(),$item->getComponents())) : 'block item / vanilla'));
 				$sender->sendMessage('NBT: '.$item->getNamedTag()->toString());
 			}
@@ -98,7 +99,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		if($id === 'prism'){
 			$tag = $item->getNamedTag();
 			$tag->setString('showcase:batch','gallery-01')->setInt('showcase:quality',3);
-			$item->setNamedTag($tag)->setLore(['Batch: gallery-01','Quality: 3 / 5','Example of persistent per-stack NBT data']);
+			$item->setNamedTag($tag)->setLore([...$item->getLore(), 'Batch: gallery-01', 'Quality: 3 / 5']);
 		}
 		return $item;
 	}
@@ -112,6 +113,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 	private function inspectBlock(Player $player, \pocketmine\block\Block $block): void {
 		$states = [];
 		if($block instanceof BlockStates){ foreach($block->getStates() as $s){ $states[$s->getName()] = $s->getCurrentValue(); } }
+		$player->sendMessage(implode("\n", $block->asItem()->getLore()));
 		$player->sendMessage($block->getName().' | states: '.json_encode($states));
 		if($block instanceof BlockComponents){ $player->sendMessage('Components: '.implode(', ',array_map(static fn($c) => $c->getName(),$block->getComponents()))); }
 	}

@@ -27,3 +27,10 @@ These server and wire-format checks do not replace a Minecraft client playtest.
 Replace both plugin PHARs from the rebuilt install bundle, restart the server, and
 reconnect clients so the corrected palette is sent. Resource textures/models did
 not change for this correction.
+
+## Descriptive lore (Showcase 1.0.2)
+
+All 98 specimens have explicit purpose/use descriptions. Tests check nonempty lore,
+creative inventory entries, persistence through Item NBT serialization, bench drop
+lore, and the command path that appends Prism batch/quality information. Existing
+saved inventory lore is preserved; freshly obtained specimens get the new text.

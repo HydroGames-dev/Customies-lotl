@@ -23,7 +23,7 @@ trait ComponentItemTrait {
 			if(in_array($key,['bundle_interaction','storage_weight_limit','storage_weight_modifier'],true)){ $this->addComponent(new I\StorageItemComponent(false,16)); }
 			$this->addComponent(ComponentCatalog::items()[$key]);
 		}
-		$this->setLore(['Customies Showcase', str_starts_with($specimen,'lab_') ? 'Component specimen: inspect behavior notes.' : 'Use /cshow inspect for specimen details.']);
+		$this->setLore(SpecimenDescriptions::item($specimen));
 	}
 	public function getSpecimen(): string { return $this->specimen; }
 }

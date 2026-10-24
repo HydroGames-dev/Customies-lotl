@@ -59,6 +59,7 @@ foreach(['north','south','west','east'] as $direction){
 		check($breakWorld->useBreakOn($target,$tool),'Bench break must succeed');
 		check($breakWorld->getBlock($at) instanceof pocketmine\block\Air && $breakWorld->getBlock($secondAt) instanceof pocketmine\block\Air,'Both bench parts must be removed');
 		check(count($breakWorld->drops) === 1 && $breakWorld->drops[0]->getCount() === 1,'Bench must drop exactly once');
+		check($breakWorld->drops[0]->getLore() === $bench->asItem()->getLore(),'Bench drops must keep their description');
 	}
 }
 echo "PASS: both slab halves and either bench part in all four directions are targetable and break through World::useBreakOn().\n";
