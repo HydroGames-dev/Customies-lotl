@@ -29,3 +29,6 @@ Follow this Wiki https://github.com/nk-archives/Customies/wiki
 | [Unickorn](https://github.com/Unickorn)               | Maintained the code during the PM4 betas and kept it up to date                              |
 | [JackNoordhuis](https://github.com/JackNoordhuis)     | Suggested the idea of using async workers and helped write the code which made them function |
 > Future contributors will not be added to this list. This is a list of the contributors who helped develop the plugin before the public release.
+## Traits and presets
+
+See [traits, presets, compatibility, and regression checks](docs/traits-and-presets.md).

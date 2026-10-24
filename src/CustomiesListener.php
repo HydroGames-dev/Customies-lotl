@@ -21,6 +21,7 @@ final class CustomiesListener implements Listener {
 
 	/** @var BlockPaletteEntry[] */
 	private array $cachedBlockPalette = [];
+	private int $cachedPaletteSize = -1;
 	private Experiments $experiments;
 
 	public function __construct() {
@@ -35,7 +36,7 @@ final class CustomiesListener implements Listener {
 	public function onDataPacketSend(DataPacketSendEvent $event): void {
 		foreach($event->getPackets() as $packet){
 			if($packet instanceof StartGamePacket){
-				if(count($this->cachedBlockPalette) === 0){
+				if($this->cachedPaletteSize !== count(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries())){
 					// Wait for the data to be needed before it is actually cached. Allows for all blocks and items to be
 					// registered before they are cached for the rest of the runtime.
 					$dataDrivenBlocks = StaticPacketCache::getInstance()->getBlockPaletteEntries();
@@ -47,11 +48,12 @@ final class CustomiesListener implements Listener {
 						return strcmp(hash("fnv164", $a->getName()), hash("fnv164", $b->getName()));
 					});
 					$this->cachedBlockPalette = $merged;
+					$this->cachedPaletteSize = count($customPalettes);
 				}
-				$packet->levelSettings->experiments = $this->experiments;
+				$packet->levelSettings->experiments = new Experiments(array_merge($packet->levelSettings->experiments->getExperiments(), $this->experiments->getExperiments()), true);
 				$packet->blockPalette = $this->cachedBlockPalette;
 			}elseif($packet instanceof ResourcePackStackPacket) {
-				$packet->experiments = $this->experiments;
+				$packet->experiments = new Experiments(array_merge($packet->experiments->getExperiments(), $this->experiments->getExperiments()), true);
 			}
 		}
 	}

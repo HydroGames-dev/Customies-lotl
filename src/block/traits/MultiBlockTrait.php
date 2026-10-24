@@ -62,6 +62,10 @@ final class MultiBlockTrait implements BlockTrait {
 		return new self("east", $parts);
 	}
 
+	public function __clone(){
+		$this->part = clone $this->part;
+	}
+
 	public function getName(): string {
 		return "minecraft:multi_block";
 	}
@@ -83,11 +87,11 @@ final class MultiBlockTrait implements BlockTrait {
 	 *
 	 * Part 0 is always the originally placed block.
 	 */
-	public function getOffsetForPart(int $part): Vector3 {
+	public function getOffsetForPart(int $part, ?string $cardinalDirection = null): Vector3 {
 		if($part < 0 || $part >= $this->parts){
 			throw new InvalidArgumentException("Invalid multi-block part {$part}; valid range is 0-" . ($this->parts - 1) . ".");
 		}
-		return match($this->direction){
+		return match(in_array($this->direction, ["up", "down"], true) ? $this->direction : ($cardinalDirection ?? $this->direction)){
 			"down" => new Vector3(0, -$part, 0),
 			"up" => new Vector3(0, $part, 0),
 			"north" => new Vector3(0, 0, -$part),
@@ -98,8 +102,19 @@ final class MultiBlockTrait implements BlockTrait {
 	}
 
 	public function applyPlacement(BlockTraitContext $context): void {
-		// The originally placed block is always part 0.
 		$this->part->setCurrentValue(0);
+		$block = $context->getBlock();
+		$pos = $context->getBlockReplace()->getPosition();
+		$direction = $block->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)?->getCurrentValue();
+		for($i = 1; $i < $this->parts; ++$i){
+			$target = $pos->addVector($this->getOffsetForPart($i, $direction));
+			if(!$context->getTransaction()->fetchBlock($target)->canBeReplaced()){
+				throw new \RuntimeException("Multi-block placement is obstructed");
+			}
+			$part = clone $block;
+			$part->getState(self::PART)->setCurrentValue($i);
+			$context->getTransaction()->addBlock($target, $part);
+		}
 	}
 
 	public function update(BlockTraitContext $context): void {

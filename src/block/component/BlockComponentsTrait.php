@@ -15,7 +15,7 @@ trait BlockComponentsTrait {
 	 * Registered block components indexed by component name.
 	 * @var array<string, BlockComponent>
 	 */
-	private array $components;
+	private array $components = [];
 
 	/**
 	 * Adds or replaces a block component.

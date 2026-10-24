@@ -63,6 +63,11 @@ final class PlacementPositionTrait implements BlockTrait {
 		return new self($enabledStates);
 	}
 
+	public function __clone(){
+		$this->blockFace = clone $this->blockFace;
+		$this->verticalHalf = clone $this->verticalHalf;
+	}
+
 	public function getName(): string {
 		return "minecraft:placement_position";
 	}
@@ -101,7 +106,7 @@ final class PlacementPositionTrait implements BlockTrait {
 		}
 		if($this->has(self::VERTICAL_HALF)){
 			$clickY = $context->getClickVector()->y;
-			$this->verticalHalf->setCurrentValue($clickY >= 0.5 ? "top" : "bottom");
+			$this->verticalHalf->setCurrentValue(($context->getFace() === Facing::DOWN || ($context->getFace() !== Facing::UP && $clickY > 0.5)) ? "top" : "bottom");
 		}
 	}
 
@@ -125,6 +130,7 @@ final class PlacementPositionTrait implements BlockTrait {
 	}
 
 	private function validate(): void {
+		if(count(array_unique($this->enabledStates)) !== count($this->enabledStates)){ throw new InvalidArgumentException("Duplicate enabled state"); }
 		if($this->enabledStates === []){
 			throw new InvalidArgumentException("Placement position requires at least one enabled state.");
 		}

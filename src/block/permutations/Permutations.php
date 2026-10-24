@@ -20,13 +20,17 @@ class Permutations {
 	 * properties.
 	 */
 	public static function fromMeta(BlockPermutations $block, int $meta): array {
-		$properties = self::getCartesianProduct(
-			array_map(static fn(BlockState $blockProperty) => $blockProperty->getValues(), $block->getStates())
-		)[$meta] ?? null;
-		if($properties === null){
-			throw new Exception("Unable to calculate permutations from block meta: " . $meta);
+		if($meta < 0){ throw new Exception("Negative block meta"); }
+		$states = array_values($block->getStates());
+		$result = [];
+		for($i = count($states) - 1; $i >= 0; --$i){
+			$values = $states[$i]->getValues();
+			$result[$i] = $values[$meta % count($values)];
+			$meta = intdiv($meta, count($values));
 		}
-		return $properties;
+		if($meta !== 0){ throw new Exception("Block meta exceeds state range"); }
+		ksort($result);
+		return array_values($result);
 	}
 
 	/**
@@ -34,15 +38,14 @@ class Permutations {
 	 * thrown if the state of the block is not a possible combination of all the block properties.
 	 */
 	public static function toMeta(BlockPermutations $block): int {
-		$properties = self::getCartesianProduct(
-			array_map(static fn(BlockState $blockProperty) => $blockProperty->getValues(), $block->getStates())
-		);
-		foreach($properties as $meta => $permutations){
-			if($permutations === $block->getCurrentStates()){
-				return $meta;
-			}
+		$meta = 0;
+		$current = array_values($block->getCurrentStates());
+		foreach(array_values($block->getStates()) as $i => $state){
+			$index = array_search($current[$i] ?? null, $state->getValues(), true);
+			if($index === false){ throw new Exception("Invalid value for state " . $state->getName()); }
+			$meta = $meta * count($state->getValues()) + $index;
 		}
-		throw new Exception("Unable to calculate block meta from current permutations");
+		return $meta;
 	}
 
 	/**
@@ -50,7 +53,7 @@ class Permutations {
 	 */
 	public static function getStateBitmask(BlockPermutations $block): int {
 		$possibleValues = array_map(static fn(BlockState $blockProperty) => $blockProperty->getValues(), $block->getStates());
-		return count(self::getCartesianProduct($possibleValues)) - 1;
+		return (int) array_product(array_map("count", $possibleValues)) - 1;
 	}
 
 	/**
@@ -61,21 +64,13 @@ class Permutations {
 		if($arrays === []){
 			return [[]];
 		}
-		$result = [];
-		$count = count($arrays) - 1;
-		$combinations = array_product(array_map(static fn(array $array) => count($array), $arrays));
-		for($i = 0; $i < $combinations; $i++){
-			$row = [];
-			foreach($arrays as $index => $_){
-				$row[] = current($arrays[$index]);
+		$result = [[]];
+		foreach($arrays as $values){
+			$next = [];
+			foreach($result as $row){
+				foreach($values as $value){ $next[] = [...$row, $value]; }
 			}
-			$result[] = $row;
-			for($j = $count; $j >= 0; $j--){
-				if(next($arrays[$j]) !== false){
-					break;
-				}
-				reset($arrays[$j]);
-			}
+			$result = $next;
 		}
 		return $result;
 	}

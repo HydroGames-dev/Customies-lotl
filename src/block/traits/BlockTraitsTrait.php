@@ -20,6 +20,7 @@ trait BlockTraitsTrait {
 	private bool $traitsInitialized = false;
 
 	public function addTrait(BlockTrait $trait): void {
+		if($this->traitsInitialized){ throw new \LogicException("Traits are frozen after initialization"); }
 		$name = $trait->getName();
 		if(isset($this->traits[$name])){
 			throw new InvalidArgumentException("Trait '{$name}' is already registered.");
@@ -46,12 +47,35 @@ trait BlockTraitsTrait {
 		if($this->traitsInitialized){
 			return;
 		}
-		$this->traitsInitialized = true;
+		if(!$this instanceof \customiesdevs\customies\block\permutations\BlockPermutations){
+			throw new \LogicException("Trait blocks must implement BlockPermutations");
+		}
+		if($this->hasTrait("minecraft:multi_block")){
+			if($this instanceof \customiesdevs\customies\block\component\BlockComponents){
+				if(!$this->hasComponent("minecraft:movable")){
+					$this->addComponent(new \customiesdevs\customies\block\component\MovableComponent());
+				}
+				$movement = $this->getComponent("minecraft:movable")->getValue()["movement_type"] ?? null;
+				if(!in_array($movement, ["immovable", "popped"], true)){ throw new InvalidArgumentException("Multi-block movement must be immovable or popped"); }
+			}
+			foreach($this->getPermutations() as $permutation){
+				foreach(["minecraft:movable", "minecraft:placement_filter", "minecraft:replaceable", "minecraft:random_offset"] as $forbidden){
+					if(array_key_exists($forbidden, $permutation->toArray()["components"])){ throw new InvalidArgumentException("Multi-block permutation cannot contain " . $forbidden); }
+				}
+			}
+			foreach($this->traits as $trait){
+				if($trait instanceof MultiBlockTrait){ continue; }
+				if(!$trait instanceof PlacementDirectionTrait || array_map(static fn(BlockState $s) => $s->getName(), $trait->getStates()) !== [PlacementDirectionTrait::CARDINAL_DIRECTION]){
+					throw new InvalidArgumentException("Multi-block only supports cardinal placement direction");
+				}
+			}
+		}
 		foreach($this->traits as $trait){
 			foreach($trait->getStates() as $state){
 				$this->addTraitState($state);
 			}
 		}
+		$this->traitsInitialized = true;
 	}
 
 	private function addTraitState(BlockState $state): void {
@@ -80,7 +104,8 @@ trait BlockTraitsTrait {
 			$blockClicked,
 			$face,
 			$clickVector,
-			$player
+			$player,
+			$this
 		);
 		foreach($this->traits as $trait){
 			$trait->applyPlacement($context);
@@ -91,14 +116,10 @@ trait BlockTraitsTrait {
 	public function updateTraitState(): void {
 		$this->initializeTraits();
 		$context = new BlockTraitContext(
-			throw new \LogicException("Update context is not available."),
-			throw new \LogicException("Update context is not available."),
-			$this,
-			$this,
-			0,
-			Vector3::zero(),
-			null
+			new BlockTransaction($this->getPosition()->getWorld()),
+			$this->asItem(), $this, $this, 0, Vector3::zero(), null, $this
 		);
+		foreach($this->traits as $trait){ $trait->update($context); }
 	}
 
 	public function serializeTraitState(BlockStateWriter $out): void {
