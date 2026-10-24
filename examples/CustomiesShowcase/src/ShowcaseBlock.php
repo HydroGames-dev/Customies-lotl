@@ -15,7 +15,7 @@ use pocketmine\math\{Vector3, AxisAlignedBB};
 use pocketmine\player\Player;
 
 final class ShowcaseBlock extends TraitBlock {
-	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower'];
+	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench'];
 
 	public function __construct(int $typeId, private readonly string $specimen){
 		$name = ucwords(str_replace('_', ' ', $specimen));
@@ -26,18 +26,18 @@ final class ShowcaseBlock extends TraitBlock {
 		}else{
 			$this->configure();
 			$geometry = match($specimen){
-				'slab' => 'geometry.showcase.slab', 'cable' => 'geometry.showcase.cable',
-				'corner_stairs' => 'geometry.showcase.stairs', 'totem' => 'geometry.showcase.totem',
+				'slab' => 'geometry.showcase.slab', 'cable', 'lumen_cable' => 'geometry.showcase.cable',
+				'corner_stairs' => 'geometry.showcase.stairs_none_bottom', 'totem' => 'geometry.showcase.totem',
 				'bench' => 'geometry.showcase.bench', 'rotor' => 'geometry.showcase.rotor_0',
-				'glow_flower' => 'geometry.showcase.flower', default => $geometry
+				'glow_flower' => 'geometry.showcase.flower', 'phase_gate' => 'geometry.showcase.gate_closed', 'spring_pad' => 'geometry.showcase.spring_pad', 'prism_workbench' => 'geometry.showcase.workbench', default => $geometry
 			};
 		}
 		$this->addComponent(new B\DisplayNameComponent($name));
 		$this->addComponent(new B\BlockTagsComponent(['showcase:specimen']));
-		$this->addComponent(new B\GeometryComponent($geometry, $specimen === 'cable' ? [
+		$this->addComponent(new B\GeometryComponent($geometry, $this->isCable() ? [
 			'north' => "q.block_state('minecraft:connection_north')", 'south' => "q.block_state('minecraft:connection_south')",
 			'west' => "q.block_state('minecraft:connection_west')", 'east' => "q.block_state('minecraft:connection_east')"
-		] : ($specimen === 'corner_stairs' ? self::stairBones() : [])));
+		] : []));
 		$this->addComponent(in_array($specimen,['machine','orienter','face_marker'],true)
 			? new B\MaterialInstancesComponent([new Material('*',$texture),new Material('north',$texture.'_front')])
 			: self::material($texture, $specimen === 'glow_flower' ? RenderMethod::ALPHA_TEST : RenderMethod::OPAQUE));
@@ -52,6 +52,13 @@ final class ShowcaseBlock extends TraitBlock {
 			$this->addComponent(new B\SelectionBoxComponent(true, new Vector3(-4,0,-4), new Vector3(8,12,8)));
 		}
 		if($specimen === 'totem' || $specimen === 'rotor'){ $this->addComponent((new B\CollisionBoxComponent())->addBox(new Box(new Vector3(-4,0,-4),new Vector3(8,16,8)))); }
+		if($specimen === 'phase_gate'){ $this->addComponent((new B\CollisionBoxComponent())->addBox(new Box(new Vector3(-8,0,-2),new Vector3(16,16,4)))); }
+		if($specimen === 'spring_pad'){
+			$this->addComponent((new B\CollisionBoxComponent())->addBox(new Box(new Vector3(-8,0,-8),new Vector3(16,4,16))));
+			$this->addComponent(new B\SelectionBoxComponent(true,new Vector3(-8,0,-8),new Vector3(16,4,16)));
+			$this->addComponent(new B\EntityFallOnComponent());
+		}
+		if($specimen === 'prism_workbench'){ $this->addComponent(new B\CraftingTableComponent(['crafting_table'],'Prism Workbench')); }
 		if($specimen === 'ice_tile'){ $this->addComponent(new B\FrictionComponent(0.02)); }
 		if($specimen === 'slab' || $specimen === 'bench'){
 			$this->addComponent((new B\CollisionBoxComponent())->addBox(new Box(new Vector3(-8,0,-8), new Vector3(16,8,16))));
@@ -73,6 +80,21 @@ final class ShowcaseBlock extends TraitBlock {
 				$this->addState(BlockState::bool('showcase:powered'));
 				$this->addPermutation(new BlockPermutation("q.block_state('showcase:powered')", new B\LightEmissionComponent(15), [self::material('showcase_lamp_on')]));
 				break;
+			case 'signal_lamp':
+				BlockPresets::cardinal($this,180);
+				$this->addState(BlockState::range('showcase:brightness',0,3));
+				for($level=1;$level<=3;++$level){ $this->addPermutation(new BlockPermutation("q.block_state('showcase:brightness') == $level",new B\LightEmissionComponent($level*5),[self::material('showcase_signal_lamp_'.$level)])); }
+				break;
+			case 'phase_gate':
+				BlockPresets::cardinal($this);
+				$this->addState(BlockState::bool('showcase:open'));
+				$this->addPermutation(new BlockPermutation("q.block_state('showcase:open')",new B\GeometryComponent('geometry.showcase.gate_open'),[new B\CollisionBoxComponent(false),new B\LightEmissionComponent(8)]));
+				break;
+			case 'spring_pad':
+				$this->addState(BlockState::bool('showcase:powered'));
+				$this->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",self::material('showcase_spring_pad_on'),[new B\LightEmissionComponent(5)]));
+				break;
+			case 'prism_workbench': BlockPresets::cardinal($this,180); break;
 			case 'machine': BlockPresets::cardinal($this, 180); break;
 			case 'orienter': BlockPresets::facing($this); break;
 			case 'face_marker':
@@ -89,7 +111,12 @@ final class ShowcaseBlock extends TraitBlock {
 				]));
 				break;
 			case 'cable':
-				BlockPresets::connections($this, static fn(Block $self, Block $other, int $face): bool => $self->getTypeId() === $other->getTypeId() || $other->isSolid());
+			case 'lumen_cable':
+				if($this->specimen === 'lumen_cable'){
+					$this->addState(BlockState::bool('showcase:powered'));
+					$this->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",new B\LightEmissionComponent(15),[self::material('showcase_lumen_cable_on')]));
+				}
+				BlockPresets::connections($this, static fn(Block $self, Block $other, int $face): bool => ($other instanceof self && $other->isCable()) || $other->isSolid());
 				$arms = ['north'=>[-2,6,-8,4,4,8], 'south'=>[-2,6,0,4,4,8], 'west'=>[-8,6,-2,8,4,4], 'east'=>[0,6,-2,8,4,4]];
 				for($bits=0; $bits<16; ++$bits){
 					$conditions = []; $boxes = [new Box(new Vector3(-2,0,-2),new Vector3(4,16,4))];
@@ -102,16 +129,18 @@ final class ShowcaseBlock extends TraitBlock {
 				}
 				break;
 			case 'corner_stairs':
+				// Set the half before corner calculation so top/bottom neighbors never join.
+				$this->addTrait(PlacementPositionTrait::verticalHalf());
 				$this->addTrait(PlacementDirectionTrait::cornerAndCardinal());
-				foreach(['north'=>0, 'west'=>90, 'south'=>180, 'east'=>270] as $face => $angle){
-					$this->addPermutation(new BlockPermutation("q.block_state('minecraft:cardinal_direction') == '$face'", new B\TransformationComponent(new Vector3(0,$angle,0))));
+				foreach(['north'=>0,'west'=>90,'south'=>180,'east'=>270] as $face=>$angle){
+					$this->addPermutation(new BlockPermutation("q.block_state('minecraft:cardinal_direction') == '$face'",new B\TransformationComponent(new Vector3(0,$angle,0))));
 				}
-				foreach(['none','outer_left','outer_right','inner_left','inner_right'] as $shape){
-					$boxes = [new Box(new Vector3(-8,0,-8),new Vector3(16,8,16))];
-					foreach([[$shape !== 'outer_right',-8,-8],[$shape !== 'outer_left',0,-8],[$shape === 'inner_left',-8,0],[$shape === 'inner_right',0,0]] as [$visible,$x,$z]){
-						if($visible){ $boxes[] = new Box(new Vector3($x,8,$z),new Vector3(8,8,8)); }
+				foreach(['bottom','top'] as $half){
+					foreach(StairShapes::SHAPES as $shape){
+						$boxes = array_map(static fn(AxisAlignedBB $b) => new Box(new Vector3($b->minX*16-8,$b->minY*16,$b->minZ*16-8),new Vector3(($b->maxX-$b->minX)*16,($b->maxY-$b->minY)*16,($b->maxZ-$b->minZ)*16)),StairShapes::boxes($shape,$half));
+						$condition = "q.block_state('minecraft:corner') == '$shape' && q.block_state('minecraft:vertical_half') == '$half'";
+						$this->addPermutation(new BlockPermutation($condition,new B\GeometryComponent("geometry.showcase.stairs_{$shape}_{$half}"),[(new B\CollisionBoxComponent())->addBoxes($boxes)]));
 					}
-					$this->addPermutation(new BlockPermutation("q.block_state('minecraft:corner') == '$shape'",(new B\CollisionBoxComponent())->addBoxes($boxes)));
 				}
 				break;
 			case 'totem':
@@ -136,22 +165,34 @@ final class ShowcaseBlock extends TraitBlock {
 		}
 	}
 
-	private static function stairBones(): array {
-		$q = "q.block_state('minecraft:corner')";
-		return ['nw' => "$q != 'outer_right'", 'ne' => "$q != 'outer_left'", 'sw' => "$q == 'inner_left'", 'se' => "$q == 'inner_right'"];
+	private function isCable(): bool { return in_array($this->specimen,['cable','lumen_cable'],true); }
+
+	public function deserializeState(\pocketmine\data\bedrock\block\convert\BlockStateReader $in): void {
+		if($this->specimen !== 'corner_stairs'){ parent::deserializeState($in); return; }
+		$this->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->setCurrentValue($in->readString(PlacementDirectionTrait::CARDINAL_DIRECTION));
+		$this->getState('minecraft:corner')->setCurrentValue($in->readString('minecraft:corner'));
+		try{ $half = $in->readString(PlacementPositionTrait::VERTICAL_HALF); }
+		catch(\pocketmine\data\bedrock\block\BlockStateDeserializeException $e){
+			if(!str_contains($e->getMessage(),'is missing')){ throw $e; }
+			$half = 'bottom'; // Preserve stairs saved before vertical-half support.
+		}
+		$this->getState(PlacementPositionTrait::VERTICAL_HALF)->setCurrentValue($half);
 	}
 
 	public function getSpecimen(): string { return $this->specimen; }
 	public function getLightLevel(): int {
+		if($this->specimen === 'signal_lamp'){ return $this->getState('showcase:brightness')->getCurrentValue()*5; }
+		if($this->specimen === 'phase_gate'){ return $this->getState('showcase:open')->getCurrentValue() ? 8 : 0; }
+		if(in_array($this->specimen,['lumen_cable','spring_pad'],true)){ return $this->getState('showcase:powered')->getCurrentValue() ? ($this->specimen === 'spring_pad' ? 5 : 15) : 0; }
 		if($this->specimen === 'prism_lamp'){ return $this->getState('showcase:powered')->getCurrentValue() ? 15 : 0; }
 		if($this->specimen === 'glow_flower' || $this->specimen === 'lab_light_emission'){ return $this->specimen === 'glow_flower' ? 8 : 15; }
 		return parent::getLightLevel();
 	}
 	public function getLightFilter(): int { return $this->specimen === 'lab_light_dampening' || $this->specimen === 'glow_flower' ? 0 : parent::getLightFilter(); }
 	public function getFrictionFactor(): float { return in_array($this->specimen, ['ice_tile', 'lab_friction'], true) ? 0.98 : parent::getFrictionFactor(); }
-	public function isSolid(): bool { return !in_array($this->specimen, ['glow_flower', 'cable', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost(); }
+	public function isSolid(): bool { return !in_array($this->specimen, ['glow_flower', 'cable', 'lumen_cable', 'spring_pad', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost(); }
 	public function canBeReplaced(): bool { return in_array($this->specimen, ['glow_flower', 'lab_replaceable'], true); }
-	private function isGhost(): bool { return $this->specimen === 'phase_block' && $this->getState('showcase:phase')->getCurrentValue() === 2; }
+	private function isGhost(): bool { return ($this->specimen === 'phase_block' && $this->getState('showcase:phase')->getCurrentValue() === 2) || ($this->specimen === 'phase_gate' && $this->getState('showcase:open')->getCurrentValue()); }
 
 	protected function recalculateCollisionBoxes(): array {
 		if($this->isGhost() || in_array($this->specimen, ['glow_flower', 'lab_collision_box'], true)){ return []; }
@@ -160,7 +201,7 @@ final class ShowcaseBlock extends TraitBlock {
 			return [new AxisAlignedBB(0,$y,0,1,$y+0.5,1)];
 		}
 		if($this->specimen === 'bench'){ return [new AxisAlignedBB(0,0,0,1,0.5,1)]; }
-		if($this->specimen === 'cable'){
+		if($this->isCable()){
 			$boxes = [new AxisAlignedBB(0.375,0,0.375,0.625,1,0.625)];
 			foreach([ConnectionTrait::NORTH=>[0.375,0.375,0,0.625,0.625,0.5], ConnectionTrait::SOUTH=>[0.375,0.375,0.5,0.625,0.625,1], ConnectionTrait::WEST=>[0,0.375,0.375,0.5,0.625,0.625], ConnectionTrait::EAST=>[0.5,0.375,0.375,1,0.625,0.625]] as $state=>$bounds){
 				if($this->getState($state)->getCurrentValue()){ $boxes[] = new AxisAlignedBB(...$bounds); }
@@ -169,29 +210,35 @@ final class ShowcaseBlock extends TraitBlock {
 		}
 		if($this->specimen === 'rotor' || $this->specimen === 'totem'){ return [new AxisAlignedBB(0.25,0,0.25,0.75,1,0.75)]; }
 		if($this->specimen === 'corner_stairs'){
-			$shape = $this->getState('minecraft:corner')->getCurrentValue();
-			$boxes = [new AxisAlignedBB(0,0,0,1,0.5,1)];
-			$parts = [[$shape !== 'outer_right',0,0], [$shape !== 'outer_left',0.5,0], [$shape === 'inner_left',0,0.5], [$shape === 'inner_right',0.5,0.5]];
-			$turns = ['north'=>0, 'west'=>1, 'south'=>2, 'east'=>3][$this->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->getCurrentValue()];
-			foreach($parts as [$visible,$x,$z]){
-				if(!$visible){ continue; }
-				for($i=0; $i<$turns; ++$i){ [$x,$z] = [$z,0.5-$x]; }
-				$boxes[] = new AxisAlignedBB($x,0.5,$z,$x+0.5,1,$z+0.5);
-			}
-			return $boxes;
+			return StairShapes::boxes($this->getState('minecraft:corner')->getCurrentValue(),$this->getState(PlacementPositionTrait::VERTICAL_HALF)->getCurrentValue(),$this->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->getCurrentValue());
 		}
+		if($this->specimen === 'spring_pad'){ return [new AxisAlignedBB(0,0,0,1,0.25,1)]; }
+		if($this->specimen === 'phase_gate'){ return in_array($this->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->getCurrentValue(),['east','west'],true) ? [new AxisAlignedBB(0.375,0,0,0.625,1,1)] : [new AxisAlignedBB(0,0,0.375,1,1,0.625)]; }
+
 		return parent::recalculateCollisionBoxes();
 	}
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []): bool {
-		$state = match($this->specimen){ 'prism_lamp'=>'showcase:powered', 'phase_block'=>'showcase:phase', default=>null };
+		if($this->specimen === 'prism_workbench'){
+			$player?->setCurrentWindow(new \pocketmine\block\inventory\CraftingTableInventory($this->getPosition()));
+			return true;
+		}
+		$state = match($this->specimen){ 'prism_lamp','lumen_cable','spring_pad'=>'showcase:powered', 'phase_block'=>'showcase:phase', 'phase_gate'=>'showcase:open', 'signal_lamp'=>'showcase:brightness', default=>null };
 		if($state === null){ return parent::onInteract($item,$face,$clickVector,$player,$returnedItems); }
 		$property = $this->getState($state);
 		$value = $property->getCurrentValue();
-		$property->setCurrentValue(is_bool($value) ? !$value : ($value+1)%3);
+		$values = $property->getValues();
+		$property->setCurrentValue($values[(array_search($value,$values,true)+1)%count($values)]);
 		$this->getPosition()->getWorld()->setBlock($this->getPosition(), $this);
 		$player?->sendActionBarMessage($this->getName() . ': ' . json_encode($this->getCurrentStates()));
 		return true;
+	}
+
+	public function onEntityLand(\pocketmine\entity\Entity $entity): ?float {
+		if($this->specimen !== 'spring_pad' || !$this->getState('showcase:powered')->getCurrentValue()){ return parent::onEntityLand($entity); }
+		if($entity instanceof \pocketmine\entity\Living && $entity->isSneaking()){ return null; }
+		$entity->resetFallDistance();
+		return max(0.0,-$entity->getMotion()->y);
 	}
 
 	public function asItem(): Item {

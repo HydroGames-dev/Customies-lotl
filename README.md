@@ -16,8 +16,8 @@ The usage guides have been moved to the [Customies Wiki](https://github.com/Cust
 
 Follow this Wiki https://github.com/nk-archives/Customies/wiki
 
-[![Mojang Item Docs](https://img.shields.io/badge/ðŸ“–-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponentlist?view=minecraft-bedrock-stable)
-[![Mojang Block Docs](https://img.shields.io/badge/ðŸ“–-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable)
+[![Mojang Item Docs](https://img.shields.io/badge/Ã°Å¸â€œâ€“-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponentlist?view=minecraft-bedrock-stable)
+[![Mojang Block Docs](https://img.shields.io/badge/Ã°Å¸â€œâ€“-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable)
 
 ## Important Contributors
 
@@ -35,4 +35,4 @@ See [traits, presets, compatibility, and regression checks](docs/traits-and-pres
 
 ## Showcase plugin and assets
 
-[Customies Showcase](examples/CustomiesShowcase/README.md) includes 46 blocks, 52 items, a resource pack, complete component specimens, and reproducible build tools.
+[Customies Showcase](examples/CustomiesShowcase/README.md) includes 51 blocks, 57 items, a resource pack, complete component specimens, and reproducible build tools.

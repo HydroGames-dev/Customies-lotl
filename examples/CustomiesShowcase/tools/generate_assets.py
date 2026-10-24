@@ -7,7 +7,8 @@ BASE = Path(__file__).resolve().parents[1]
 PACK = BASE / 'resource_pack'
 COVERAGE = json.loads((BASE / 'component-coverage.json').read_text())
 BLOCKS = re.findall(r"'([^']+)'", re.search(r'public const PLAYABLE = \[(.*?)\]', (BASE/'src/ShowcaseBlock.php').read_text()).group(1))
-ITEMS = re.findall(r"'([^']+)'", re.search(r'public const PLAYABLE = \[(.*?)\]', (BASE/'src/ShowcaseItem.php').read_text()).group(1)) + ['prism_berry','prism_pickaxe','prism_helmet','prism_pebble']
+SPECIAL_ITEMS = re.findall(r"'([^']+)'\s*=>", re.search(r'public const SPECIAL_ITEMS = \[(.*?)\]', (BASE/'src/ShowcasePlugin.php').read_text()).group(1))
+ITEMS = re.findall(r"'([^']+)'", re.search(r'public const PLAYABLE = \[(.*?)\]', (BASE/'src/ShowcaseItem.php').read_text()).group(1)) + SPECIAL_ITEMS
 
 def write(path, value):
     target = PACK/path
@@ -39,6 +40,23 @@ def texture(name, item=False):
                 draw.ellipse((8,1,14,7),outline=white,width=2)
             else:
                 draw.polygon([(9,0),(14,3),(11,7),(7,4)],fill=base,outline=white)
+        elif 'blade' in name:
+            draw.line((3,14,12,2),fill=dark,width=4)
+            draw.line((4,12,12,2),fill=(174,242,255),width=2)
+            draw.line((3,9,8,13),fill=(115,156,189),width=2)
+        elif 'repair_kit' in name:
+            draw.rectangle((2,5,13,13),fill=dark,outline=light)
+            draw.rectangle((5,2,10,5),outline=white)
+            draw.rectangle((7,7,8,11),fill=white)
+            draw.rectangle((5,9,10,9),fill=white)
+        elif 'elixir' in name:
+            draw.rectangle((6,1,9,4),fill=light)
+            draw.rectangle((4,5,11,14),fill=(138,213,240),outline=white)
+            draw.rectangle((5,9,10,13),fill=base)
+        elif name.endswith('energized_ration'):
+            draw.rounded_rectangle((2,4,13,13),radius=3,fill=(187,131,74),outline=(236,204,151))
+            draw.line((5,5,5,8),fill=white)
+            draw.line((9,5,9,8),fill=white)
         elif 'helmet' in name:
             draw.rectangle((2,3,13,11),fill=dark)
             draw.rectangle((3,2,12,8),fill=light)
@@ -73,8 +91,14 @@ def texture(name, item=False):
             draw.rectangle((3,3,12,12),fill=dark)
             draw.polygon([(8,3),(12,8),(9,8),(9,12),(6,12),(6,8),(3,8)],fill=white)
         elif 'lamp' in name:
-            draw.rectangle((4,4,11,11),fill=(244,235,143) if 'on' in name else (76,104,100))
-            if 'on' in name: draw.rectangle((6,6,9,9),fill=white)
+            draw.rectangle((4,4,11,11),fill=(244,235,143) if 'on' in name or name.endswith(('_1','_2','_3')) else (76,104,100))
+            if 'on' in name or name.endswith(('_1','_2','_3')): draw.rectangle((6,6,9,9),fill=white)
+        elif 'spring_pad' in name:
+            draw.rectangle((3,3,12,12),fill=dark)
+            for k in (4,7,10): draw.line((4,k,11,k),fill=(137,255,184) if '_on' in name else light,width=1)
+        elif 'signal_lamp' in name or 'lumen_cable' in name:
+            draw.rectangle((4,4,11,11),fill=(226,255,197) if name.endswith(('_1','_2','_3','_on')) else dark)
+            draw.line((8,2,8,13),fill=light)
         elif 'totem' in name:
             draw.rectangle((4,5,6,7),fill=white); draw.rectangle((9,5,11,7),fill=white)
             draw.line((5,10,10,10),fill=dark,width=2)
@@ -90,8 +114,8 @@ def texture(name, item=False):
                     if seed & (1 << ((y-5)*6+x-5)): draw.point((x,y),fill=white)
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 98 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,0,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,0,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
-block_names = ['showcase_'+name for name in BLOCKS] + ['showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 108 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,1,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,1,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+block_names = ['showcase_'+name for name in BLOCKS] + ['showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
 item_names = ['showcase_'+name for name in ITEMS] + ['showcase_lab_item_'+key for key in COVERAGE['item']]
 for kind,names in [('blocks',block_names),('items',item_names)]:
     for name in names:
@@ -113,6 +137,15 @@ model('slab',[bone('root',[-8,0,-8],[16,8,16])])
 model('slab_top',[bone('root',[-8,8,-8],[16,8,16])])
 model('cable',[bone('post',[-2,0,-2],[4,16,4]),bone('north',[-2,6,-8],[4,4,8]),bone('south',[-2,6,0],[4,4,8]),bone('west',[-8,6,-2],[8,4,4]),bone('east',[0,6,-2],[8,4,4])])
 model('stairs',[bone('base',[-8,0,-8],[16,8,16]),bone('nw',[-8,8,-8],[8,8,8]),bone('ne',[0,8,-8],[8,8,8]),bone('sw',[-8,8,0],[8,8,8]),bone('se',[0,8,0],[8,8,8])])
+for half in ['bottom','top']:
+    for shape,quadrants in {'none':[(0,0),(8,0)],'outer_left':[(0,0)],'outer_right':[(8,0)],'inner_left':[(0,0),(8,0),(0,8)],'inner_right':[(0,0),(8,0),(8,8)]}.items():
+        bones=[bone('base',[-8,8 if half=='top' else 0,-8],[16,8,16])]
+        bones += [bone(f'quarter_{i}',[x-8,0 if half=='top' else 8,z-8],[8,8,8]) for i,(x,z) in enumerate(quadrants)]
+        model('stairs_'+shape+'_'+half,bones)
+model('gate_closed',[bone('panel',[-8,0,-2],[16,16,4])])
+model('gate_open',[bone('left',[-8,0,-2],[2,16,4]),bone('right',[6,0,-2],[2,16,4]),bone('top',[-6,14,-2],[12,2,4])])
+model('spring_pad',[bone('base',[-8,0,-8],[16,4,16])])
+model('workbench',[bone('root',[-8,0,-8],[16,16,16])])
 model('totem',[bone('root',[-4,0,-4],[8,16,8])])
 model('bench',[bone('root',[-8,0,-8],[16,8,16])])
 for i in range(16):
@@ -158,4 +191,4 @@ for index,(name,is_item) in enumerate(entries):
     label=name.removeprefix('showcase_')
     for row in range(0,len(label),22):d.text((x+6,y+69+row//22*12),label[row:row+22],fill=(184,211,216),font=ImageFont.load_default(size=10))
 sheet.save(BASE/'asset-preview.png')
-print(f'Generated {len(block_names)} block textures, {len(item_names)} item icons, 24 block models, helmet and original audio.')
+print(f'Generated {len(block_names)} block textures, {len(item_names)} item icons, {len(list((PACK/'models/blocks').glob('*.json')))} block models, helmet and original audio.')

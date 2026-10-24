@@ -34,3 +34,15 @@ All 98 specimens have explicit purpose/use descriptions. Tests check nonempty lo
 creative inventory entries, persistence through Item NBT serialization, bench drop
 lore, and the command path that appends Prism batch/quality information. Existing
 saved inventory lore is preserved; freshly obtained specimens get the new text.
+
+## Combined examples and corner stairs (1.1.0 / Customies 1.5.42)
+
+- Registered 51 blocks and 57 items; all runtime states round-trip through the host serializers.
+- Lore and inventory persistence checked for all 108 specimens.
+- Corner matrix covers five shapes, four directions, two halves, mixed-half rejection, neighbor removal and migration of older saved stairs.
+- Explicit stair model cubes are compared with the PHP server collision boxes.
+- Interactions exercise lamp brightness, gate collision/light, cable connections and light, spring landing/sneaking, a nine-slot crafting grid, repair-kit consumption/clamping, scout effects/cooldown, blade wear/effect and food/residue.
+- Packaged Customies 1.5.42 and Showcase 1.1.0 enabled with resource pack 1.1.0 on Axolotl, registered 108 specimens, and reached Done.
+- Every geometry, material texture and icon reference exported from the registered definitions resolves in the resource pack.
+
+No Minecraft client playtest was available. These checks cover server logic and emitted definitions/assets, not client rendering, prediction or animation.

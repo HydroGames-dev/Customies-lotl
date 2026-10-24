@@ -8,13 +8,18 @@ use pocketmine\utils\TextFormat as F;
 final class SpecimenDescriptions {
 	/** @var array<string, list<string>> */
 	private const BLOCKS = [
+		'signal_lamp' => ['A four-way lamp with four brightness settings.','Interact to cycle light levels 0, 5, 10 and 15.'],
+		'lumen_cable' => ['A connecting cable with switchable illumination.','Interact to toggle light; joins Cable and Lumen Cable.'],
+		'phase_gate' => ['A directional gate with a luminous open state.','Interact to open/close; open gates have no collision.'],
+		'spring_pad' => ['A switchable quarter-height bounce platform.','Interact to arm; land to bounce, sneak to stop.'],
+		'prism_workbench' => ['A directional crystal crafting workbench.','Interact to open a real 3-by-3 crafting grid.'],
 		'prism_lamp' => ['A crystal lamp with two power states.','Interact to switch its light between 0 and 15.'],
 		'machine' => ['A machine with a marked front panel.','Faces you when placed; uses four-way rotation.'],
 		'orienter' => ['A directional cube with six orientations.','Look up, down, or sideways while placing.'],
 		'face_marker' => ['Marks the face against which it was placed.','Place against any of the six block faces.'],
 		'slab' => ['A half-height building block.','Place high or low to choose its vertical half.'],
 		'cable' => ['A connecting post with four optional arms.','Join posts together or place beside solid blocks.'],
-		'corner_stairs' => ['Stairs that form inner and outer corners.','Place perpendicular neighbors to change shape.'],
+		'corner_stairs' => ['Stairs with inner/outer corners and two halves.','Place high/low; matching halves join at corners.'],
 		'totem' => ['A three-part vertical crystal totem.','Needs three free cells; break any part to remove.'],
 		'bench' => ['A two-part, half-height horizontal structure.','Needs two free cells; break either part to remove.'],
 		'rotor' => ['A directional pointer with 16 yaw positions.','Aim while placing, or cycle it with State Wrench.'],
@@ -24,8 +29,13 @@ final class SpecimenDescriptions {
 	];
 	/** @var array<string, list<string>> */
 	private const ITEMS = [
+		'scout_wand' => ['Use in the air for speed, jump and night vision.','Speed/Jump: 10s | Night vision: 30s | Cooldown: 5s'],
+		'repair_kit' => ['Repairs a damaged durable item in your offhand.','Use in the air: consumes one kit, repairs up to 64.'],
+		'energized_ration' => ['A filling travel ration with a movement boost.','Food: 10 | Saturation: 12 | Speed I: 15s'],
+		'prism_elixir' => ['Drink even at full hunger; returns a glass bottle.','Resistance I: 10s | Night vision: 30s'],
+		'frost_blade' => ['An iron-tier blade that chills living targets.','On hit: Slowness I for 2s; normal wear applies.'],
 		'inspector' => ['Read the states and components of a block.','Use on a block; requires showcase permission.'],
-		'state_wrench' => ['Adjust a lamp, phase block, or rotor.','Use to cycle its state without replacing it.'],
+		'state_wrench' => ['Adjust lamps, gates, rotors, and spring controls.','Use to cycle its state without replacing it.'],
 		'pulse_wand' => ['Release a short burst of movement energy.','Use in the air: Speed I for 5s; cooldown 2s.'],
 		'prism' => ['A rare crystal carrying per-stack data.','Can be held offhand; inspect its batch and quality.'],
 		'ember_fuel' => ['A fireproof ember that fuels a furnace.','Burn time: 20 seconds / 400 ticks.'],

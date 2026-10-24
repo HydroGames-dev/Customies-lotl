@@ -56,6 +56,26 @@
     "sound": "stone",
     "textures": "showcase_glow_flower"
   },
+  "showcase:signal_lamp": {
+    "sound": "stone",
+    "textures": "showcase_signal_lamp"
+  },
+  "showcase:lumen_cable": {
+    "sound": "stone",
+    "textures": "showcase_lumen_cable"
+  },
+  "showcase:phase_gate": {
+    "sound": "stone",
+    "textures": "showcase_phase_gate"
+  },
+  "showcase:spring_pad": {
+    "sound": "stone",
+    "textures": "showcase_spring_pad"
+  },
+  "showcase:prism_workbench": {
+    "sound": "stone",
+    "textures": "showcase_prism_workbench"
+  },
   "showcase:lab_block_block_entity": {
     "sound": "stone",
     "textures": "showcase_lab_block_block_entity"

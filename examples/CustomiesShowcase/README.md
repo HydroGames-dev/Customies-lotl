@@ -1,9 +1,9 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.0.2 adds descriptive lore to all specimens; bundled Customies 1.5.41 includes the slab/bench selection-box fix.
+Showcase 1.1.0 adds combined gameplay examples and explicit corner-stair geometry. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
-**46 blocks + 52 items**, including 23 playable examples and 75 component specimens.
+**51 blocks + 57 items**, including 33 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
 example in `src/ComponentCatalog.php` and a separate laboratory specimen.
 
@@ -23,7 +23,7 @@ support; those clients have not been tested here.
 
 ## Descriptions and lore
 
-Every one of the 98 specimens has purpose-specific lore. Playable examples explain
+Every one of the 108 specimens has purpose-specific lore. Playable examples explain
 how to use them and give key values; laboratory examples explain their metadata
 and identify behavior that needs additional server support. The same descriptions
 appear in creative inventory, command kits, block drops, and inspector output.
@@ -43,11 +43,39 @@ Placed blocks gain the new description when inspected or broken into an item.
 - `/cshow inspect block` shows targeted block states and component names.
 
 All commands and inspector/wrench actions require `customiesshowcase.command`
-(default: operator). Inventory overflow is skipped, not dropped. Kit pages 1-3
-contain the playable set first; later pages contain the laboratory.
+(default: operator). Inventory overflow is skipped, not dropped. The first kit pages contain the playable set; later pages contain the laboratory.
 `plugins/CustomiesShowcase/config.yml` can disable `component-laboratory`; restart
 before testing changes. Keep the same registration configuration for saved test worlds.
 Removing a registered specimen can make saved blocks/items unavailable.
+
+## Combined-feature additions (1.1.0)
+
+| ID | Combined features and function |
+| --- | --- |
+| `signal_lamp` | Cardinal rotation + integer brightness + materials + light. Interact to cycle light levels 0, 5, 10, 15. |
+| `lumen_cable` | Cardinal connections + conditional arms/collision + powered state. Connects to both cable variants; interact to toggle light 0/15. |
+| `phase_gate` | Cardinal rotation + open state + geometry/collision/light permutations. Interact to open or close. |
+| `spring_pad` | Quarter-height model/collision + powered state + landing callback. Interact to arm, land to bounce; sneak to suppress bouncing. |
+| `prism_workbench` | Cardinal rotation + crafting-table metadata + real server crafting inventory. Interact for a 3-by-3 crafting grid. |
+| `scout_wand` | Cooldown + glint + rarity + server effect action. Speed/Jump I for 10 seconds, Night Vision for 30 seconds; 5-second cooldown. |
+| `repair_kit` | Stack limit + action label + server inventory operation. Hold a damaged durable item offhand and use in air to restore up to 64 durability; consumes one kit. |
+| `energized_ration` | Real food + use animation + modifiers + effects. Restores 10 hunger/12 saturation and grants Speed I for 15 seconds. |
+| `prism_elixir` | Always-consumable drink + effects + residue. Resistance I for 10 seconds and Night Vision for 30 seconds; returns a glass bottle. |
+| `frost_blade` | Iron-tier sword + wear + damage/enchant/repair/swing metadata + hit effect. Applies Slowness I to living targets for 2 seconds. |
+
+These additions include distinct textures and item icons, gate/pad/workbench models,
+and descriptive lore. Update both PHARs **and** the resource pack to 1.1.0, restart,
+and reconnect. The pack UUID is unchanged; its version is increased for client updates.
+
+### Corner-stair correction
+
+Corner stairs now support bottom and upside-down placement. Five explicit shapes
+for each half replace conditional-bone rendering. The same shape table drives server
+and client collision. Tests cover all 40 direction/half/shape cases, mixed-half
+neighbors and neighbor removal. Old saved stairs without a vertical-half state load
+as bottom-half stairs. The corner selector no longer also enables the conflicting
+standalone cardinal selector. Cross-identifier/tag-expression corner joining remains
+outside this showcase's implementation.
 
 ## Playable tour
 
@@ -59,7 +87,7 @@ Removing a registered specimen can make saved blocks/items unavailable.
 | `face_marker` | Place against each of six faces | `minecraft:block_face` and matching rotation |
 | `slab` | Place against upper/lower side or top/bottom face | Vertical-half state, matching half-height geometry/collision |
 | `cable` | Place a row and connect solid neighbors | Four connection states, conditional model bones and collision boxes |
-| `corner_stairs` | Place perpendicular neighbors | Corner/cardinal states, shape geometry and collision |
+| `corner_stairs` | Place perpendicular neighbors | Corner/cardinal/vertical-half states, explicit shape geometry and collision |
 | `totem` | Place with three free vertical cells | Atomic three-part structure; part-specific textures; grouped break |
 | `bench` | Place with two free horizontal cells | Cardinal + multi-block; matching two-part placement and grouped break |
 | `rotor` | Place at different yaw angles; use wrench | 16-way state; 16 models with 22.5-degree bone rotations |
@@ -78,7 +106,7 @@ Removing a registered specimen can make saved blocks/items unavailable.
 | `prism_pebble` | Throw | Actual PocketMine snowball projectile; stack size 16 |
 
 All textures and audio are original and deterministically generated by the included
-tool. Models include actual connection bones, stairs, half slabs, posts, and rotor
+tool. Models include connection bones, ten explicit stair shapes, half slabs, gates, pads, posts, and rotor
 variants; arbitrary-angle rotations are in geometry, not quarter-turn wire indices.
 
 ## Component laboratory: what is implemented

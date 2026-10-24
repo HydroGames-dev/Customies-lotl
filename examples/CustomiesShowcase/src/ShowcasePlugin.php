@@ -17,6 +17,7 @@ use pocketmine\plugin\PluginBase;
 final class ShowcasePlugin extends PluginBase implements Listener {
 	/** @var array<string, string> */
 	private array $entries = [];
+	public const SPECIAL_ITEMS = ['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class,'energized_ration'=>EnergizedRation::class,'prism_elixir'=>PrismElixir::class,'frost_blade'=>FrostBlade::class];
 
 	protected function onEnable(): void {
 		$this->saveDefaultConfig();
@@ -26,7 +27,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 			CustomiesItemFactory::getInstance()->registerItem(static fn() => new ShowcaseItem($id,$specimen),'showcase:'.$specimen);
 			$this->entries[$specimen] = 'item';
 		}
-		foreach(['prism_berry'=>PrismFood::class, 'prism_pickaxe'=>PrismPickaxe::class, 'prism_helmet'=>PrismHelmet::class, 'prism_pebble'=>PrismPebble::class] as $specimen=>$class){
+		foreach(self::SPECIAL_ITEMS as $specimen=>$class){
 			$id = ItemTypeIds::newId();
 			CustomiesItemFactory::getInstance()->registerItem(static fn() => new $class($id),'showcase:'.$specimen);
 			$this->entries[$specimen] = 'item';
@@ -132,7 +133,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		$block = $event->getBlock();
 		if($item->getSpecimen() === 'state_wrench' && $block instanceof ShowcaseBlock){
 			// Keep multi-block and connection topology owned by their traits.
-			foreach(['showcase:powered','showcase:phase','minecraft:sixteen_way_rotation'] as $name){
+			foreach(['showcase:powered','showcase:phase','showcase:brightness','showcase:open','minecraft:sixteen_way_rotation'] as $name){
 				$state = $block->getState($name);
 				if($state === null){ continue; }
 				$values = $state->getValues();

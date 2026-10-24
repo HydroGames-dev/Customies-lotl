@@ -20,6 +20,12 @@
     "showcase_pigment": {
       "textures": "textures/items/showcase_pigment"
     },
+    "showcase_scout_wand": {
+      "textures": "textures/items/showcase_scout_wand"
+    },
+    "showcase_repair_kit": {
+      "textures": "textures/items/showcase_repair_kit"
+    },
     "showcase_prism_berry": {
       "textures": "textures/items/showcase_prism_berry"
     },
@@ -31,6 +37,15 @@
     },
     "showcase_prism_pebble": {
       "textures": "textures/items/showcase_prism_pebble"
+    },
+    "showcase_energized_ration": {
+      "textures": "textures/items/showcase_energized_ration"
+    },
+    "showcase_prism_elixir": {
+      "textures": "textures/items/showcase_prism_elixir"
+    },
+    "showcase_frost_blade": {
+      "textures": "textures/items/showcase_frost_blade"
     },
     "showcase_lab_item_allow_off_hand": {
       "textures": "textures/items/showcase_lab_item_allow_off_hand"

@@ -69,7 +69,7 @@ foreach([...ShowcaseItem::PLAYABLE, ...array_map(static fn($key) => 'lab_'.$key,
 	CustomiesItemFactory::getInstance()->registerItem(static fn() => new ShowcaseItem($id,$specimen),$identifier);
 	$items[$identifier] = CustomiesItemFactory::getInstance()->get($identifier);
 }
-foreach(['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class] as $key=>$class){
+foreach(customiesdevs\showcase\ShowcasePlugin::SPECIAL_ITEMS as $key=>$class){
 	$id = ItemTypeIds::newId();
 	CustomiesItemFactory::getInstance()->registerItem(static fn() => new $class($id),'showcase:'.$key);
 	$items['showcase:'.$key] = CustomiesItemFactory::getInstance()->get('showcase:'.$key);
@@ -86,5 +86,7 @@ $ghost->getState('showcase:phase')->setCurrentValue(2);
 check($ghost->getCollisionBoxes() === [],'Ghost server collision');
 require __DIR__.'/lore.php';
 require __DIR__.'/breaking.php';
+require __DIR__.'/combined.php';
+require __DIR__.'/asset_refs.php';
 file_put_contents(dirname(__DIR__).'/component-coverage.json',json_encode($coverage,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n");
 echo 'PASS: '.count($coverage['block']).' block components, '.count($coverage['item']).' item components, '.count(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries()).' blocks, '.count($items)." items; every block state round-trips.\n";

@@ -2,11 +2,11 @@
   "format_version": 2,
   "header": {
     "name": "Customies Showcase - Prism Laboratory",
-    "description": "Original textures, models and audio for 98 Customies specimens.",
+    "description": "Original textures, models and audio for 108 Customies specimens.",
     "uuid": "d0d0b823-d2c1-54fc-ae7a-a4c68c2f308b",
     "version": [
       1,
-      0,
+      1,
       0
     ],
     "min_engine_version": [
@@ -21,7 +21,7 @@
       "uuid": "768da51e-9522-5b08-b316-a3e076c276c5",
       "version": [
         1,
-        0,
+        1,
         0
       ]
     }

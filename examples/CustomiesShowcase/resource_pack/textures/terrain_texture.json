@@ -43,6 +43,36 @@
     "showcase_glow_flower": {
       "textures": "textures/blocks/showcase_glow_flower"
     },
+    "showcase_signal_lamp": {
+      "textures": "textures/blocks/showcase_signal_lamp"
+    },
+    "showcase_lumen_cable": {
+      "textures": "textures/blocks/showcase_lumen_cable"
+    },
+    "showcase_phase_gate": {
+      "textures": "textures/blocks/showcase_phase_gate"
+    },
+    "showcase_spring_pad": {
+      "textures": "textures/blocks/showcase_spring_pad"
+    },
+    "showcase_prism_workbench": {
+      "textures": "textures/blocks/showcase_prism_workbench"
+    },
+    "showcase_signal_lamp_1": {
+      "textures": "textures/blocks/showcase_signal_lamp_1"
+    },
+    "showcase_signal_lamp_2": {
+      "textures": "textures/blocks/showcase_signal_lamp_2"
+    },
+    "showcase_signal_lamp_3": {
+      "textures": "textures/blocks/showcase_signal_lamp_3"
+    },
+    "showcase_lumen_cable_on": {
+      "textures": "textures/blocks/showcase_lumen_cable_on"
+    },
+    "showcase_spring_pad_on": {
+      "textures": "textures/blocks/showcase_spring_pad_on"
+    },
     "showcase_machine_front": {
       "textures": "textures/blocks/showcase_machine_front"
     },
