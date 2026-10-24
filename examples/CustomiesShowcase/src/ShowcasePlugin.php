@@ -17,6 +17,10 @@ use pocketmine\plugin\PluginBase;
 final class ShowcasePlugin extends PluginBase implements Listener {
 	/** @var array<string, string> */
 	private array $entries = [];
+	/** @var \WeakMap<Player, bool>|null */
+	private ?\WeakMap $detailed = null;
+	/** @var \WeakMap<Player, float>|null */
+	private ?\WeakMap $lastInspection = null;
 	public const SPECIAL_ITEMS = ['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class,'energized_ration'=>EnergizedRation::class,'prism_elixir'=>PrismElixir::class,'frost_blade'=>FrostBlade::class,'prism_chestplate'=>PrismChestplate::class,'prism_leggings'=>PrismLeggings::class,'prism_boots'=>PrismBoots::class,'moon_mochi'=>MoonMochi::class];
 
 	protected function onEnable(): void {
@@ -56,11 +60,24 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		if($action === 'list'){
 			$filter = $args[1] ?? '';
 			$entries = array_filter(array_keys($this->entries),static fn(string $id) => $filter === '' || str_contains($id,$filter));
-			$sender->sendMessage('Showcase IDs ('.count($entries).'): '.implode(', ',$entries));
-			$sender->sendMessage('/cshow give <id> [amount] | /cshow kit [page] | /cshow inspect [block]');
+			$page = filter_var($args[2] ?? '1',FILTER_VALIDATE_INT);
+			$pages = array_chunk(array_values($entries),12);
+			if($pages === []){ $sender->sendMessage('[Showcase] No IDs match '.DebugMessages::bounded($filter,64)); return true; }
+			if($page === false || !isset($pages[$page-1])){ $sender->sendMessage('Choose a list page from 1 to '.count($pages)); return true; }
+			$sender->sendMessage('§b[Showcase] §f'.count($entries).' IDs | page '.$page.'/'.count($pages));
+			foreach(array_chunk($pages[$page-1],4) as $line){ $sender->sendMessage(implode(', ',$line)); }
+			$sender->sendMessage('/cshow give <id> [amount] | /cshow kit [page] | /cshow inspect [block] [full] | /cshow debug <on|off> | /cshow list [filter] [page]');
 			return true;
 		}
 		if(!$sender instanceof Player){ $sender->sendMessage('This action requires an in-game player.'); return true; }
+		if($action === 'debug'){
+			$mode = strtolower($args[1] ?? '');
+			if(!in_array($mode,['on','off'],true)){ $sender->sendMessage('Use /cshow debug on or /cshow debug off'); return true; }
+			$this->detailed ??= new \WeakMap();
+			$this->detailed[$sender] = $mode === 'on';
+			$sender->sendMessage('[Showcase] Detailed inspection '.$mode.'. Tool output is throttled to once per second.');
+			return true;
+		}
 		if($action === 'give'){
 			$id = str_replace('showcase:','',$args[1] ?? '');
 			if(!isset($this->entries[$id])){ $sender->sendMessage('Unknown specimen. Use /cshow list [filter].'); return true; }
@@ -82,13 +99,13 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		if($action === 'inspect'){
 			if(($args[1] ?? '') === 'block'){
 				$block = $sender->getTargetBlock(6);
-				if($block !== null){ $this->inspectBlock($sender,$block); }
+				if($block !== null){ $this->inspectBlock($sender,$block,($args[2] ?? '') === 'full'); }else{ $sender->sendMessage('[Showcase] No block in range (6 blocks).'); }
 			}else{
 				$item = $sender->getInventory()->getItemInHand();
 				$sender->sendMessage($item->getName().' | server type '.$item->getTypeId().' | stack '.$item->getMaxStackSize());
 				$sender->sendMessage(implode("\n", $item->getLore()));
 				$sender->sendMessage('Components: '.($item instanceof ItemComponents ? implode(', ',array_map(static fn($c) => $c->getName(),$item->getComponents())) : 'block item / vanilla'));
-				$sender->sendMessage('NBT: '.$item->getNamedTag()->toString());
+				if(($args[1] ?? '') === 'full' || ($this->detailed[$sender] ?? false)){ $sender->sendMessage('NBT: '.DebugMessages::bounded($item->getNamedTag()->toString())); }
 			}
 			return true;
 		}
@@ -111,12 +128,8 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		$player->getInventory()->addItem($item);
 	}
 
-	private function inspectBlock(Player $player, \pocketmine\block\Block $block): void {
-		$states = [];
-		if($block instanceof BlockStates){ foreach($block->getStates() as $s){ $states[$s->getName()] = $s->getCurrentValue(); } }
-		$player->sendMessage(implode("\n", $block->asItem()->getLore()));
-		$player->sendMessage($block->getName().' | states: '.json_encode($states));
-		if($block instanceof BlockComponents){ $player->sendMessage('Components: '.implode(', ',array_map(static fn($c) => $c->getName(),$block->getComponents()))); }
+	private function inspectBlock(Player $player, \pocketmine\block\Block $block, bool $full = false): void {
+		foreach(DebugMessages::block($block,$full || ($this->detailed[$player] ?? false)) as $line){ $player->sendMessage($line); }
 	}
 
 	/**
@@ -130,11 +143,15 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 		$player = $event->getPlayer();
 		if(!$player->hasPermission('customiesshowcase.command')){ return; }
 		$event->cancel();
+		$this->lastInspection ??= new \WeakMap();
+		$now = microtime(true);
+		if($now - ($this->lastInspection[$player] ?? 0) < 1.0){ return; }
+		$this->lastInspection[$player] = $now;
 		$block = $event->getBlock();
 		if($item->getSpecimen() === 'builder_compass'){
 			$parts = $block->getAffectedBlocks();
 			$positions = array_map(static fn($b) => $b->getPosition()->getFloorX().','.$b->getPosition()->getFloorY().','.$b->getPosition()->getFloorZ(),$parts);
-			$player->sendMessage('Structure cells ('.count($parts).'): '.implode(' | ',$positions));
+			foreach(array_chunk($positions,4) as $i=>$line){ $player->sendMessage('§7Cells '.($i*4+1).'-'.min(($i+1)*4,count($parts)).'/'.count($parts).': §f'.implode(' | ',$line)); }
 		}
 		if($item->getSpecimen() === 'state_wrench' && $block instanceof ShowcaseBlock){
 			if(ExpansionBlocks::has($block->getSpecimen())){

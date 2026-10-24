@@ -88,6 +88,33 @@
     "showcase_runic_pedestal": {
       "textures": "textures/blocks/showcase_runic_pedestal"
     },
+    "showcase_runic_arch": {
+      "textures": "textures/blocks/showcase_runic_arch"
+    },
+    "showcase_thermal_forge": {
+      "textures": "textures/blocks/showcase_thermal_forge"
+    },
+    "showcase_crystal_conservatory": {
+      "textures": "textures/blocks/showcase_crystal_conservatory"
+    },
+    "showcase_sky_dock": {
+      "textures": "textures/blocks/showcase_sky_dock"
+    },
+    "showcase_storm_engine": {
+      "textures": "textures/blocks/showcase_storm_engine"
+    },
+    "showcase_molten_cell": {
+      "textures": "textures/blocks/showcase_molten_cell"
+    },
+    "showcase_tide_cell": {
+      "textures": "textures/blocks/showcase_tide_cell"
+    },
+    "showcase_aurora_tile": {
+      "textures": "textures/blocks/showcase_aurora_tile"
+    },
+    "showcase_astral_beacon": {
+      "textures": "textures/blocks/showcase_astral_beacon"
+    },
     "showcase_sky_obelisk_on": {
       "textures": "textures/blocks/showcase_sky_obelisk_on"
     },
@@ -100,14 +127,41 @@
     "showcase_pocket_planter_on": {
       "textures": "textures/blocks/showcase_pocket_planter_on"
     },
+    "showcase_reactor_flow": {
+      "textures": "textures/blocks/showcase_reactor_flow"
+    },
+    "showcase_runic_arch_flow": {
+      "textures": "textures/blocks/showcase_runic_arch_flow"
+    },
+    "showcase_thermal_forge_flow": {
+      "textures": "textures/blocks/showcase_thermal_forge_flow"
+    },
+    "showcase_crystal_conservatory_flow": {
+      "textures": "textures/blocks/showcase_crystal_conservatory_flow"
+    },
+    "showcase_sky_dock_flow": {
+      "textures": "textures/blocks/showcase_sky_dock_flow"
+    },
+    "showcase_storm_engine_flow": {
+      "textures": "textures/blocks/showcase_storm_engine_flow"
+    },
+    "showcase_molten_cell_flow": {
+      "textures": "textures/blocks/showcase_molten_cell_flow"
+    },
+    "showcase_tide_cell_flow": {
+      "textures": "textures/blocks/showcase_tide_cell_flow"
+    },
+    "showcase_aurora_tile_flow": {
+      "textures": "textures/blocks/showcase_aurora_tile_flow"
+    },
+    "showcase_astral_beacon_flow": {
+      "textures": "textures/blocks/showcase_astral_beacon_flow"
+    },
     "showcase_mini_chess_1": {
       "textures": "textures/blocks/showcase_mini_chess_1"
     },
     "showcase_mini_chess_2": {
       "textures": "textures/blocks/showcase_mini_chess_2"
-    },
-    "showcase_reactor_flow": {
-      "textures": "textures/blocks/showcase_reactor_flow"
     },
     "showcase_signal_lamp_1": {
       "textures": "textures/blocks/showcase_signal_lamp_1"

@@ -57,3 +57,24 @@ No Minecraft client playtest was available. These checks cover server logic and 
 - A common-scale model preview is generated from the authored cubes, including cube rotations.
 
 No Minecraft client playtest was available. Armor/hand alignment, slim skins, first-person poses, visual animation playback and input prediction remain client validation tasks.
+
+## Structure footprint expansion (Showcase 1.3.0)
+
+- Six non-linear structure definitions contain 9, 12, 26, 15, 16 and 32 cells;
+  every footprint places and breaks from every part in all four directions.
+- Whole-footprint obstruction checks, height bounds, persisted state round trips,
+  matching local collision boxes and one-item drops use real PocketMine APIs.
+- Structure abilities require power and completeness, consume one Resonance Cell,
+  and produce the specified effect duration/amplifier. Failed offers preserve items.
+- Breaking an incomplete structure preserves unrelated blocks occupying missing cells.
+- Chromatic Lens executes the real item interaction hook and synchronizes power.
+- Layout validation rejects duplicate, noninteger and incorrectly anchored cells.
+- Compact debug output omits verbose components; NBT output is capped at 1024 bytes.
+- 70 block / 66 item registrations, every state round trip, all lore and asset
+  references, ten eight-frame block flipbooks and existing animated gear are checked.
+- Client playback, visual alignment and prediction still require in-game testing.
+
+Packaged Showcase 1.3.0 and Customies 1.5.42 loaded together on the isolated
+Axolotl server with the 1.3.0 resource pack. Startup registered all 136 specimens,
+reached Done, and shut down cleanly. Log: structures-startup.log in the local
+integration-server directory.

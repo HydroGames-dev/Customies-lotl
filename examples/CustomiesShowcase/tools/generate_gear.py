@@ -101,7 +101,7 @@ entries=[]
 for name,definition in json.loads((BASE/'resources/expansion_blocks.json').read_text()).items():
     cubes=[]
     for index,segment in enumerate(definition['segments']):
-        dx,dy,dz=0,0,0
+        dx,dy,dz=[v*16 for v in definition['layout'][index]] if 'layout' in definition else (0,0,0)
         if definition.get('direction')=='up':dy=index*16
         elif definition.get('direction')=='down':dy=-index*16
         elif definition.get('direction')=='north':dz=-index*16
@@ -110,7 +110,7 @@ for name,definition in json.loads((BASE/'resources/expansion_blocks.json').read_
 for name in ['prism_helmet','prism_chestplate','prism_leggings','prism_boots','clockwork_staff','wind_fan','frost_blade']:
     g=json.loads((PACK/'models/entity'/f'{name}.geo.json').read_text())['minecraft:geometry'][0]
     entries.append((name,[c for b in g['bones'] for c in b['cubes']]))
-W,H=240,245;cols=5
+W,H=240,320;cols=5
 sheet=Image.new('RGB',(W*cols,55+math.ceil(len(entries)/cols)*H),(14,25,37));draw=ImageDraw.Draw(sheet)
 draw.text((18,14),'PRISM EXPANSION / GEOMETRY AT COMMON SCALE',font=ImageFont.load_default(size=19),fill=(118,240,220))
 for n,(name,cubes) in enumerate(entries):
@@ -133,8 +133,8 @@ for n,(name,cubes) in enumerate(entries):
     allpoints=[p for _,poly,_ in faces for p in poly]
     midx=(min(p[0] for p in allpoints)+max(p[0] for p in allpoints))/2
     midy=(min(p[1] for p in allpoints)+max(p[1] for p in allpoints))/2
-    for _,poly,color in sorted(faces,key=lambda f:f[0]):draw.polygon([(x+W/2+(px-midx)*2.2,y+104+(py-midy)*2.2) for px,py in poly],fill=color,outline=(20,59,71))
-    draw.text((x+10,y+211),name,font=ImageFont.load_default(size=12),fill=(215,235,237))
-    draw.text((x+10,y+229),'Rest pose / 2.2 px per model pixel',font=ImageFont.load_default(size=10),fill=(125,163,176))
+    for _,poly,color in sorted(faces,key=lambda f:f[0]):draw.polygon([(x+W/2+(px-midx)*1.7,y+139+(py-midy)*1.7) for px,py in poly],fill=color,outline=(20,59,71))
+    draw.text((x+10,y+286),name,font=ImageFont.load_default(size=12),fill=(215,235,237))
+    draw.text((x+10,y+304),'Rest pose / 1.7 px per model pixel',font=ImageFont.load_default(size=10),fill=(125,163,176))
 sheet.save(BASE/'model-preview.png')
 print('Generated 4 armor rigs, 3 held rigs, 17 local animations, 2 animation controllers and model preview.')

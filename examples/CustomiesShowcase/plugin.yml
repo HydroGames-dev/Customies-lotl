@@ -1,7 +1,7 @@
 name: CustomiesShowcase
 main: customiesdevs\showcase\ShowcasePlugin
 src-namespace-prefix: customiesdevs\showcase
-version: 1.2.0
+version: 1.3.0
 api: 5.49.0
 load: POSTWORLD
 depend: [Customies-Axolotl]
@@ -10,7 +10,7 @@ description: Playable Customies examples and a complete component laboratory.
 commands:
   cshow:
     description: Browse, give, and inspect Customies showcase specimens
-    usage: "/cshow <list|give|kit|inspect> [id/page] [amount]"
+    usage: "/cshow <list|give|kit|inspect|debug> [id/page] [amount]"
     permission: customiesshowcase.command
 permissions:
   customiesshowcase.command:

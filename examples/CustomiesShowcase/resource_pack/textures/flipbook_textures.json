@@ -3,5 +3,50 @@
     "flipbook_texture": "textures/blocks/showcase_reactor_flow",
     "atlas_tile": "showcase_reactor_flow",
     "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_runic_arch_flow",
+    "atlas_tile": "showcase_runic_arch_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_thermal_forge_flow",
+    "atlas_tile": "showcase_thermal_forge_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_crystal_conservatory_flow",
+    "atlas_tile": "showcase_crystal_conservatory_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_sky_dock_flow",
+    "atlas_tile": "showcase_sky_dock_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_storm_engine_flow",
+    "atlas_tile": "showcase_storm_engine_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_molten_cell_flow",
+    "atlas_tile": "showcase_molten_cell_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_tide_cell_flow",
+    "atlas_tile": "showcase_tide_cell_flow",
+    "ticks_per_frame": 4
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_aurora_tile_flow",
+    "atlas_tile": "showcase_aurora_tile_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_astral_beacon_flow",
+    "atlas_tile": "showcase_astral_beacon_flow",
+    "ticks_per_frame": 3
   }
 ]

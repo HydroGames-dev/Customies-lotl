@@ -138,23 +138,44 @@ def texture(name, item=False):
                     if seed & (1 << ((y-5)*6+x-5)): draw.point((x,y),fill=white)
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 125 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,2,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,2,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
-block_names = ['showcase_'+name for name in BLOCKS] + [*( 'showcase_'+key+'_on' for key,d in EXPANSION.items() if d['mode']=='powered' and key != 'crystal_reactor'), 'showcase_mini_chess_1','showcase_mini_chess_2','showcase_reactor_flow','showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 136 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,3,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,3,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+animated = {'showcase_reactor_flow':'reactor', **{d['active_texture']:key for key,d in EXPANSION.items() if 'active_texture' in d}}
+block_names = ['showcase_'+name for name in BLOCKS] + [*( 'showcase_'+key+'_on' for key,d in EXPANSION.items() if d['mode']=='powered' and key != 'crystal_reactor' and 'active_texture' not in d), *animated, 'showcase_mini_chess_1','showcase_mini_chess_2','showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
 item_names = ['showcase_'+name for name in ITEMS] + ['showcase_lab_item_'+key for key in COVERAGE['item']]
 for kind,names in [('blocks',block_names),('items',item_names)]:
     for name in names:
         path=PACK/'textures'/kind/(name+'.png');path.parent.mkdir(parents=True,exist_ok=True)
         texture(name,kind=='items').save(path)
-flow=Image.new('RGBA',(16,128))
-for frame in range(8):
-    tile=texture('showcase_reactor_flow')
-    pixels=tile.load()
-    for y in range(16):
-        for x in range(16):
-            if (x+y+frame*2)%8 < 3:pixels[x,y]=(118,250,232,255)
-    flow.paste(tile,(0,frame*16))
-flow.save(PACK/'textures/blocks/showcase_reactor_flow.png')
-write(Path('textures/flipbook_textures.json'),[{'flipbook_texture':'textures/blocks/showcase_reactor_flow','atlas_tile':'showcase_reactor_flow','ticks_per_frame':3}])
+flipbooks=[]
+for name,style in animated.items():
+    flow=Image.new('RGBA',(16,128))
+    palettes={
+        'thermal_forge':((68,24,20),(255,161,45)), 'molten_cell':((87,22,31),(255,211,70)),
+        'tide_cell':((18,54,107),(72,224,249)), 'aurora_tile':((37,25,86),(162,255,199)),
+        'runic_arch':((47,24,88),(217,148,255)), 'crystal_conservatory':((19,76,43),(153,255,109)),
+        'sky_dock':((24,52,84),(162,233,255)), 'storm_engine':((36,24,77),(216,226,255)),
+        'astral_beacon':((29,23,81),(243,224,154)),
+        'reactor':((18,72,75),(118,250,232))}
+    dark,bright=palettes[style]
+    for frame in range(8):
+        tile=Image.new('RGBA',(16,16),dark+(255,)); pixels=tile.load()
+        for y in range(16):
+            for x in range(16):
+                if style in ('molten_cell','thermal_forge'):
+                    glow=(x*2+y+frame*2+(y//4)*3)%13<4
+                elif style in ('aurora_tile','tide_cell'):
+                    glow=(y+round(2*math.sin((x+frame*2)*math.pi/8))+frame)%8<3
+                elif style=='storm_engine':
+                    glow=(x+y*3+frame*2)%11<2 or (x-y-frame)%16==0
+                elif style=='crystal_conservatory':
+                    glow=(x-frame)%8==0 or (y+x//3+frame)%9<2
+                else:glow=(x+y+frame*2)%8<3
+                if glow:pixels[x,y]=bright+(255,)
+                elif x in (0,15) or y in (0,15):pixels[x,y]=tuple(max(0,c-12) for c in dark)+(255,)
+        flow.paste(tile,(0,frame*16))
+    flow.save(PACK/'textures/blocks'/(name+'.png'))
+    flipbooks.append({'flipbook_texture':'textures/blocks/'+name,'atlas_tile':name,'ticks_per_frame':4 if style=='tide_cell' else 3})
+write(Path('textures/flipbook_textures.json'),flipbooks)
 write(Path('textures/terrain_texture.json'), {'resource_pack_name':'CustomiesShowcase','texture_name':'atlas.terrain','padding':8,'num_mip_levels':4,'texture_data':{n:{'textures':'textures/blocks/'+n} for n in block_names}})
 write(Path('textures/item_texture.json'), {'resource_pack_name':'CustomiesShowcase','texture_name':'atlas.items','texture_data':{n:{'textures':'textures/items/'+n} for n in item_names}})
 write(Path('blocks.json'), {'format_version':[1,1,0], **{'showcase:'+name:{'sound':'stone','textures':'showcase_'+name} for name in BLOCKS}, **{'showcase:lab_block_'+key:{'sound':'stone','textures':'showcase_lab_block_'+key} for key in COVERAGE['block']}})

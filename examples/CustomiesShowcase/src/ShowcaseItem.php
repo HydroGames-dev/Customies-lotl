@@ -10,14 +10,14 @@ use pocketmine\entity\effect\{EffectInstance, VanillaEffects};
 
 final class ShowcaseItem extends Item implements ItemComponents {
 	use ComponentItemTrait;
-	public const PLAYABLE = ['inspector','state_wrench','pulse_wand','prism','ember_fuel','pigment','scout_wand','repair_kit','clockwork_staff','wind_fan','builder_compass'];
+	public const PLAYABLE = ['inspector','state_wrench','pulse_wand','prism','ember_fuel','pigment','scout_wand','repair_kit','clockwork_staff','wind_fan','builder_compass','chromatic_lens','resonance_cell'];
 	public function __construct(int $id, string $specimen){
 		$name = ucwords(str_replace('_',' ',$specimen));
 		parent::__construct(new ItemIdentifier($id),$name);
 		$this->configureComponents($specimen,$name,$this->stackSize($specimen));
-		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass'],true)){
+		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass','chromatic_lens'],true)){
 			$this->addComponent(new I\HandEquippedComponent());
-			$this->addComponent(new I\InteractButtonComponent(match($specimen){ 'pulse_wand'=>'Pulse','scout_wand'=>'Scout','clockwork_staff'=>'Haste','wind_fan'=>'Dash','builder_compass'=>'Survey','state_wrench'=>'Cycle state',default=>'Inspect' }));
+			$this->addComponent(new I\InteractButtonComponent(match($specimen){ 'pulse_wand'=>'Pulse','scout_wand'=>'Scout','clockwork_staff'=>'Haste','wind_fan'=>'Dash','builder_compass'=>'Survey','chromatic_lens'=>'Alter texture','state_wrench'=>'Cycle state',default=>'Inspect' }));
 		}
 		if(in_array($specimen,['clockwork_staff','wind_fan'],true)){ $this->addComponent(new I\CooldownComponent('showcase:'.$specimen,$specimen === 'clockwork_staff' ? 8.0 : 3.0)); $this->addComponent(new I\RarityComponent('rare')); }
 		if($specimen === 'clockwork_staff'){ $this->addComponent(new I\GlintComponent()); }
@@ -29,7 +29,7 @@ final class ShowcaseItem extends Item implements ItemComponents {
 		if($specimen === 'pigment'){ $this->addComponent(new I\DyeableComponent('#39d8ce')); }
 	}
 	private function stackSize(string $specimen): int {
-		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass','lab_wearable','lab_damage_absorption','lab_durability','lab_durability_sensor','lab_repairable','lab_shooter','lab_kinetic_weapon','lab_piercing_weapon','lab_storage_item','lab_bundle_interaction','lab_storage_weight_limit','lab_storage_weight_modifier'],true)){ return 1; }
+		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass','chromatic_lens','lab_wearable','lab_damage_absorption','lab_durability','lab_durability_sensor','lab_repairable','lab_shooter','lab_kinetic_weapon','lab_piercing_weapon','lab_storage_item','lab_bundle_interaction','lab_storage_weight_limit','lab_storage_weight_modifier'],true)){ return 1; }
 		return in_array($specimen,['lab_max_stack_size','repair_kit'],true) ? 16 : 64;
 	}
 	public function getMaxStackSize(): int { return $this->stackSize($this->getSpecimen()); }
@@ -47,6 +47,14 @@ final class ShowcaseItem extends Item implements ItemComponents {
 		$target->setDamage(max(0,$target->getDamage()-64));
 		$this->pop();
 		return true;
+	}
+	public function onInteractBlock(Player $player, \pocketmine\block\Block $blockReplace, \pocketmine\block\Block $blockClicked, int $face, Vector3 $clickVector, array &$returnedItems): ItemUseResult {
+		if(in_array($this->getSpecimen(),['chromatic_lens','resonance_cell'],true)){
+			if($blockClicked instanceof ShowcaseBlock && ExpansionBlocks::has($blockClicked->getSpecimen()) && ($this->getSpecimen() !== 'chromatic_lens' || in_array(ExpansionBlocks::definitions()[$blockClicked->getSpecimen()]['mode'],['powered','color'],true)) && ExpansionBlocks::interact($blockClicked,$this,$player)){ return ItemUseResult::SUCCESS; }
+			$player->sendActionBarMessage('Use on a compatible showcase block'.($this->getSpecimen() === 'resonance_cell' ? ' with a structure ability' : ''));
+			return ItemUseResult::FAIL;
+		}
+		return parent::onInteractBlock($player,$blockReplace,$blockClicked,$face,$clickVector,$returnedItems);
 	}
 	public function onClickAir(Player $player, Vector3 $directionVector, array &$returnedItems): ItemUseResult {
 		if($this->getSpecimen() === 'clockwork_staff'){

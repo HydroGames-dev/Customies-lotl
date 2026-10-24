@@ -35,6 +35,12 @@
     "showcase_builder_compass": {
       "textures": "textures/items/showcase_builder_compass"
     },
+    "showcase_chromatic_lens": {
+      "textures": "textures/items/showcase_chromatic_lens"
+    },
+    "showcase_resonance_cell": {
+      "textures": "textures/items/showcase_resonance_cell"
+    },
     "showcase_prism_berry": {
       "textures": "textures/items/showcase_prism_berry"
     },

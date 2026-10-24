@@ -3,6 +3,8 @@ import json, struct, uuid
 BASE=Path(__file__).resolve().parents[1];PACK=BASE/'resource_pack'
 def check(ok,message):
     if not ok:raise AssertionError(message)
+# Chat formatting and translated names must remain valid UTF-8 on the wire.
+for path in (BASE/'src').glob('*.php'):path.read_bytes().decode('utf-8')
 for path in PACK.rglob('*.json'):
     json.loads(path.read_text(encoding='utf-8'))
 manifest=json.loads((PACK/'manifest.json').read_text())
@@ -16,7 +18,7 @@ for atlas in ['terrain_texture','item_texture']:
         raw=path.read_bytes()
         check(raw[:8]==b'\x89PNG\r\n\x1a\n',f'Invalid PNG {path}')
         dims=struct.unpack('>II',raw[16:24])
-        check(dims==(16,16) or (key=='showcase_reactor_flow' and dims==(16,128)),f'Unexpected dimensions {path}')
+        check(dims==(16,16) or (key.endswith('_flow') and dims==(16,128)),f'Unexpected dimensions {path}')
 models={}
 for path in (PACK/'models').rglob('*.json'):
     for geometry in json.loads(path.read_text())['minecraft:geometry']:
@@ -82,3 +84,11 @@ for path in (PACK/'attachables').glob('*.json'):
 flipbooks=json.loads((PACK/'textures/flipbook_textures.json').read_text())
 check(any(f['atlas_tile']=='showcase_reactor_flow' and f['ticks_per_frame']>0 for f in flipbooks),'Missing reactor flipbook')
 print(f'PASS: {len(animations)} animations, {len(controllers)} animation controllers, all gear rigs/bones/poses and reactor flipbook.')
+
+# Every custom animated material must have a matching, complete eight-frame strip.
+expected={d['active_texture'] for d in json.loads((BASE/'resources/expansion_blocks.json').read_text()).values() if 'active_texture' in d}
+check(expected <= {f['atlas_tile'] for f in flipbooks},'Missing state-driven flipbooks')
+for f in flipbooks:
+    raw=(PACK/(f['flipbook_texture']+'.png')).read_bytes()
+    check(struct.unpack('>II',raw[16:24])==(16,128),'Flipbook must have eight square frames')
+print(f'PASS: {len(flipbooks)} animated state-driven block textures.')

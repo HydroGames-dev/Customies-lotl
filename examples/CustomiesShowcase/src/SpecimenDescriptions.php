@@ -8,6 +8,16 @@ use pocketmine\utils\TextFormat as F;
 final class SpecimenDescriptions {
 	/** @var array<string, list<string>> */
 	private const BLOCKS = [
+		'astral_beacon' => ['A 5 x 6 x 3 astral pavilion with 32 occupied cells.','Toggle power; offer a Resonance Cell for Night Vision 60s.'],
+		'runic_arch' => ['A 3 x 4 x 1 rune arch with a walk-through opening.','Toggle power; offer a Resonance Cell for Speed I 20s.'],
+		'thermal_forge' => ['A 3 x 2 x 2 furnace structure with flowing embers.','Toggle power; offer a Resonance Cell for Haste II 20s.'],
+		'crystal_conservatory' => ['A 3 x 3 x 3 crystal garden with 26 occupied cells.','Toggle power; offer a Resonance Cell for Regeneration I 10s.'],
+		'sky_dock' => ['A 5 x 1 x 3 elevated deck with raised side guards.','Toggle power; offer a Resonance Cell for Jump II 20s.'],
+		'storm_engine' => ['A 4 x 2 x 2 engine with animated electric conduits.','Toggle power; offer a Resonance Cell for Resistance I 15s.'],
+		'molten_cell' => ['A full-size energy block with flowing molten bands.','Interact or use Chromatic Lens to toggle animation and light.'],
+		'tide_cell' => ['A three-quarter-height block with a flowing water texture.','Interact or use Chromatic Lens to toggle animation and light.'],
+		'aurora_tile' => ['A quarter-height luminous aurora floor tile.','Interact or use Chromatic Lens to toggle animation and light.'],
+
 		'sky_obelisk' => ['A four-block rune tower with a luminous crown.','Needs 4 free cells above; interact to light all parts.'],
 		'crystal_reactor' => ['A three-block reactor with an animated energy core.','Interact on any part to toggle the entire reactor.'],
 		'suspended_chandelier' => ['A hanging three-block lamp with a narrow chain.','Place below a ceiling; needs 3 free cells downward.'],
@@ -39,6 +49,8 @@ final class SpecimenDescriptions {
 	];
 	/** @var array<string, list<string>> */
 	private const ITEMS = [
+		'chromatic_lens' => ['A reusable server-side texture and power control.','Use on powered/color expansion blocks; updates every part.'],
+		'resonance_cell' => ['Consumable energy for six large structure abilities.','Power the complete structure, then offer one cell.'],
 		'prism_chestplate' => ['Crystal plate with animated shoulder satellites.','Armor: 6 | Durability: 384 | Slot: chest'],
 		'prism_leggings' => ['Prism leg plates with articulated knee crystals.','Armor: 5 | Durability: 360 | Slot: legs'],
 		'prism_boots' => ['Winglet boots that grant Jump Boost I while worn.','Armor: 2 | Durability: 300 | No flight ability'],

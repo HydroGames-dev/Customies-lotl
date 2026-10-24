@@ -116,6 +116,42 @@
     "sound": "stone",
     "textures": "showcase_runic_pedestal"
   },
+  "showcase:runic_arch": {
+    "sound": "stone",
+    "textures": "showcase_runic_arch"
+  },
+  "showcase:thermal_forge": {
+    "sound": "stone",
+    "textures": "showcase_thermal_forge"
+  },
+  "showcase:crystal_conservatory": {
+    "sound": "stone",
+    "textures": "showcase_crystal_conservatory"
+  },
+  "showcase:sky_dock": {
+    "sound": "stone",
+    "textures": "showcase_sky_dock"
+  },
+  "showcase:storm_engine": {
+    "sound": "stone",
+    "textures": "showcase_storm_engine"
+  },
+  "showcase:molten_cell": {
+    "sound": "stone",
+    "textures": "showcase_molten_cell"
+  },
+  "showcase:tide_cell": {
+    "sound": "stone",
+    "textures": "showcase_tide_cell"
+  },
+  "showcase:aurora_tile": {
+    "sound": "stone",
+    "textures": "showcase_aurora_tile"
+  },
+  "showcase:astral_beacon": {
+    "sound": "stone",
+    "textures": "showcase_astral_beacon"
+  },
   "showcase:lab_block_block_entity": {
     "sound": "stone",
     "textures": "showcase_lab_block_block_entity"

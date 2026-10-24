@@ -35,4 +35,4 @@ See [traits, presets, compatibility, and regression checks](docs/traits-and-pres
 
 ## Showcase plugin and assets
 
-[Customies Showcase](examples/CustomiesShowcase/README.md) includes 61 blocks, 64 items, a resource pack, complete component specimens, and reproducible build tools.
+[Customies Showcase](examples/CustomiesShowcase/README.md) includes 70 blocks, 66 items, a resource pack, complete component specimens, and reproducible build tools.

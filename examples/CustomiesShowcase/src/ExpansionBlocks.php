@@ -14,23 +14,32 @@ use pocketmine\entity\effect\{EffectInstance,VanillaEffects};
 final class ExpansionBlocks {
 	public static function definitions(): array {
 		static $data = null;
-		return $data ??= json_decode(file_get_contents(__DIR__.'/../resources/expansion_blocks.json'),true,512,JSON_THROW_ON_ERROR);
+		if($data === null){
+			$data = json_decode(file_get_contents(__DIR__.'/../resources/expansion_blocks.json'),true,512,JSON_THROW_ON_ERROR);
+			foreach($data as $definition){ if(isset($definition['layout'])){ StructureLayout::validate($definition); } }
+		}
+		return $data;
 	}
 	public static function has(string $id): bool { return isset(self::definitions()[$id]); }
 	private static function definition(ShowcaseBlock $block): array { return self::definitions()[$block->getSpecimen()]; }
 	public static function configure(ShowcaseBlock $block): void {
 		$d = self::definition($block); $id = $block->getSpecimen();
-		if(isset($d['direction'])){
+		if(isset($d['layout'])){
+			BlockPresets::cardinal($block);
+			$block->addState(BlockState::range(StructureLayout::PART,0,$d['parts']-1));
+			$block->addComponent(new B\MovableComponent());
+		}elseif(isset($d['direction'])){
 			if(in_array($d['direction'],['north','south','west','east'],true)){ BlockPresets::cardinal($block); }
 			BlockPresets::multiBlock($block,$d['direction'],$d['parts']);
 		}
 		if($d['mode'] === 'powered'){ $block->addState(BlockState::bool('showcase:powered')); }
 		if($d['mode'] === 'color'){ $block->addState(BlockState::range('showcase:color',0,2)); }
+		$partState = isset($d['layout']) ? StructureLayout::PART : 'minecraft:multi_block_part';
 		foreach($d['segments'] as $i=>$segment){
-			if($i > 0){ $block->addPermutation(new BlockPermutation("q.block_state('minecraft:multi_block_part') == $i",new B\GeometryComponent("geometry.showcase.{$id}_{$i}"),self::shapeComponents($segment))); }
+			if($i > 0){ $block->addPermutation(new BlockPermutation("q.block_state('$partState') == $i",new B\GeometryComponent("geometry.showcase.{$id}_{$i}"),self::shapeComponents($segment))); }
 		}
 		if($d['mode'] === 'powered'){
-			$texture = $id === 'crystal_reactor' ? 'showcase_reactor_flow' : 'showcase_'.$id.'_on';
+			$texture = $d['active_texture'] ?? ($id === 'crystal_reactor' ? 'showcase_reactor_flow' : 'showcase_'.$id.'_on');
 			$block->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",new B\MaterialInstancesComponent([new Material('*',$texture)]),[new B\LightEmissionComponent($d['active_light'])]));
 		}
 		if($d['mode'] === 'color'){
@@ -54,10 +63,10 @@ final class ExpansionBlocks {
 	public static function light(ShowcaseBlock $block): int {
 		$d = self::definition($block);
 		if($d['mode'] === 'powered' && $block->getState('showcase:powered')->getCurrentValue()){ return $d['active_light']; }
-		return $d['segments'][$block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0]['light'];
+		return $d['segments'][$block->getState(StructureLayout::PART)?->getCurrentValue() ?? $block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0]['light'];
 	}
 	public static function collision(ShowcaseBlock $block): array {
-		$d = self::definition($block); $part = $block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0;
+		$d = self::definition($block); $part = $block->getState(StructureLayout::PART)?->getCurrentValue() ?? $block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0;
 		[$x,$y,$z,$xx,$yy,$zz] = $d['segments'][$part]['bounds'];
 		$direction = $block->getState('minecraft:cardinal_direction')?->getCurrentValue();
 		$turns = ['north'=>0,'west'=>1,'south'=>2,'east'=>3][$direction ?? 'north'];
@@ -73,14 +82,34 @@ final class ExpansionBlocks {
 	}
 	public static function interact(ShowcaseBlock $block, Item $item, ?Player $player): bool {
 		$d = self::definition($block);
+		if($item instanceof ShowcaseItem && $item->getSpecimen() === 'resonance_cell'){
+			if(!isset($d['ability']) || $player === null || $item->getCount() < 1){ return false; }
+			if(!$block->getState('showcase:powered')->getCurrentValue()){
+				$player->sendActionBarMessage('Power on '.$block->getName().' before offering a Resonance Cell'); return true;
+			}
+			if(count($block->getAffectedBlocks()) !== $d['parts']){
+				$player->sendActionBarMessage('Structure incomplete: rebuild missing cells before using its ability'); return true;
+			}
+			$effect = match($d['ability']){
+				'speed' => VanillaEffects::SPEED(), 'haste' => VanillaEffects::HASTE(),
+				'regeneration' => VanillaEffects::REGENERATION(), 'jump' => VanillaEffects::JUMP_BOOST(),
+				'resistance' => VanillaEffects::RESISTANCE(), 'night_vision' => VanillaEffects::NIGHT_VISION()
+			};
+			$player->getEffects()->add(new EffectInstance($effect,$d['duration'],$d['amplifier'] ?? 0));
+			$item->pop();
+			$player->sendActionBarMessage($block->getName().': '.$d['ability'].' for '.($d['duration']/20).'s | 1 Resonance Cell used');
+			return true;
+		}
 		if($d['mode'] === 'powered' || $d['mode'] === 'color'){
 			$name = $d['mode'] === 'powered' ? 'showcase:powered' : 'showcase:color';
 			$property = $block->getState($name); $values = $property->getValues();
 			$value = $values[(array_search($property->getCurrentValue(),$values,true)+1)%count($values)];
-			foreach($block->getAffectedBlocks() as $part){
+			$parts = $block->getAffectedBlocks();
+			foreach($parts as $part){
 				$part->getState($name)->setCurrentValue($value);
 				$part->getPosition()->getWorld()->setBlock($part->getPosition(),$part);
 			}
+			$player?->sendActionBarMessage($block->getName().': '.(is_bool($value) ? ($value ? 'power on' : 'power off') : 'color '.$value).' | '.count($parts).' cells');
 			return true;
 		}
 		if($d['mode'] === 'telescope'){

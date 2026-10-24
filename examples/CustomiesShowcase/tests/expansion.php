@@ -12,7 +12,7 @@ class ExpansionWorld extends ShowcaseBreakWorld {
 }
 $factory=CustomiesBlockFactory::getInstance();
 foreach(ExpansionBlocks::definitions() as $name=>$definition){
-	$directions=isset($definition['direction']) && in_array($definition['direction'],['north','south','east','west'],true) ? ['north','east','south','west'] : [null];
+	$directions=isset($definition['layout']) || (isset($definition['direction']) && in_array($definition['direction'],['north','south','east','west'],true)) ? ['north','east','south','west'] : [null];
 	foreach($directions as $direction){
 		$world=new ExpansionWorld();$at=new Vector3(100,70,-100);
 		$block=$factory->get('showcase:'.$name);
@@ -47,7 +47,8 @@ foreach(ExpansionBlocks::definitions() as $name=>$definition){
 		}
 		if($definition['parts']>1){
 			$world=new ExpansionWorld();$replace=$world->getBlock($at);$trait=$block->getTrait('minecraft:multi_block');
-			$obstruction=$at->addVector($trait->getOffsetForPart($definition['parts']-1,$direction));
+			$offset = isset($definition['layout']) ? customiesdevs\showcase\StructureLayout::offset($definition,$definition['parts']-1,$direction) : $trait->getOffsetForPart($definition['parts']-1,$direction);
+			$obstruction=$at->addVector($offset);
 			$world->setBlock($obstruction,pocketmine\block\VanillaBlocks::STONE());$tx=new BlockTransaction($world);
 			check(!$block->place($tx,$block->asItem(),$replace,$replace,1,Vector3::zero()),'Obstructed multi-block placement must fail');
 			check($world->getBlock($at) instanceof pocketmine\block\Air,'Failed placement must not write the origin');
@@ -85,3 +86,43 @@ class FanPlayer extends ShowcasePlayer {
 $fanPlayer=new FanPlayer();$items['showcase:wind_fan']->onClickAir($fanPlayer,new Vector3(1,0,0),$returned);
 check($fanPlayer->appliedMotion !== null && $fanPlayer->appliedMotion->x===0.9 && $fanPlayer->appliedMotion->y===0.2,'Fan must apply a forward dash with upward lift');
 echo "PASS: expansion placement, every-part breaking, directions, bounds/obstructions, grouped toggles, miniatures, offerings, armor, staff, fan and food.\n";
+
+// Large structure abilities consume exactly one cell, only when powered and complete.
+foreach(ExpansionBlocks::definitions() as $name=>$d){
+    if(!isset($d['layout'])){ continue; }
+    check(count($d['layout'])>4,'Structure-sized examples must exceed native chain length');
+    $world=new ExpansionWorld();$at=new Vector3(60,70,60);$block=$factory->get('showcase:'.$name);
+    $replace=$world->getBlock($at);$tx=new BlockTransaction($world);
+    check($block->place($tx,$block->asItem(),$replace,$replace,1,Vector3::zero()) && $tx->apply(),'Ability structure placement');
+    $cell=clone $items['showcase:resonance_cell'];$cell->setCount(3);$before=count($player->effects->recorded);
+    $block=$world->getBlock($at);$block->onInteract($cell,1,Vector3::zero(),$player);
+    check($cell->getCount()===3 && count($player->effects->recorded)===$before,'Unpowered structures must preserve cells');
+    $lens=clone $items['showcase:chromatic_lens'];$returned=[];
+    check($lens->onInteractBlock($player,$block,$block,1,Vector3::zero(),$returned)===pocketmine\item\ItemUseResult::SUCCESS,'Lens must alter all structure materials');
+    $block=$world->getBlock($at);$cell->onInteractBlock($player,$block,$block,1,Vector3::zero(),$returned);
+    check($cell->getCount()===2 && count($player->effects->recorded)===$before+1,'Powered ability consumes one cell and grants effect');
+    $effect=end($player->effects->recorded);
+    check($effect->getDuration()===$d['duration'] && $effect->getAmplifier()===$d['amplifier'],'Structure effect duration and strength');
+    $parts=$block->getAffectedBlocks();$last=end($parts);$world->setBlock($last->getPosition(),pocketmine\block\VanillaBlocks::STONE());
+    $world->getBlock($at)->onInteract($cell,1,Vector3::zero(),$player);
+    check($cell->getCount()===2,'Incomplete structures must preserve cells');
+    $world->getBlock($at)->getAffectedBlocks();
+    $tool=VanillaItems::AIR();$world->useBreakOn($at,$tool);
+    check($world->getBlock($last->getPosition())->getTypeId()===pocketmine\block\VanillaBlocks::STONE()->getTypeId(),'Breaking must preserve unrelated replacement blocks');
+    $world=new ExpansionWorld();$at=new Vector3(5,319,5);$replace=$world->getBlock($at);$tx=new BlockTransaction($world);
+    $fits=max(array_column($d['layout'],1))===0;
+    check($factory->get('showcase:'.$name)->place($tx,$block->asItem(),$replace,$replace,1,Vector3::zero())===$fits,'Large footprint must respect world height');
+}
+foreach([
+    ['layout'=>[[0,0,0],[0,0,0]],'segments'=>[[],[]]],
+    ['layout'=>[[1,0,0],[0,0,0]],'segments'=>[[],[]]],
+    ['layout'=>[[0,0,0],[0.5,0,0]],'segments'=>[[],[]]]
+] as $invalid){
+    try{ customiesdevs\showcase\StructureLayout::validate($invalid); check(false,'Invalid layouts must fail'); }
+    catch(InvalidArgumentException){}
+}
+$world=new ExpansionWorld();$at=new Vector3(0,70,0);$world->setBlock($at,$factory->get('showcase:thermal_forge'));
+$lines=customiesdevs\showcase\DebugMessages::block($world->getBlock($at));
+check(!str_contains(implode(' ',$lines),'Components:'),'Compact diagnostics must omit verbose component data');
+check(strlen(customiesdevs\showcase\DebugMessages::bounded(str_repeat('x',10000)))<1100,'NBT diagnostics must be bounded');
+echo "PASS: arbitrary footprints in four directions, every-part breaks, powered abilities, cell consumption, unrelated-block protection and bounded diagnostics.\n";

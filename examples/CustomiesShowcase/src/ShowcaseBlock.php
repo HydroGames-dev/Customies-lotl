@@ -15,7 +15,7 @@ use pocketmine\math\{Vector3, AxisAlignedBB};
 use pocketmine\player\Player;
 
 final class ShowcaseBlock extends TraitBlock {
-	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench', 'sky_obelisk', 'crystal_reactor', 'suspended_chandelier', 'holo_bench', 'prism_bridge', 'prism_telescope', 'tiny_lantern', 'mini_chess', 'pocket_planter', 'runic_pedestal'];
+	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench', 'sky_obelisk', 'crystal_reactor', 'suspended_chandelier', 'holo_bench', 'prism_bridge', 'prism_telescope', 'tiny_lantern', 'mini_chess', 'pocket_planter', 'runic_pedestal', 'runic_arch', 'thermal_forge', 'crystal_conservatory', 'sky_dock', 'storm_engine', 'molten_cell', 'tide_cell', 'aurora_tile', 'astral_beacon'];
 
 	public function __construct(int $typeId, private readonly string $specimen){
 		$name = ucwords(str_replace('_', ' ', $specimen));
@@ -181,6 +181,17 @@ final class ShowcaseBlock extends TraitBlock {
 		$this->getState(PlacementPositionTrait::VERTICAL_HALF)->setCurrentValue($half);
 	}
 
+	public function place(\pocketmine\world\BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool {
+		$d = ExpansionBlocks::definitions()[$this->specimen] ?? [];
+		if(!isset($d['layout'])){ return parent::place($tx,$item,$blockReplace,$blockClicked,$face,$clickVector,$player); }
+		$this->applyTraitPlacement($tx,$item,$blockReplace,$blockClicked,$face,$clickVector,$player);
+		return StructureLayout::place($this,$d,$tx,$blockReplace,$player);
+	}
+	public function getAffectedBlocks(): array {
+		$d = ExpansionBlocks::definitions()[$this->specimen] ?? [];
+		return isset($d['layout']) ? StructureLayout::affected($this,$d) : parent::getAffectedBlocks();
+	}
+
 	public function getSpecimen(): string { return $this->specimen; }
 	public function getLightLevel(): int {
 		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::light($this); }
@@ -251,7 +262,7 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	public function getDrops(Item $item): array {
-		if(($this->getState(MultiBlockTrait::PART)?->getCurrentValue() ?? 0) !== 0){ return []; }
+		if(($this->getState(StructureLayout::PART)?->getCurrentValue() ?? $this->getState(MultiBlockTrait::PART)?->getCurrentValue() ?? 0) !== 0){ return []; }
 		return parent::getDrops($item);
 	}
 }

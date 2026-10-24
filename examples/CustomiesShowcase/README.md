@@ -1,9 +1,9 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.2.0 adds large structures, miniature blocks, complete armor rigs and animated held gear. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
+Showcase 1.3.0 adds arbitrary structure footprints, server-powered abilities and ten animated block materials. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
-**61 blocks + 64 items**, including 50 playable examples and 75 component specimens.
+**70 blocks + 66 items**, including 61 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
 example in `src/ComponentCatalog.php` and a separate laboratory specimen.
 
@@ -23,7 +23,7 @@ support; those clients have not been tested here.
 
 ## Descriptions and lore
 
-Every one of the 125 specimens has purpose-specific lore. Playable examples explain
+Every one of the 136 specimens has purpose-specific lore. Playable examples explain
 how to use them and give key values; laboratory examples explain their metadata
 and identify behavior that needs additional server support. The same descriptions
 appear in creative inventory, command kits, block drops, and inspector output.
@@ -36,17 +36,65 @@ Placed blocks gain the new description when inspected or broken into an item.
 
 ## Commands
 
-- `/cshow list [filter]` lists IDs; filters include `lab_block`, `lab_item`, `rotor`.
+- `/cshow list [filter] [page]` lists 12 IDs per page; filters include `lab_block`, `lab_item`, `rotor`.
 - `/cshow give <id> [amount]` gives a specimen; `showcase:` is optional.
 - `/cshow kit [page]` gives nine specimens per page without replacing inventory contents.
-- `/cshow inspect` shows held-item component names, server ID, stack limit and NBT.
-- `/cshow inspect block` shows targeted block states and component names.
+- `/cshow inspect` shows held-item component names, server ID, stack limit and lore.
+- `/cshow inspect full` additionally shows NBT, capped at 1024 bytes.
+- `/cshow inspect block` shows readable states, position, light and structure completeness.
+- `/cshow inspect block full` includes components, server IDs and lore.
+- `/cshow debug on|off` toggles detailed inspection for your session. Inspector, compass and wrench are limited to one action per second to avoid message floods.
 
 All commands and inspector/wrench actions require `customiesshowcase.command`
 (default: operator). Inventory overflow is skipped, not dropped. The first kit pages contain the playable set; later pages contain the laboratory.
 `plugins/CustomiesShowcase/config.yml` can disable `component-laboratory`; restart
 before testing changes. Keep the same registration configuration for saved test worlds.
 Removing a registered specimen can make saved blocks/items unavailable.
+
+## Structure footprints and server abilities (1.3.0)
+
+Nine new blocks and two new items bring the catalog to 136 specimens. Each structure
+has a base anchored at the placed cell, follows cardinal direction, checks all occupied
+cells before placement, and breaks as a group with exactly one drop. Bounding boxes
+below describe the north-facing footprint (width X, height Y, depth toward north).
+Hollow cells are deliberately unoccupied and do not block placement.
+
+| ID | Size / occupied cells | Resonance ability |
+| --- | --- | --- |
+| `runic_arch` | 3 x 4 x 1 / 9 | Speed I, 20 seconds |
+| `thermal_forge` | 3 x 2 x 2 / 12 | Haste II, 20 seconds |
+| `crystal_conservatory` | 3 x 3 x 3 / 26 | Regeneration I, 10 seconds |
+| `sky_dock` | 5 x 1 x 3 / 15 | Jump Boost II, 20 seconds |
+| `storm_engine` | 4 x 2 x 2 / 16 | Resistance I, 15 seconds |
+| `astral_beacon` | 5 x 6 x 3 / 32 | Night Vision I, 60 seconds |
+
+Interact with an empty hand to toggle the whole structure's power, texture and light.
+Offer one `resonance_cell` to any powered part to apply the listed effect to yourself.
+Unpowered or incomplete structures preserve the cell. Repeated offers refresh effects;
+there is no automatic area effect or fuel processing. `chromatic_lens` is a reusable
+texture/power controller for powered/color expansion blocks. These actions execute
+in `ShowcaseItem::onInteractBlock()` and `ExpansionBlocks::interact()` on PocketMine.
+
+`molten_cell` (full cube), `tide_cell` (three-quarter height), and `aurora_tile`
+(quarter height) toggle between static textures and animated, luminous materials.
+Together with the six structures and existing reactor, ten eight-frame flipbook
+materials are supplied: molten currents, tide waves, aurora bands, electric arcs,
+crystal growth and rune flows. Animation is client-side; state, effects and light are
+server-side. No repeating PHP timer or per-player world scan is needed.
+
+`resources/expansion_blocks.json` is the editable layout/geometry/ability catalog.
+`StructureLayout` validates unique integer offsets and supports 2-32 cells within
+8 blocks of the origin, including irregular and hollow layouts. `showcase:structure_part`
+is a persisted custom state; each part has matching geometry, selection and collision.
+The 32-part beacon uses 256 combinations (32 parts x 4 directions x 2 power values).
+This is a server-managed system, separate from the native linear trait, which is
+[limited to 2-4 parts](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/traits/multi_block?view=minecraft-bedrock-stable).
+No invalid oversized `minecraft:multi_block` definition is sent to clients.
+
+Operators can use Builder Compass for a paged cell-coordinate listing, or Inspector
+for the present/expected part count and ability requirements. Failed placement reports
+the blocked coordinate. Detailed NBT is opt-in and truncated; state/component lists
+are split into short lines. These controls replace long unbounded debug chat dumps.
 
 ## Size, structure and animated-gear expansion (1.2.0)
 
@@ -96,7 +144,7 @@ Minecraft client playtest. Pose values are editable in the generated JSON and
 
 Update **both PHARs and the resource pack**, restart the server, and reconnect.
 Obtain fresh items with `/cshow kit` or `/cshow give <id>`. The pack UUID is preserved
-and its version is increased to 1.2.0 so clients can accept the update.
+and its version is increased to 1.3.0 so clients can accept the update.
 
 ## Combined-feature additions (1.1.0)
 
