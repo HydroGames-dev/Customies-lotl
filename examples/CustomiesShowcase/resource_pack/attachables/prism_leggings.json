@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.30",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "showcase:prism_leggings",
+      "item": {
+        "showcase:prism_leggings": "query.is_owner_identifier_any('minecraft:player')"
+      },
+      "materials": {
+        "default": "armor",
+        "enchanted": "armor_enchanted"
+      },
+      "textures": {
+        "default": "textures/models/prism_armor",
+        "enchanted": "textures/misc/enchanted_actor_glint"
+      },
+      "geometry": {
+        "default": "geometry.showcase.prism_leggings"
+      },
+      "animations": {
+        "controller": "controller.animation.showcase.armor",
+        "idle": "animation.showcase.prism_leggings.idle",
+        "offset": "animation.showcase.prism_leggings.offset"
+      },
+      "scripts": {
+        "parent_setup": "variable.leg_layer_visible = 0.0;",
+        "animate": [
+          "controller"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.showcase.gear"
+      ]
+    }
+  }
+}

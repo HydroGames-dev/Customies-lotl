@@ -17,9 +17,9 @@ class PrismFood extends Food implements ItemComponents {
 		$this->addComponent(new I\CompostableComponent(65));
 	}
 	public function getMaxStackSize(): int { return $this->getSpecimen() === 'prism_elixir' ? 1 : 16; }
-	public function getFoodRestore(): int { return match($this->getSpecimen()){ 'prism_elixir'=>0,'energized_ration'=>10,default=>6 }; }
+	public function getFoodRestore(): int { return match($this->getSpecimen()){ 'prism_elixir'=>0,'energized_ration'=>10,'moon_mochi'=>4,default=>6 }; }
 	public function getSaturationRestore(): float { return $this->getFoodRestore()*1.2; }
 	public function requiresHunger(): bool { return $this->getSpecimen() !== 'prism_elixir'; }
 	public function getResidue(): \pocketmine\item\Item { return $this->getSpecimen() === 'prism_elixir' ? \pocketmine\item\VanillaItems::GLASS_BOTTLE() : parent::getResidue(); }
-	public function getAdditionalEffects(): array { return match($this->getSpecimen()){ 'prism_elixir'=>[new EffectInstance(VanillaEffects::RESISTANCE(),200,0),new EffectInstance(VanillaEffects::NIGHT_VISION(),600,0)],'energized_ration'=>[new EffectInstance(VanillaEffects::SPEED(),300,0)],default=>[new EffectInstance(VanillaEffects::REGENERATION(),60,0)] }; }
+	public function getAdditionalEffects(): array { return match($this->getSpecimen()){ 'moon_mochi'=>[new EffectInstance(VanillaEffects::JUMP_BOOST(),300,0),new EffectInstance(VanillaEffects::NIGHT_VISION(),200,0)],'prism_elixir'=>[new EffectInstance(VanillaEffects::RESISTANCE(),200,0),new EffectInstance(VanillaEffects::NIGHT_VISION(),600,0)],'energized_ration'=>[new EffectInstance(VanillaEffects::SPEED(),300,0)],default=>[new EffectInstance(VanillaEffects::REGENERATION(),60,0)] }; }
 }

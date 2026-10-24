@@ -1,21 +1,35 @@
 {
-  "format_version": "1.10.0",
+  "format_version": "1.20.30",
   "minecraft:attachable": {
     "description": {
       "identifier": "showcase:prism_helmet",
+      "item": {
+        "showcase:prism_helmet": "query.is_owner_identifier_any('minecraft:player')"
+      },
       "materials": {
         "default": "armor",
         "enchanted": "armor_enchanted"
       },
       "textures": {
-        "default": "textures/items/showcase_prism_helmet",
-        "enchanted": "textures/misc/enchanted_item_glint"
+        "default": "textures/models/prism_armor",
+        "enchanted": "textures/misc/enchanted_actor_glint"
       },
       "geometry": {
-        "default": "geometry.showcase.helmet"
+        "default": "geometry.showcase.prism_helmet"
+      },
+      "animations": {
+        "controller": "controller.animation.showcase.armor",
+        "idle": "animation.showcase.prism_helmet.idle",
+        "offset": "animation.showcase.prism_helmet.offset"
+      },
+      "scripts": {
+        "parent_setup": "variable.helmet_layer_visible = 0.0;",
+        "animate": [
+          "controller"
+        ]
       },
       "render_controllers": [
-        "controller.render.showcase.helmet"
+        "controller.render.showcase.gear"
       ]
     }
   }

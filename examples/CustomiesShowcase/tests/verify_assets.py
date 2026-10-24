@@ -15,7 +15,8 @@ for atlas in ['terrain_texture','item_texture']:
         check(path.is_file(),f'Missing texture {key}')
         raw=path.read_bytes()
         check(raw[:8]==b'\x89PNG\r\n\x1a\n',f'Invalid PNG {path}')
-        check(struct.unpack('>II',raw[16:24])==(16,16),f'Unexpected dimensions {path}')
+        dims=struct.unpack('>II',raw[16:24])
+        check(dims==(16,16) or (key=='showcase_reactor_flow' and dims==(16,128)),f'Unexpected dimensions {path}')
 models={}
 for path in (PACK/'models').rglob('*.json'):
     for geometry in json.loads(path.read_text())['minecraft:geometry']:
@@ -48,3 +49,36 @@ for group,atlas in [('block_textures','terrain_texture'),('item_textures','item_
     keys=json.loads((PACK/'textures'/f'{atlas}.json').read_text())['texture_data']
     for key in references[group]:check(key in keys,f'Missing referenced texture {key}')
 print('PASS: all 10 stair models match server collision; every exported geometry/material/icon reference resolves.')
+
+# Validate attachable -> controller/animation -> bone/texture/geometry relationships.
+animations={};controllers={};renderers={}
+for path in (PACK/'animations').glob('*.json'):animations.update(json.loads(path.read_text()).get('animations',{}))
+for path in (PACK/'animation_controllers').glob('*.json'):controllers.update(json.loads(path.read_text()).get('animation_controllers',{}))
+for path in (PACK/'render_controllers').glob('*.json'):renderers.update(json.loads(path.read_text()).get('render_controllers',{}))
+known_items=set(json.loads((PACK/'textures/item_texture.json').read_text())['texture_data'])
+for path in (PACK/'attachables').glob('*.json'):
+    desc=json.loads(path.read_text())['minecraft:attachable']['description']
+    item=desc['identifier'].split(':',1)[1]
+    check('showcase_'+item in known_items,f'Unknown attachable item {item}')
+    geometry=models[desc['geometry']['default']]
+    bones={b['name'] for b in geometry['bones']}
+    check(len(bones)==len(geometry['bones']),f'Duplicate bone in {item}')
+    for bone in geometry['bones']:check('parent' not in bone or bone['parent'] in bones,f'Missing parent in {item}')
+    for key,texture in desc['textures'].items():
+        if not texture.startswith('textures/misc/'):check((PACK/(texture+'.png')).is_file(),f'Missing gear texture {texture}')
+    for renderer in desc['render_controllers']:check(renderer in renderers,f'Missing renderer {renderer}')
+    aliases=desc.get('animations',{})
+    for alias,reference in aliases.items():
+        if reference.startswith('controller.animation.'):
+            check(reference in controllers,f'Missing controller {reference}')
+            for state in controllers[reference]['states'].values():
+                for entry in state.get('animations',[]):
+                    for name in ([entry] if isinstance(entry,str) else entry):check(name in aliases,f'Unknown controller animation alias {name}')
+        else:
+            check(reference in animations,f'Missing animation {reference}')
+            check(set(animations[reference].get('bones',{})) <= bones,f'Animation targets missing bones: {reference}')
+    for entry in desc.get('scripts',{}).get('animate',[]):
+        for alias in ([entry] if isinstance(entry,str) else entry):check(alias in aliases,f'Unknown script alias {alias}')
+flipbooks=json.loads((PACK/'textures/flipbook_textures.json').read_text())
+check(any(f['atlas_tile']=='showcase_reactor_flow' and f['ticks_per_frame']>0 for f in flipbooks),'Missing reactor flipbook')
+print(f'PASS: {len(animations)} animations, {len(controllers)} animation controllers, all gear rigs/bones/poses and reactor flipbook.')

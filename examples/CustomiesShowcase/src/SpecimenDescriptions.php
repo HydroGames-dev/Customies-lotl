@@ -8,6 +8,16 @@ use pocketmine\utils\TextFormat as F;
 final class SpecimenDescriptions {
 	/** @var array<string, list<string>> */
 	private const BLOCKS = [
+		'sky_obelisk' => ['A four-block rune tower with a luminous crown.','Needs 4 free cells above; interact to light all parts.'],
+		'crystal_reactor' => ['A three-block reactor with an animated energy core.','Interact on any part to toggle the entire reactor.'],
+		'suspended_chandelier' => ['A hanging three-block lamp with a narrow chain.','Place below a ceiling; needs 3 free cells downward.'],
+		'holo_bench' => ['A long three-part luminous display bench.','Interact to toggle all three sections together.'],
+		'prism_bridge' => ['A four-block walkway with raised side rails.','Extends in its facing direction; break any segment.'],
+		'prism_telescope' => ['A two-block telescope on a miniature tripod.','Interact for Night Vision for 20s; no FOV zoom.'],
+		'tiny_lantern' => ['A tiny six-pixel-wide switchable light.','Interact to toggle light level 0 / 12.'],
+		'mini_chess' => ['A four-pixel-wide collectible rook.','Interact to cycle its three crystal colors.'],
+		'pocket_planter' => ['A small decorative crystal planter.','Interact to activate its luminous leaves.'],
+		'runic_pedestal' => ['An offering altar with a small raised platform.','Offer a Prism Berry: Regeneration II for 5s.'],
 		'signal_lamp' => ['A four-way lamp with four brightness settings.','Interact to cycle light levels 0, 5, 10 and 15.'],
 		'lumen_cable' => ['A connecting cable with switchable illumination.','Interact to toggle light; joins Cable and Lumen Cable.'],
 		'phase_gate' => ['A directional gate with a luminous open state.','Interact to open/close; open gates have no collision.'],
@@ -29,6 +39,13 @@ final class SpecimenDescriptions {
 	];
 	/** @var array<string, list<string>> */
 	private const ITEMS = [
+		'prism_chestplate' => ['Crystal plate with animated shoulder satellites.','Armor: 6 | Durability: 384 | Slot: chest'],
+		'prism_leggings' => ['Prism leg plates with articulated knee crystals.','Armor: 5 | Durability: 360 | Slot: legs'],
+		'prism_boots' => ['Winglet boots that grant Jump Boost I while worn.','Armor: 2 | Durability: 300 | No flight ability'],
+		'clockwork_staff' => ['An animated staff with a spinning clockwork core.','Use in air: Haste I for 15s | Cooldown: 8s'],
+		'wind_fan' => ['A modeled fan with continuously spinning blades.','Use in air to dash forward | Cooldown: 3s'],
+		'builder_compass' => ['A survey tool for grouped structures.','Use on a block to list cells; showcase permission.'],
+		'moon_mochi' => ['A small mooncake for high-jump exploration.','Food: 4 | Jump I: 15s | Night Vision: 10s'],
 		'scout_wand' => ['Use in the air for speed, jump and night vision.','Speed/Jump: 10s | Night vision: 30s | Cooldown: 5s'],
 		'repair_kit' => ['Repairs a damaged durable item in your offhand.','Use in the air: consumes one kit, repairs up to 64.'],
 		'energized_ration' => ['A filling travel ration with a movement boost.','Food: 10 | Saturation: 12 | Speed I: 15s'],

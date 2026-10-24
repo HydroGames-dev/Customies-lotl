@@ -15,7 +15,7 @@ with zipfile.ZipFile(pack,'w',zipfile.ZIP_DEFLATED) as archive:
 with zipfile.ZipFile(out/'CustomiesShowcase-install.zip','w',zipfile.ZIP_DEFLATED) as archive:
     for name in ['CustomiesShowcase.phar','Customies-Axolotl.phar']:archive.write(out/name,'plugins/'+name)
     archive.write(pack,'resource_packs/'+pack.name)
-    for name in ['README.md','component-coverage.json','asset-preview.png','LICENSE','VALIDATION.md']:
+    for name in ['README.md','component-coverage.json','asset-preview.png','model-preview.png','LICENSE','VALIDATION.md']:
         archive.write(BASE/name,name)
     archive.writestr('resource_packs/resource_packs.yml.example','force_resources: true\nresource_stack:\n  - CustomiesShowcase.mcpack\n')
 files=[out/name for name in ['CustomiesShowcase.phar','Customies-Axolotl.phar','CustomiesShowcase.mcpack','CustomiesShowcase-install.zip']]

@@ -1,7 +1,7 @@
 name: CustomiesShowcase
 main: customiesdevs\showcase\ShowcasePlugin
 src-namespace-prefix: customiesdevs\showcase
-version: 1.1.0
+version: 1.2.0
 api: 5.49.0
 load: POSTWORLD
 depend: [Customies-Axolotl]

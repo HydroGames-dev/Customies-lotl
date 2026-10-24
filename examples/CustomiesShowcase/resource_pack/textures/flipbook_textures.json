@@ -1,0 +1,7 @@
+[
+  {
+    "flipbook_texture": "textures/blocks/showcase_reactor_flow",
+    "atlas_tile": "showcase_reactor_flow",
+    "ticks_per_frame": 3
+  }
+]

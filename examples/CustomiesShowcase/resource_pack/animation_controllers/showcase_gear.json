@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.showcase.armor": {
+      "initial_state": "default",
+      "states": {
+        "default": {
+          "animations": [
+            "offset",
+            "idle"
+          ]
+        }
+      }
+    },
+    "controller.animation.showcase.held": {
+      "initial_state": "default",
+      "states": {
+        "default": {
+          "animations": [
+            "idle",
+            {
+              "first_person": "context.is_first_person"
+            },
+            {
+              "third_person": "!context.is_first_person"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -76,6 +76,46 @@
     "sound": "stone",
     "textures": "showcase_prism_workbench"
   },
+  "showcase:sky_obelisk": {
+    "sound": "stone",
+    "textures": "showcase_sky_obelisk"
+  },
+  "showcase:crystal_reactor": {
+    "sound": "stone",
+    "textures": "showcase_crystal_reactor"
+  },
+  "showcase:suspended_chandelier": {
+    "sound": "stone",
+    "textures": "showcase_suspended_chandelier"
+  },
+  "showcase:holo_bench": {
+    "sound": "stone",
+    "textures": "showcase_holo_bench"
+  },
+  "showcase:prism_bridge": {
+    "sound": "stone",
+    "textures": "showcase_prism_bridge"
+  },
+  "showcase:prism_telescope": {
+    "sound": "stone",
+    "textures": "showcase_prism_telescope"
+  },
+  "showcase:tiny_lantern": {
+    "sound": "stone",
+    "textures": "showcase_tiny_lantern"
+  },
+  "showcase:mini_chess": {
+    "sound": "stone",
+    "textures": "showcase_mini_chess"
+  },
+  "showcase:pocket_planter": {
+    "sound": "stone",
+    "textures": "showcase_pocket_planter"
+  },
+  "showcase:runic_pedestal": {
+    "sound": "stone",
+    "textures": "showcase_runic_pedestal"
+  },
   "showcase:lab_block_block_entity": {
     "sound": "stone",
     "textures": "showcase_lab_block_block_entity"

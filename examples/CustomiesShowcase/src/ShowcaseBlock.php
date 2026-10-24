@@ -15,7 +15,7 @@ use pocketmine\math\{Vector3, AxisAlignedBB};
 use pocketmine\player\Player;
 
 final class ShowcaseBlock extends TraitBlock {
-	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench'];
+	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench', 'sky_obelisk', 'crystal_reactor', 'suspended_chandelier', 'holo_bench', 'prism_bridge', 'prism_telescope', 'tiny_lantern', 'mini_chess', 'pocket_planter', 'runic_pedestal'];
 
 	public function __construct(int $typeId, private readonly string $specimen){
 		$name = ucwords(str_replace('_', ' ', $specimen));
@@ -67,6 +67,7 @@ final class ShowcaseBlock extends TraitBlock {
 		if(str_starts_with($specimen, 'lab_')){
 			$this->addComponent(ComponentCatalog::blocks()[substr($specimen, 4)]);
 		}
+		if(ExpansionBlocks::has($specimen)){ ExpansionBlocks::applyComponents($this); }
 		parent::__construct(new BlockIdentifier($typeId), $name, new BlockTypeInfo(new BlockBreakInfo(0.6)));
 	}
 
@@ -75,6 +76,7 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	private function configure(): void {
+		if(ExpansionBlocks::has($this->specimen)){ ExpansionBlocks::configure($this); return; }
 		switch($this->specimen){
 			case 'prism_lamp':
 				$this->addState(BlockState::bool('showcase:powered'));
@@ -181,6 +183,7 @@ final class ShowcaseBlock extends TraitBlock {
 
 	public function getSpecimen(): string { return $this->specimen; }
 	public function getLightLevel(): int {
+		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::light($this); }
 		if($this->specimen === 'signal_lamp'){ return $this->getState('showcase:brightness')->getCurrentValue()*5; }
 		if($this->specimen === 'phase_gate'){ return $this->getState('showcase:open')->getCurrentValue() ? 8 : 0; }
 		if(in_array($this->specimen,['lumen_cable','spring_pad'],true)){ return $this->getState('showcase:powered')->getCurrentValue() ? ($this->specimen === 'spring_pad' ? 5 : 15) : 0; }
@@ -190,11 +193,12 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 	public function getLightFilter(): int { return $this->specimen === 'lab_light_dampening' || $this->specimen === 'glow_flower' ? 0 : parent::getLightFilter(); }
 	public function getFrictionFactor(): float { return in_array($this->specimen, ['ice_tile', 'lab_friction'], true) ? 0.98 : parent::getFrictionFactor(); }
-	public function isSolid(): bool { return !in_array($this->specimen, ['glow_flower', 'cable', 'lumen_cable', 'spring_pad', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost(); }
+	public function isSolid(): bool { return !ExpansionBlocks::has($this->specimen) && !in_array($this->specimen, ['glow_flower', 'cable', 'lumen_cable', 'spring_pad', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost(); }
 	public function canBeReplaced(): bool { return in_array($this->specimen, ['glow_flower', 'lab_replaceable'], true); }
 	private function isGhost(): bool { return ($this->specimen === 'phase_block' && $this->getState('showcase:phase')->getCurrentValue() === 2) || ($this->specimen === 'phase_gate' && $this->getState('showcase:open')->getCurrentValue()); }
 
 	protected function recalculateCollisionBoxes(): array {
+		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::collision($this); }
 		if($this->isGhost() || in_array($this->specimen, ['glow_flower', 'lab_collision_box'], true)){ return []; }
 		if($this->specimen === 'slab'){
 			$y = $this->getState(PlacementPositionTrait::VERTICAL_HALF)->getCurrentValue() === 'top' ? 0.5 : 0;
@@ -219,6 +223,7 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	public function onInteract(Item $item, int $face, Vector3 $clickVector, ?Player $player = null, array &$returnedItems = []): bool {
+		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::interact($this,$item,$player); }
 		if($this->specimen === 'prism_workbench'){
 			$player?->setCurrentWindow(new \pocketmine\block\inventory\CraftingTableInventory($this->getPosition()));
 			return true;

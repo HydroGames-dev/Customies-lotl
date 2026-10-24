@@ -10,15 +10,17 @@ use pocketmine\entity\effect\{EffectInstance, VanillaEffects};
 
 final class ShowcaseItem extends Item implements ItemComponents {
 	use ComponentItemTrait;
-	public const PLAYABLE = ['inspector','state_wrench','pulse_wand','prism','ember_fuel','pigment','scout_wand','repair_kit'];
+	public const PLAYABLE = ['inspector','state_wrench','pulse_wand','prism','ember_fuel','pigment','scout_wand','repair_kit','clockwork_staff','wind_fan','builder_compass'];
 	public function __construct(int $id, string $specimen){
 		$name = ucwords(str_replace('_',' ',$specimen));
 		parent::__construct(new ItemIdentifier($id),$name);
 		$this->configureComponents($specimen,$name,$this->stackSize($specimen));
-		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand'],true)){
+		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass'],true)){
 			$this->addComponent(new I\HandEquippedComponent());
-			$this->addComponent(new I\InteractButtonComponent($specimen === 'pulse_wand' ? 'Pulse' : ($specimen === 'scout_wand' ? 'Scout' : 'Inspect')));
+			$this->addComponent(new I\InteractButtonComponent(match($specimen){ 'pulse_wand'=>'Pulse','scout_wand'=>'Scout','clockwork_staff'=>'Haste','wind_fan'=>'Dash','builder_compass'=>'Survey','state_wrench'=>'Cycle state',default=>'Inspect' }));
 		}
+		if(in_array($specimen,['clockwork_staff','wind_fan'],true)){ $this->addComponent(new I\CooldownComponent('showcase:'.$specimen,$specimen === 'clockwork_staff' ? 8.0 : 3.0)); $this->addComponent(new I\RarityComponent('rare')); }
+		if($specimen === 'clockwork_staff'){ $this->addComponent(new I\GlintComponent()); }
 		if($specimen === 'scout_wand'){ $this->addComponent(new I\CooldownComponent('showcase:scout',5.0)); $this->addComponent(new I\GlintComponent()); $this->addComponent(new I\RarityComponent('rare')); }
 		if($specimen === 'repair_kit'){ $this->addComponent(new I\InteractButtonComponent('Repair offhand')); $this->addComponent(new I\RarityComponent('uncommon')); }
 		if($specimen === 'pulse_wand'){ $this->addComponent(new I\CooldownComponent('showcase:pulse',2.0)); $this->addComponent(new I\GlintComponent()); }
@@ -27,15 +29,15 @@ final class ShowcaseItem extends Item implements ItemComponents {
 		if($specimen === 'pigment'){ $this->addComponent(new I\DyeableComponent('#39d8ce')); }
 	}
 	private function stackSize(string $specimen): int {
-		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','lab_wearable','lab_damage_absorption','lab_durability','lab_durability_sensor','lab_repairable','lab_shooter','lab_kinetic_weapon','lab_piercing_weapon','lab_storage_item','lab_bundle_interaction','lab_storage_weight_limit','lab_storage_weight_modifier'],true)){ return 1; }
+		if(in_array($specimen,['inspector','state_wrench','pulse_wand','scout_wand','clockwork_staff','wind_fan','builder_compass','lab_wearable','lab_damage_absorption','lab_durability','lab_durability_sensor','lab_repairable','lab_shooter','lab_kinetic_weapon','lab_piercing_weapon','lab_storage_item','lab_bundle_interaction','lab_storage_weight_limit','lab_storage_weight_modifier'],true)){ return 1; }
 		return in_array($specimen,['lab_max_stack_size','repair_kit'],true) ? 16 : 64;
 	}
 	public function getMaxStackSize(): int { return $this->stackSize($this->getSpecimen()); }
 	public function getAttackPoints(): int { return $this->getSpecimen() === 'lab_damage' ? 6 : parent::getAttackPoints(); }
 	public function getFuelTime(): int { return in_array($this->getSpecimen(),['ember_fuel','lab_fuel'],true) ? 400 : 0; }
 	public function isFireProof(): bool { return in_array($this->getSpecimen(),['ember_fuel','lab_fire_resistant'],true); }
-	public function getCooldownTicks(): int { return match($this->getSpecimen()){ 'pulse_wand'=>40,'scout_wand'=>100,default=>0 }; }
-	public function getCooldownTag(): ?string { return match($this->getSpecimen()){ 'pulse_wand'=>'showcase:pulse','scout_wand'=>'showcase:scout',default=>null }; }
+	public function getCooldownTicks(): int { return match($this->getSpecimen()){ 'pulse_wand'=>40,'scout_wand'=>100,'clockwork_staff'=>160,'wind_fan'=>60,default=>0 }; }
+	public function getCooldownTag(): ?string { return match($this->getSpecimen()){ 'pulse_wand'=>'showcase:pulse','scout_wand'=>'showcase:scout','clockwork_staff'=>'showcase:clockwork_staff','wind_fan'=>'showcase:wind_fan',default=>null }; }
 	/** @return EffectInstance[] */
 	public function getAbilityEffects(): array {
 		return $this->getSpecimen() === 'scout_wand' ? [new EffectInstance(VanillaEffects::SPEED(),200,0),new EffectInstance(VanillaEffects::JUMP_BOOST(),200,0),new EffectInstance(VanillaEffects::NIGHT_VISION(),600,0)] : [];
@@ -47,6 +49,15 @@ final class ShowcaseItem extends Item implements ItemComponents {
 		return true;
 	}
 	public function onClickAir(Player $player, Vector3 $directionVector, array &$returnedItems): ItemUseResult {
+		if($this->getSpecimen() === 'clockwork_staff'){
+			$player->getEffects()->add(new EffectInstance(VanillaEffects::HASTE(),300,0));
+			$player->sendActionBarMessage('Clockwork: Haste I for 15 seconds');
+			return ItemUseResult::SUCCESS;
+		}
+		if($this->getSpecimen() === 'wind_fan'){
+			$player->setMotion(new Vector3($directionVector->x*0.9,max(0.2,$directionVector->y*0.9+0.2),$directionVector->z*0.9));
+			return ItemUseResult::SUCCESS;
+		}
 		if($this->getSpecimen() === 'repair_kit'){
 			$offhand = $player->getOffHandInventory()->getItem(0);
 			if(!$offhand instanceof \pocketmine\item\Durable || !$this->repairTarget($offhand)){ return ItemUseResult::FAIL; }

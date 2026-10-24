@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.30",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "showcase:prism_chestplate",
+      "item": {
+        "showcase:prism_chestplate": "query.is_owner_identifier_any('minecraft:player')"
+      },
+      "materials": {
+        "default": "armor",
+        "enchanted": "armor_enchanted"
+      },
+      "textures": {
+        "default": "textures/models/prism_armor",
+        "enchanted": "textures/misc/enchanted_actor_glint"
+      },
+      "geometry": {
+        "default": "geometry.showcase.prism_chestplate"
+      },
+      "animations": {
+        "controller": "controller.animation.showcase.armor",
+        "idle": "animation.showcase.prism_chestplate.idle",
+        "offset": "animation.showcase.prism_chestplate.offset"
+      },
+      "scripts": {
+        "parent_setup": "variable.chest_layer_visible = 0.0;",
+        "animate": [
+          "controller"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.showcase.gear"
+      ]
+    }
+  }
+}

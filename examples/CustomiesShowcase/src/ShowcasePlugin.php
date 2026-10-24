@@ -17,7 +17,7 @@ use pocketmine\plugin\PluginBase;
 final class ShowcasePlugin extends PluginBase implements Listener {
 	/** @var array<string, string> */
 	private array $entries = [];
-	public const SPECIAL_ITEMS = ['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class,'energized_ration'=>EnergizedRation::class,'prism_elixir'=>PrismElixir::class,'frost_blade'=>FrostBlade::class];
+	public const SPECIAL_ITEMS = ['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class,'energized_ration'=>EnergizedRation::class,'prism_elixir'=>PrismElixir::class,'frost_blade'=>FrostBlade::class,'prism_chestplate'=>PrismChestplate::class,'prism_leggings'=>PrismLeggings::class,'prism_boots'=>PrismBoots::class,'moon_mochi'=>MoonMochi::class];
 
 	protected function onEnable(): void {
 		$this->saveDefaultConfig();
@@ -126,12 +126,22 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 	public function onInteract(PlayerInteractEvent $event): void {
 		if($event->isCancelled() || $event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){ return; }
 		$item = $event->getItem();
-		if(!$item instanceof ShowcaseItem || !in_array($item->getSpecimen(),['inspector','state_wrench'],true)){ return; }
+		if(!$item instanceof ShowcaseItem || !in_array($item->getSpecimen(),['inspector','state_wrench','builder_compass'],true)){ return; }
 		$player = $event->getPlayer();
 		if(!$player->hasPermission('customiesshowcase.command')){ return; }
 		$event->cancel();
 		$block = $event->getBlock();
+		if($item->getSpecimen() === 'builder_compass'){
+			$parts = $block->getAffectedBlocks();
+			$positions = array_map(static fn($b) => $b->getPosition()->getFloorX().','.$b->getPosition()->getFloorY().','.$b->getPosition()->getFloorZ(),$parts);
+			$player->sendMessage('Structure cells ('.count($parts).'): '.implode(' | ',$positions));
+		}
 		if($item->getSpecimen() === 'state_wrench' && $block instanceof ShowcaseBlock){
+			if(ExpansionBlocks::has($block->getSpecimen())){
+				ExpansionBlocks::interact($block,$item,$player);
+				$this->inspectBlock($player,$block->getPosition()->getWorld()->getBlock($block->getPosition()));
+				return;
+			}
 			// Keep multi-block and connection topology owned by their traits.
 			foreach(['showcase:powered','showcase:phase','showcase:brightness','showcase:open','minecraft:sixteen_way_rotation'] as $name){
 				$state = $block->getState($name);

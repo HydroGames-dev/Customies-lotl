@@ -46,3 +46,14 @@ saved inventory lore is preserved; freshly obtained specimens get the new text.
 - Every geometry, material texture and icon reference exported from the registered definitions resolves in the resource pack.
 
 No Minecraft client playtest was available. These checks cover server logic and emitted definitions/assets, not client rendering, prediction or animation.
+
+## Structures, scale and gear (Showcase 1.2.0)
+
+- Registers 61 blocks and 64 items, with lore and inventory serialization checked for all 125 specimens.
+- Expansion tests place every new block and structure in every supported horizontal direction, break each possible part, check single-drop behavior, obstruction preservation, world-bound rejection and synchronized power state.
+- Gameplay tests exercise the offering pedestal, miniature color cycle, telescope effect, armor defenses/durability and boot bonus, staff effect/cooldown, fan motion and new food effects.
+- Packaged Showcase 1.2.0 and its resource pack enabled on Axolotl and registered all 125 specimens before reaching Done.
+- Asset tests resolve 7 attachables through their model/texture/render/animation-controller references, verify target bones/aliases, and validate 17 local animations and an eight-frame reactor strip.
+- A common-scale model preview is generated from the authored cubes, including cube rotations.
+
+No Minecraft client playtest was available. Armor/hand alignment, slim skins, first-person poses, visual animation playback and input prediction remain client validation tasks.

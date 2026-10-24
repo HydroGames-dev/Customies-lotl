@@ -58,6 +58,57 @@
     "showcase_prism_workbench": {
       "textures": "textures/blocks/showcase_prism_workbench"
     },
+    "showcase_sky_obelisk": {
+      "textures": "textures/blocks/showcase_sky_obelisk"
+    },
+    "showcase_crystal_reactor": {
+      "textures": "textures/blocks/showcase_crystal_reactor"
+    },
+    "showcase_suspended_chandelier": {
+      "textures": "textures/blocks/showcase_suspended_chandelier"
+    },
+    "showcase_holo_bench": {
+      "textures": "textures/blocks/showcase_holo_bench"
+    },
+    "showcase_prism_bridge": {
+      "textures": "textures/blocks/showcase_prism_bridge"
+    },
+    "showcase_prism_telescope": {
+      "textures": "textures/blocks/showcase_prism_telescope"
+    },
+    "showcase_tiny_lantern": {
+      "textures": "textures/blocks/showcase_tiny_lantern"
+    },
+    "showcase_mini_chess": {
+      "textures": "textures/blocks/showcase_mini_chess"
+    },
+    "showcase_pocket_planter": {
+      "textures": "textures/blocks/showcase_pocket_planter"
+    },
+    "showcase_runic_pedestal": {
+      "textures": "textures/blocks/showcase_runic_pedestal"
+    },
+    "showcase_sky_obelisk_on": {
+      "textures": "textures/blocks/showcase_sky_obelisk_on"
+    },
+    "showcase_holo_bench_on": {
+      "textures": "textures/blocks/showcase_holo_bench_on"
+    },
+    "showcase_tiny_lantern_on": {
+      "textures": "textures/blocks/showcase_tiny_lantern_on"
+    },
+    "showcase_pocket_planter_on": {
+      "textures": "textures/blocks/showcase_pocket_planter_on"
+    },
+    "showcase_mini_chess_1": {
+      "textures": "textures/blocks/showcase_mini_chess_1"
+    },
+    "showcase_mini_chess_2": {
+      "textures": "textures/blocks/showcase_mini_chess_2"
+    },
+    "showcase_reactor_flow": {
+      "textures": "textures/blocks/showcase_reactor_flow"
+    },
     "showcase_signal_lamp_1": {
       "textures": "textures/blocks/showcase_signal_lamp_1"
     },

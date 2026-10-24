@@ -1,9 +1,9 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.1.0 adds combined gameplay examples and explicit corner-stair geometry. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
+Showcase 1.2.0 adds large structures, miniature blocks, complete armor rigs and animated held gear. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
-**51 blocks + 57 items**, including 33 playable examples and 75 component specimens.
+**61 blocks + 64 items**, including 50 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
 example in `src/ComponentCatalog.php` and a separate laboratory specimen.
 
@@ -23,7 +23,7 @@ support; those clients have not been tested here.
 
 ## Descriptions and lore
 
-Every one of the 108 specimens has purpose-specific lore. Playable examples explain
+Every one of the 125 specimens has purpose-specific lore. Playable examples explain
 how to use them and give key values; laboratory examples explain their metadata
 and identify behavior that needs additional server support. The same descriptions
 appear in creative inventory, command kits, block drops, and inspector output.
@@ -48,6 +48,56 @@ All commands and inspector/wrench actions require `customiesshowcase.command`
 before testing changes. Keep the same registration configuration for saved test worlds.
 Removing a registered specimen can make saved blocks/items unavailable.
 
+## Size, structure and animated-gear expansion (1.2.0)
+
+Ten new blocks and seven new items are included. Each has its own icon/texture and
+lore. See `model-preview.png` for geometry drawn at a common scale, and
+`asset-preview.png` for the texture sheet.
+
+| Block | Occupied cells / size | Function |
+| --- | --- | --- |
+| `sky_obelisk` | 1 x 4 vertical | Four-part rune tower; toggle illumination from any part. |
+| `crystal_reactor` | 1 x 3 vertical | Three-part reactor; synchronized power and an eight-frame animated energy texture. |
+| `suspended_chandelier` | 3 downward | Ceiling canopy, chain and lamp; bottom part emits light 12. |
+| `holo_bench` | 3 horizontal | Three-part bench; all sections toggle illumination together. |
+| `prism_bridge` | 4 horizontal | Walkable deck with raised side rails; grouped placement and breaking. |
+| `prism_telescope` | 2 horizontal | Tripod and barrel; interact for Night Vision for 20 seconds. No FOV zoom. |
+| `tiny_lantern` | 6 x 8 x 6 model pixels | A tiny switchable light with a matching small selection/collision box. |
+| `mini_chess` | 4 x 8 x 4 model pixels | Collectible rook with three interactive material colors. |
+| `pocket_planter` | 8 x 10 x 8 model pixels | Small planter with luminous leaves when activated. |
+| `runic_pedestal` | 12 x 16 x 12 model pixels | Consume an offered Prism Berry for Regeneration II for 5 seconds. |
+
+Multi-block traits reserve real neighboring cells. These are linear structures,
+not unsupported 2-by-2-by-2 cube definitions. Every structure needs its entire
+space free and within world bounds. Breaking any segment removes the group and
+drops one item. Small models still occupy a grid cell; multiple miniatures cannot
+share one cell. Bounds, client boxes and server collision are authored together in
+`resources/expansion_blocks.json`. The bridge has separate deck/rail collisions.
+
+| Item | Function |
+| --- | --- |
+| `prism_chestplate` | Armor 6, durability 384; articulated plates and animated shoulder satellites. |
+| `prism_leggings` | Armor 5, durability 360; articulated legs and pulsing knee crystals. |
+| `prism_boots` | Armor 2, durability 300; Jump Boost I while worn and cosmetic animated winglets. No flight. |
+| `clockwork_staff` | Use in air: Haste I for 15 seconds, cooldown 8 seconds; modeled rotating orb and gear. |
+| `wind_fan` | Use in air to dash forward with a little lift, cooldown 3 seconds; modeled spinning fan. |
+| `builder_compass` | Use on a block to list the coordinates of its grouped cells; requires showcase permission. |
+| `moon_mochi` | Food 4 / saturation 4.8; Jump Boost I for 15 seconds and Night Vision for 10 seconds. |
+
+The existing Prism Helmet now has a matching crown rig and a rotating crystal.
+Frost Blade also has a 3D held model. The pack contains four armor rigs, three held
+rigs, 17 skeletal animations, two animation controllers, first/third-person poses,
+a dedicated render controller, four model texture sheets, and a reactor flipbook.
+Animations are cosmetic; flight, shield blocking and camera zoom are not added.
+Geometry/bone/controller references are checked automatically. Player alignment,
+slim-skin appearance, first-person offsets and animation timing still need a real
+Minecraft client playtest. Pose values are editable in the generated JSON and
+`tools/generate_gear.py`.
+
+Update **both PHARs and the resource pack**, restart the server, and reconnect.
+Obtain fresh items with `/cshow kit` or `/cshow give <id>`. The pack UUID is preserved
+and its version is increased to 1.2.0 so clients can accept the update.
+
 ## Combined-feature additions (1.1.0)
 
 | ID | Combined features and function |
@@ -64,7 +114,7 @@ Removing a registered specimen can make saved blocks/items unavailable.
 | `frost_blade` | Iron-tier sword + wear + damage/enchant/repair/swing metadata + hit effect. Applies Slowness I to living targets for 2 seconds. |
 
 These additions include distinct textures and item icons, gate/pad/workbench models,
-and descriptive lore. Update both PHARs **and** the resource pack to 1.1.0, restart,
+and descriptive lore. These examples were introduced in 1.1.0. Update both PHARs **and** the latest resource pack, restart,
 and reconnect. The pack UUID is unchanged; its version is increased for client updates.
 
 ### Corner-stair correction
@@ -154,10 +204,12 @@ python -m pip install Pillow
 python examples/CustomiesShowcase/tools/generate_assets.py
 ```
 
-The PHP tests register every specimen against real Axolotl registries and round-trip
+The PHP tests register every specimen against real Axolotl registries, exercise expansion placement/breaking and equipment behavior, and round-trip
 every runtime block state through the disk serializer/deserializer. Asset tests
 check JSON, atlases, textures, models, rotation variants, Ogg and UUIDs. A successful
 server boot verifies load-time integration; a Minecraft client still needs to check
 visuals, use animations, custom armor alignment, packet behavior and interaction.
 
 See `asset-preview.png` for the texture sheet. License: MIT; see `LICENSE`.
+
+Reference formats: [Microsoft attachables](https://learn.microsoft.com/en-us/minecraft/creator/documents/attachables?view=minecraft-bedrock-stable), [animation schema](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/visualreference/actor_animation.v1.8.0?view=minecraft-bedrock-stable). All new meshes, textures, audio and animations are original procedural assets.

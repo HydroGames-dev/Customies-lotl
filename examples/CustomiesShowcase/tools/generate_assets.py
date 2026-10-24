@@ -1,10 +1,11 @@
 """Deterministic, original pixel textures and JSON models. Requires Pillow and ffmpeg."""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
-import hashlib, json, math, random, re, struct, subprocess, tempfile, uuid, wave
+import hashlib, json, math, random, re, struct, subprocess, tempfile, uuid, wave, sys
 
 BASE = Path(__file__).resolve().parents[1]
 PACK = BASE / 'resource_pack'
+EXPANSION = json.loads((BASE/'resources/expansion_blocks.json').read_text())
 COVERAGE = json.loads((BASE / 'component-coverage.json').read_text())
 BLOCKS = re.findall(r"'([^']+)'", re.search(r'public const PLAYABLE = \[(.*?)\]', (BASE/'src/ShowcaseBlock.php').read_text()).group(1))
 SPECIAL_ITEMS = re.findall(r"'([^']+)'\s*=>", re.search(r'public const SPECIAL_ITEMS = \[(.*?)\]', (BASE/'src/ShowcasePlugin.php').read_text()).group(1))
@@ -23,6 +24,9 @@ def texture(name, item=False):
     seed = int.from_bytes(hashlib.sha256(name.encode()).digest()[:8], 'big')
     rng = random.Random(seed)
     base = color(name)
+    if name in ['showcase_prism_helmet','showcase_prism_chestplate','showcase_prism_leggings','showcase_prism_boots']:base=(54,146,170)
+    if name=='showcase_clockwork_staff':base=(115,81,43)
+    if name=='showcase_wind_fan':base=(57,147,128)
     image = Image.new('RGBA',(16,16),(0,0,0,0) if item else base+(255,))
     draw = ImageDraw.Draw(image)
     light = tuple(min(255,v+55) for v in base)+(255,)
@@ -57,6 +61,26 @@ def texture(name, item=False):
             draw.rounded_rectangle((2,4,13,13),radius=3,fill=(187,131,74),outline=(236,204,151))
             draw.line((5,5,5,8),fill=white)
             draw.line((9,5,9,8),fill=white)
+        elif 'chestplate' in name:
+            draw.polygon([(1,3),(5,2),(6,5),(9,5),(10,2),(14,3),(13,8),(11,8),(11,14),(4,14),(4,8),(2,8)],fill=light,outline=dark)
+            draw.rectangle((7,7,8,10),fill=white)
+        elif 'leggings' in name:
+            draw.rectangle((3,2,12,7),fill=light,outline=dark)
+            draw.rectangle((3,6,6,14),fill=base,outline=dark);draw.rectangle((9,6,12,14),fill=base,outline=dark)
+        elif 'boots' in name:
+            draw.rectangle((3,4,6,13),fill=light,outline=dark);draw.rectangle((9,4,12,13),fill=light,outline=dark)
+            draw.rectangle((1,11,6,14),fill=base,outline=dark);draw.rectangle((9,11,14,14),fill=base,outline=dark)
+        elif 'wind_fan' in name:
+            draw.line((8,8,8,15),fill=dark,width=2)
+            for points in [[(8,7),(4,1),(10,2)],[(8,7),(14,4),(13,10)],[(8,7),(8,13),(2,9)]]:draw.polygon(points,fill=light,outline=dark)
+            draw.rectangle((7,6,9,8),fill=white)
+        elif 'clockwork_staff' in name:
+            draw.line((5,15,9,4),fill=dark,width=3);draw.line((5,14,9,5),fill=light)
+            draw.ellipse((5,0,13,8),fill=dark,outline=white);draw.ellipse((7,2,11,6),fill=light)
+        elif 'builder_compass' in name:
+            draw.ellipse((1,1,14,14),fill=dark,outline=light);draw.polygon([(8,3),(11,10),(8,8),(5,10)],fill=white)
+        elif 'moon_mochi' in name:
+            draw.ellipse((2,4,13,13),fill=(235,215,247),outline=light);draw.ellipse((5,6,9,10),fill=(172,123,194))
         elif 'helmet' in name:
             draw.rectangle((2,3,13,11),fill=dark)
             draw.rectangle((3,2,12,8),fill=light)
@@ -114,13 +138,23 @@ def texture(name, item=False):
                     if seed & (1 << ((y-5)*6+x-5)): draw.point((x,y),fill=white)
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 108 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,1,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,1,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
-block_names = ['showcase_'+name for name in BLOCKS] + ['showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 125 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,2,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,2,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+block_names = ['showcase_'+name for name in BLOCKS] + [*( 'showcase_'+key+'_on' for key,d in EXPANSION.items() if d['mode']=='powered' and key != 'crystal_reactor'), 'showcase_mini_chess_1','showcase_mini_chess_2','showcase_reactor_flow','showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
 item_names = ['showcase_'+name for name in ITEMS] + ['showcase_lab_item_'+key for key in COVERAGE['item']]
 for kind,names in [('blocks',block_names),('items',item_names)]:
     for name in names:
         path=PACK/'textures'/kind/(name+'.png');path.parent.mkdir(parents=True,exist_ok=True)
         texture(name,kind=='items').save(path)
+flow=Image.new('RGBA',(16,128))
+for frame in range(8):
+    tile=texture('showcase_reactor_flow')
+    pixels=tile.load()
+    for y in range(16):
+        for x in range(16):
+            if (x+y+frame*2)%8 < 3:pixels[x,y]=(118,250,232,255)
+    flow.paste(tile,(0,frame*16))
+flow.save(PACK/'textures/blocks/showcase_reactor_flow.png')
+write(Path('textures/flipbook_textures.json'),[{'flipbook_texture':'textures/blocks/showcase_reactor_flow','atlas_tile':'showcase_reactor_flow','ticks_per_frame':3}])
 write(Path('textures/terrain_texture.json'), {'resource_pack_name':'CustomiesShowcase','texture_name':'atlas.terrain','padding':8,'num_mip_levels':4,'texture_data':{n:{'textures':'textures/blocks/'+n} for n in block_names}})
 write(Path('textures/item_texture.json'), {'resource_pack_name':'CustomiesShowcase','texture_name':'atlas.items','texture_data':{n:{'textures':'textures/items/'+n} for n in item_names}})
 write(Path('blocks.json'), {'format_version':[1,1,0], **{'showcase:'+name:{'sound':'stone','textures':'showcase_'+name} for name in BLOCKS}, **{'showcase:lab_block_'+key:{'sound':'stone','textures':'showcase_lab_block_'+key} for key in COVERAGE['block']}})
@@ -132,6 +166,9 @@ def bone(name,origin,size,**extra):
     return {'name':name,'pivot':[0,0,0],'cubes':[cube(origin,size)],**extra}
 def model(name,bones):
     write(Path('models/blocks/'+name+'.geo.json'),{'format_version':'1.12.0','minecraft:geometry':[{'description':{'identifier':'geometry.showcase.'+name,'texture_width':16,'texture_height':16,'visible_bounds_width':2,'visible_bounds_height':2,'visible_bounds_offset':[0,0.5,0]},'bones':bones}]})
+for key,definition in EXPANSION.items():
+    for i,segment in enumerate(definition['segments']):
+        model(f'{key}_{i}',[bone(f'piece_{n}',part['origin'],part['size']) for n,part in enumerate(segment['cubes'])])
 model('cube',[bone('root',[-8,0,-8],[16,16,16])])
 model('slab',[bone('root',[-8,0,-8],[16,8,16])])
 model('slab_top',[bone('root',[-8,8,-8],[16,8,16])])
@@ -192,3 +229,5 @@ for index,(name,is_item) in enumerate(entries):
     for row in range(0,len(label),22):d.text((x+6,y+69+row//22*12),label[row:row+22],fill=(184,211,216),font=ImageFont.load_default(size=10))
 sheet.save(BASE/'asset-preview.png')
 print(f'Generated {len(block_names)} block textures, {len(item_names)} item icons, {len(list((PACK/'models/blocks').glob('*.json')))} block models, helmet and original audio.')
+
+subprocess.run([sys.executable,str(BASE/'tools/generate_gear.py')],check=True)

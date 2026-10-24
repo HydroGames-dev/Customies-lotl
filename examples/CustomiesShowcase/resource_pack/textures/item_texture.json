@@ -26,6 +26,15 @@
     "showcase_repair_kit": {
       "textures": "textures/items/showcase_repair_kit"
     },
+    "showcase_clockwork_staff": {
+      "textures": "textures/items/showcase_clockwork_staff"
+    },
+    "showcase_wind_fan": {
+      "textures": "textures/items/showcase_wind_fan"
+    },
+    "showcase_builder_compass": {
+      "textures": "textures/items/showcase_builder_compass"
+    },
     "showcase_prism_berry": {
       "textures": "textures/items/showcase_prism_berry"
     },
@@ -46,6 +55,18 @@
     },
     "showcase_frost_blade": {
       "textures": "textures/items/showcase_frost_blade"
+    },
+    "showcase_prism_chestplate": {
+      "textures": "textures/items/showcase_prism_chestplate"
+    },
+    "showcase_prism_leggings": {
+      "textures": "textures/items/showcase_prism_leggings"
+    },
+    "showcase_prism_boots": {
+      "textures": "textures/items/showcase_prism_boots"
+    },
+    "showcase_moon_mochi": {
+      "textures": "textures/items/showcase_moon_mochi"
     },
     "showcase_lab_item_allow_off_hand": {
       "textures": "textures/items/showcase_lab_item_allow_off_hand"
