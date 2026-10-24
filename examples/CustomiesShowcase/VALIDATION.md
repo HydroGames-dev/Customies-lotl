@@ -10,3 +10,20 @@
 - Built PHAR files, MCPACK and install ZIP; SHA-256 checksums generated.
 
 A Minecraft client was not available. In-game visuals, custom helmet alignment, all laboratory metadata, animation, recipe UI, connection prediction and protocol-specific client behavior still require client testing. The laboratory metadata does not implement the unsupported server gameplay listed in README.md.
+
+## Selection-box correction (Customies 1.5.41 / Showcase 1.0.1)
+
+The original showcase selection vectors used integer NBT elements when constructors
+received integer pixels. The host's canonical data-driven block definitions encode
+these vectors as FloatTag lists. A new palette-level test failed on the original
+slab's origin vector and passes after explicitly converting all six coordinates to
+floats in SelectionBoxComponent. This covers base components and permutations.
+
+An in-memory world using the real World::useBreakOn() and Block::onBreak() checks
+ray selection and removal of both slab halves, plus breaking either bench part in
+each of four cardinal directions. Both bench parts are removed and one item drops.
+These server and wire-format checks do not replace a Minecraft client playtest.
+
+Replace both plugin PHARs from the rebuilt install bundle, restart the server, and
+reconnect clients so the corrected palette is sent. Resource textures/models did
+not change for this correction.

@@ -45,6 +45,23 @@ foreach([...ShowcaseBlock::PLAYABLE, ...array_map(static fn($key) => 'lab_'.$key
 		check($decoded === $permutation->getStateId(),'State persistence: '.$identifier);
 	}
 }
+
+// Bedrock's selection-box vectors are FloatTag lists, even when supplied as whole pixels.
+foreach(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries() as $entry){
+	$root = $entry->getStates()->getRoot();
+	$components = [$root->getCompoundTag('components')];
+	foreach($root->getListTag('permutations') ?? [] as $permutation){ $components[] = $permutation->getCompoundTag('components'); }
+	foreach($components as $componentSet){
+		$selection = $componentSet?->getCompoundTag('minecraft:selection_box');
+		if($selection === null){ continue; }
+		foreach(['origin','size'] as $field){
+			$vector = $selection->getListTag($field);
+			check($vector !== null && count($vector) === 3,'Selection vector dimensions: '.$entry->getName());
+			foreach($vector as $coordinate){ check($coordinate instanceof pocketmine\nbt\tag\FloatTag,'Selection coordinates must be NBT floats: '.$entry->getName().' '.$field); }
+		}
+	}
+}
+
 $items = [];
 foreach([...ShowcaseItem::PLAYABLE, ...array_map(static fn($key) => 'lab_'.$key,array_keys(ComponentCatalog::items()))] as $specimen){
 	$id = ItemTypeIds::newId();
@@ -67,5 +84,6 @@ check($lamp->getLightLevel() === 15,'Powered lamp server light');
 $ghost = CustomiesBlockFactory::getInstance()->get('showcase:phase_block');
 $ghost->getState('showcase:phase')->setCurrentValue(2);
 check($ghost->getCollisionBoxes() === [],'Ghost server collision');
+require __DIR__.'/breaking.php';
 file_put_contents(dirname(__DIR__).'/component-coverage.json',json_encode($coverage,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES)."\n");
 echo 'PASS: '.count($coverage['block']).' block components, '.count($coverage['item']).' item components, '.count(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries()).' blocks, '.count($items)." items; every block state round-trips.\n";

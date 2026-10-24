@@ -1,6 +1,8 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
+Showcase 1.0.1 / bundled Customies 1.5.41 includes the slab/bench selection-box fix.
+When updating, replace both plugin PHARs, restart the server, and reconnect clients.
 **46 blocks + 52 items**, including 23 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
 example in `src/ComponentCatalog.php` and a separate laboratory specimen.
