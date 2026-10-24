@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\traits;
 
 use customiesdevs\customies\block\states\BlockState;
+use customiesdevs\customies\block\states\BlockStates;
 use pocketmine\math\Facing;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
@@ -107,6 +108,13 @@ final class PlacementDirectionTrait implements BlockTrait {
 		);
 	}
 
+	public function __clone(){
+		$this->cardinal = clone $this->cardinal;
+		$this->facing = clone $this->facing;
+		$this->sixteenWay = clone $this->sixteenWay;
+		$this->corner = clone $this->corner;
+	}
+
 	public function getName(): string {
 		return "minecraft:placement_direction";
 	}
@@ -143,6 +151,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 	public function applyPlacement(BlockTraitContext $context): void {
 		$player = $context->getPlayer();
 		if($player === null){
+			$this->update($context);
 			return;
 		}
 		$horizontal = $player->getHorizontalFacing();
@@ -154,7 +163,9 @@ final class PlacementDirectionTrait implements BlockTrait {
 		}
 		if($this->has(self::FACING_DIRECTION)){
 			$this->facing->setCurrentValue(
-				$this->facingName($player->getHorizontalFacing())
+				abs($player->getLocation()->getPitch()) >= 45
+					? ($player->getLocation()->getPitch() > 0 ? "down" : "up")
+					: $this->rotateCardinal($horizontal)
 			);
 		}
 		if($this->has(self::SIXTEEN_WAY_ROTATION)){
@@ -162,11 +173,41 @@ final class PlacementDirectionTrait implements BlockTrait {
 				$this->getSixteenWayRotation($player->getLocation()->getYaw())
 			);
 		}
+		$this->update($context);
 	}
 
 	public function update(BlockTraitContext $context): void {
-		// Placement direction is intrinsic to the block and does not
-		// change when neighbouring blocks are modified.
+		if(!$this->has(self::CORNER_AND_CARDINAL_DIRECTION)){ return; }
+		$self = $context->getBlock();
+		if(!$self instanceof BlockStates){
+			throw new \LogicException("Corner placement direction requires a block implementing BlockStates");
+		}
+		$position = $context->getBlockReplace()->getPosition();
+		$faces = ["north" => Facing::NORTH, "east" => Facing::EAST, "south" => Facing::SOUTH, "west" => Facing::WEST];
+		$names = array_keys($faces);
+		$direction = $this->cardinal->getCurrentValue();
+		$index = array_search($direction, $names, true);
+		$half = $self->getState(PlacementPositionTrait::VERTICAL_HALF)?->getCurrentValue();
+		$neighborDirection = function(int $face) use ($context, $position, $self, $half): ?string {
+			$other = $context->getTransaction()->fetchBlock($position->getSide($face));
+			if(!$other instanceof BlockStates){ return null; }
+			if($other->getTypeId() !== $self->getTypeId()){ return null; }
+			if($other->getState(PlacementPositionTrait::VERTICAL_HALF)?->getCurrentValue() !== $half){ return null; }
+			$direction = $other->getState(self::CARDINAL_DIRECTION)?->getCurrentValue();
+			return is_string($direction) && in_array($direction, ["north", "east", "south", "west"], true) ? $direction : null;
+		};
+		$this->corner->setCurrentValue("none");
+		foreach([1 => "outer", -1 => "inner"] as $sign => $shape){
+			$face = $sign === 1 ? $faces[$direction] : Facing::opposite($faces[$direction]);
+			$other = $neighborDirection($face);
+			if($other === null || $other === $direction || $faces[$other] === Facing::opposite($faces[$direction])){ continue; }
+			$side = $other === $names[($index + 3) % 4] ? "left" : "right";
+			$guard = $sign === 1 ? Facing::opposite($faces[$other]) : $faces[$other];
+			if($neighborDirection($guard) !== $direction){
+				$this->corner->setCurrentValue($shape . "_" . $side);
+				return;
+			}
+		}
 	}
 
 	private function rotateCardinal(int $facing): string {
@@ -177,7 +218,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 			Facing::EAST => 3,
 		];
 		$index = $directions[$facing] ?? 0;
-		$offset = match($this->yRotationOffset){
+		$offset = match(($this->yRotationOffset % 360 + 360) % 360){
 			90 => 1,
 			180, -180 => 2,
 			270, -90 => 3,
@@ -188,7 +229,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 			"west",
 			"north",
 			"east",
-		][($index + $offset) & 3];
+		][($index - $offset) & 3];
 	}
 
 	private function facingName(int $facing): string {
@@ -216,7 +257,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 		 * 12 = east
 		 */
 		$rotation = (int) round($yaw / 22.5);
-		$rotation += match($this->yRotationOffset){
+		$rotation -= match(($this->yRotationOffset % 360 + 360) % 360){
 			90 => 4,
 			180, -180 => 8,
 			270, -90 => 12,
@@ -258,6 +299,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 	}
 
 	private function validate(): void {
+		if(count(array_unique($this->enabledStates)) !== count($this->enabledStates)){ throw new InvalidArgumentException("Duplicate enabled state"); }
 		if($this->enabledStates === []){
 			throw new InvalidArgumentException("Placement direction requires at least one enabled state.");
 		}

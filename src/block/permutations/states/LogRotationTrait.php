@@ -50,7 +50,9 @@ trait LogRotationTrait {
 	}
 
 	public function getCurrentStates(): array {
-		return [$this->axis];
+		$writer = BlockStateWriter::create("customies:state");
+		$this->serializeState($writer);
+		return array_values(array_map(static fn($tag) => $tag->getValue(), $writer->getBlockStateData()->getStates()));
 	}
 
 	public function place(BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool {

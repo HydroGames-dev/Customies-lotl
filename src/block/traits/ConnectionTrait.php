@@ -46,6 +46,13 @@ final class ConnectionTrait implements BlockTrait {
 		return new self(true, $connectionResolver);
 	}
 
+	public function __clone(){
+		$this->north = clone $this->north;
+		$this->south = clone $this->south;
+		$this->west = clone $this->west;
+		$this->east = clone $this->east;
+	}
+
 	public function getName(): string {
 		return "minecraft:connection";
 	}
@@ -60,11 +67,19 @@ final class ConnectionTrait implements BlockTrait {
 	}
 
 	public function applyPlacement(BlockTraitContext $context): void {
-		// See refresh() below, should be sent by Plugin.
+		$block = $context->getBlock();
+		$pos = $context->getBlockReplace()->getPosition();
+		$tx = $context->getTransaction();
+		$this->refresh($block,
+			$tx->fetchBlock($pos->getSide(Facing::NORTH)),
+			$tx->fetchBlock($pos->getSide(Facing::SOUTH)),
+			$tx->fetchBlock($pos->getSide(Facing::WEST)),
+			$tx->fetchBlock($pos->getSide(Facing::EAST))
+		);
 	}
 
 	public function update(BlockTraitContext $context): void {
-		// See refresh() below, should be sent by Plugin.
+		$this->applyPlacement($context);
 	}
 
 	/**

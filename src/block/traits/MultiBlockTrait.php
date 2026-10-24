@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\traits;
 
 use customiesdevs\customies\block\states\BlockState;
+use customiesdevs\customies\block\states\BlockStates;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use InvalidArgumentException;
@@ -62,6 +63,10 @@ final class MultiBlockTrait implements BlockTrait {
 		return new self("east", $parts);
 	}
 
+	public function __clone(){
+		$this->part = clone $this->part;
+	}
+
 	public function getName(): string {
 		return "minecraft:multi_block";
 	}
@@ -83,11 +88,11 @@ final class MultiBlockTrait implements BlockTrait {
 	 *
 	 * Part 0 is always the originally placed block.
 	 */
-	public function getOffsetForPart(int $part): Vector3 {
+	public function getOffsetForPart(int $part, ?string $cardinalDirection = null): Vector3 {
 		if($part < 0 || $part >= $this->parts){
 			throw new InvalidArgumentException("Invalid multi-block part {$part}; valid range is 0-" . ($this->parts - 1) . ".");
 		}
-		return match($this->direction){
+		return match(in_array($this->direction, ["up", "down"], true) ? $this->direction : ($cardinalDirection ?? $this->direction)){
 			"down" => new Vector3(0, -$part, 0),
 			"up" => new Vector3(0, $part, 0),
 			"north" => new Vector3(0, 0, -$part),
@@ -98,8 +103,27 @@ final class MultiBlockTrait implements BlockTrait {
 	}
 
 	public function applyPlacement(BlockTraitContext $context): void {
-		// The originally placed block is always part 0.
-		$this->part->setCurrentValue(0);
+		$block = $context->getBlock();
+		if(!$block instanceof BlockStates){
+			throw new \LogicException("Multi-block placement requires a block implementing BlockStates");
+		}
+		$partState = $block->getState(self::PART);
+		if($partState === null){
+			throw new \LogicException("Multi-block placement requires the minecraft:multi_block_part state");
+		}
+		$partState->setCurrentValue(0);
+		$pos = $context->getBlockReplace()->getPosition();
+		$direction = $block->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)?->getCurrentValue();
+		for($i = 1; $i < $this->parts; ++$i){
+			$target = $pos->addVector($this->getOffsetForPart($i, $direction));
+			if(!$context->getTransaction()->fetchBlock($target)->canBeReplaced()){
+				throw new \RuntimeException("Multi-block placement is obstructed");
+			}
+			$part = clone $block;
+			$partState = $part->getState(self::PART) ?? throw new \LogicException("Cloned multi-block is missing its part state");
+			$partState->setCurrentValue($i);
+			$context->getTransaction()->addBlock($target, $part);
+		}
 	}
 
 	public function update(BlockTraitContext $context): void {

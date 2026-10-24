@@ -18,8 +18,13 @@ final class BlockTraitContext {
 		private readonly Block $blockClicked,
 		private readonly int $face,
 		private readonly Vector3 $clickVector,
-		private readonly ?Player $player
+		private readonly ?Player $player,
+		private readonly ?Block $block = null
 	) {}
+
+	public function getBlock(): Block {
+		return $this->block ?? $this->blockReplace;
+	}
 
 	public function getTransaction(): BlockTransaction {
 		return $this->transaction;

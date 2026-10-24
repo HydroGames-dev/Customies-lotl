@@ -15,6 +15,9 @@ trait BlockStatesTrait {
 	 * @param BlockState $state
 	 */
 	public function addState(BlockState $state): void {
+		if(isset($this->states[$state->getName()])){
+			throw new \InvalidArgumentException("Duplicate block state: " . $state->getName());
+		}
 		$this->states[$state->getName()] = $state;
 	}
 
@@ -42,5 +45,32 @@ trait BlockStatesTrait {
 	 */
 	public function getStates(): array {
 		return $this->states;
+	}
+	public function getCurrentStates(): array {
+		return array_values(array_map(static fn(BlockState $state) => $state->getCurrentValue(), $this->states));
+	}
+
+	public function serializeState(\pocketmine\data\bedrock\block\convert\BlockStateWriter $out): void {
+		foreach($this->states as $state){
+			$name = $state->getName();
+			$value = $state->getCurrentValue();
+			match(true){
+				is_bool($value) => $out->writeBool($name, $value),
+				is_int($value) => $out->writeInt($name, $value),
+				default => $out->writeString($name, $value)
+			};
+		}
+	}
+
+	public function deserializeState(\pocketmine\data\bedrock\block\convert\BlockStateReader $in): void {
+		foreach($this->states as $state){
+			$name = $state->getName();
+			$default = $state->getValues()[0];
+			$state->setCurrentValue(match(true){
+				is_bool($default) => $in->readBool($name),
+				is_int($default) => $in->readInt($name),
+				default => $in->readString($name)
+			});
+		}
 	}
 }

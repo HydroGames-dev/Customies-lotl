@@ -19,7 +19,16 @@ class BlockState {
 		protected readonly string $name,
 		protected readonly array $values
 	) {
-		$this->currentValue = $values[0] ?? null;
+		if($name === "" || $values === [] || !array_is_list($values)){
+			throw new \InvalidArgumentException("States require a name and a non-empty list of values");
+		}
+		$type = get_debug_type($values[0]);
+		foreach($values as $i => $value){
+			if(!in_array($type, ["bool", "int", "string"], true) || get_debug_type($value) !== $type || in_array($value, array_slice($values, 0, $i), true)){
+				throw new \InvalidArgumentException("State values must have one scalar type and be unique");
+			}
+		}
+		$this->currentValue = $values[0];
 	}
 
 	/**

@@ -13,8 +13,13 @@ class BlockPermutation {
 	 */
 	public function __construct(
 		private readonly string $condition,
-		private readonly BlockComponent $components
-	) {}
+		private readonly BlockComponent $components,
+		private readonly array $additionalComponents = []
+	) {
+		foreach($additionalComponents as $component){
+			if(!$component instanceof BlockComponent){ throw new \InvalidArgumentException("Permutation components must implement BlockComponent"); }
+		}
+	}
 
 	/**
 	 * Gets the condition string for this permutation.
@@ -34,11 +39,10 @@ class BlockPermutation {
 	 * Converts the BlockPermutation to an array format.
 	 */
 	public function toArray(): array {
-		return [
-			"condition" => $this->condition,
-			"components" => [
-				$this->components->getName() => $this->components->getValue()
-			]
-		];
+		$components = [];
+		foreach([$this->components, ...$this->additionalComponents] as $component){
+			$components[$component->getName()] = $component->getValue();
+		}
+		return ["condition" => $this->condition, "components" => $components];
 	}
 }

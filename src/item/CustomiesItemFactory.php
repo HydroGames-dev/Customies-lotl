@@ -110,6 +110,9 @@ final class CustomiesItemFactory {
 		string $identifier, 
 		CreativeInventoryInfo $creativeInfo = new CreativeInventoryInfo(CreativeInventoryInfo::CATEGORY_EQUIPMENT)
 	): void {
+		if(isset($this->itemTableEntries[$identifier])){
+			throw new InvalidArgumentException("Item already registered: " . $identifier);
+		}
 		$item = $itemFunc();
 		if(!$item instanceof Item){
 			throw new InvalidArgumentException("Class returned from closure is not a Item");

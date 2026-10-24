@@ -95,10 +95,15 @@ final class CustomiesBlockFactory {
 		?Closure $serializer = null,
 		?Closure $deserializer = null
 	): void {
+		if(isset($this->customBlocks[$identifier])){
+			throw new InvalidArgumentException("Block already registered: " . $identifier);
+		}
 		$block = $blockFunc();
 		if(!$block instanceof Block){
 			throw new InvalidArgumentException("Class returned from closure is not a Block");
 		}
+
+		if($block instanceof BlockTraits){ $block->initializeTraits(); }
 
 		RuntimeBlockStateRegistry::getInstance()->register($block);
 		CustomiesItemFactory::getInstance()->registerBlockItem($identifier, $block);
@@ -157,6 +162,7 @@ final class CustomiesBlockFactory {
 				$block->getPermutations()
 			)));
 			$nbtTag->setTag("properties", new ListTag(array_reverse($blockProperties)));
+			$paletteStates = [];
 			foreach(Permutations::getCartesianProduct($blockValues) as $meta => $stateValues){
 				$stateTag = CompoundTag::create();
 				// We need to insert states for every possible permutation to allow for all blocks to be used and to
@@ -164,13 +170,14 @@ final class CustomiesBlockFactory {
 				foreach($stateValues as $i => $value){
 					$stateTag->setTag($blockNames[$i], NBT::getTagType($value));
 				}
-				BlockPalette::getInstance()->insertState(
+				$paletteStates[] = [
 					CompoundTag::create()
 						->setString(BlockStateData::TAG_NAME, $identifier)
 						->setTag(BlockStateData::TAG_STATES, $stateTag),
 					$meta
-				);
+				];
 			}
+			BlockPalette::getInstance()->insertStates($paletteStates);
 			$serializer ??= static function (BlockPermutations $b) use ($identifier): BlockStateWriter {
 				assert($b instanceof BlockPermutations);
 				$writer = BlockStateWriter::create($identifier);
@@ -191,7 +198,7 @@ final class CustomiesBlockFactory {
 					->setTag(BlockStateData::TAG_STATES, CompoundTag::create())
 			);
 			$serializer ??= static fn(Block $b) => new BlockStateWriter($identifier);
-			$deserializer ??= static fn(BlockStateReader $in) => $block;
+			$deserializer ??= static fn(BlockStateReader $in) => clone $block;
 		}
 		GlobalBlockStateHandlers::getSerializer()->map($block, $serializer);
 		GlobalBlockStateHandlers::getDeserializer()->map($identifier, $deserializer);
@@ -206,14 +213,10 @@ final class CustomiesBlockFactory {
 		$this->blockPaletteEntries[] = new BlockPaletteEntry($identifier, new CacheableNbt($nbtTag));
 		$this->blockFuncs[$identifier] = [$blockFunc, $serializer, $deserializer];
 
-		foreach($this->blockPaletteEntries as $i => $entry){
-			$root = $entry->getStates()->getRoot();
-			// ->setByte("can_dampen_vibrations", 0)
-			// ->setByte("can_occlude_vibrations", 0)
-			// ->setFloat("translucency", 0.8)
-			// ->setByte("requires_correct_tool_for_drops", 0)
-			$root->setTag("vanilla_block_data", CompoundTag::create()->setInt("block_id", 10000 + $i));
-			$this->blockPaletteEntries[$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
-		}
+		$i = count($this->blockPaletteEntries) - 1;
+		$entry = $this->blockPaletteEntries[$i];
+		$root = clone $entry->getStates()->getRoot();
+		$root->setTag("vanilla_block_data", CompoundTag::create()->setInt("block_id", 10000 + $i));
+		$this->blockPaletteEntries[$i] = new BlockPaletteEntry($entry->getName(), new CacheableNbt($root));
 	}
 }
