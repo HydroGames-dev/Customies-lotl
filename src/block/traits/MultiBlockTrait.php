@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\traits;
 
 use customiesdevs\customies\block\states\BlockState;
+use customiesdevs\customies\block\states\BlockStates;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use InvalidArgumentException;
@@ -102,8 +103,15 @@ final class MultiBlockTrait implements BlockTrait {
 	}
 
 	public function applyPlacement(BlockTraitContext $context): void {
-		$this->part->setCurrentValue(0);
 		$block = $context->getBlock();
+		if(!$block instanceof BlockStates){
+			throw new \LogicException("Multi-block placement requires a block implementing BlockStates");
+		}
+		$partState = $block->getState(self::PART);
+		if($partState === null){
+			throw new \LogicException("Multi-block placement requires the minecraft:multi_block_part state");
+		}
+		$partState->setCurrentValue(0);
 		$pos = $context->getBlockReplace()->getPosition();
 		$direction = $block->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)?->getCurrentValue();
 		for($i = 1; $i < $this->parts; ++$i){
@@ -112,7 +120,8 @@ final class MultiBlockTrait implements BlockTrait {
 				throw new \RuntimeException("Multi-block placement is obstructed");
 			}
 			$part = clone $block;
-			$part->getState(self::PART)->setCurrentValue($i);
+			$partState = $part->getState(self::PART) ?? throw new \LogicException("Cloned multi-block is missing its part state");
+			$partState->setCurrentValue($i);
 			$context->getTransaction()->addBlock($target, $part);
 		}
 	}

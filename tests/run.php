@@ -92,5 +92,13 @@ check(count($permutation->toArray()['components']) === 2, 'multiple permutation 
 $factory->registerBlock(static fn() => new TallBlock(), 'test:tall');
 check(count(customiesdevs\customies\block\BlockPalette::getInstance()->getCustomStates()) === 19, 'non-power-of-two part states');
 try { $factory->registerBlock(static fn() => new TestBlock(), 'test:connections'); throw new RuntimeException('accepted duplicate'); } catch(InvalidArgumentException){}
+$invalidContext = new customiesdevs\customies\block\traits\BlockTraitContext($tx, $air->asItem(), $air, $air, 1, $pos, null);
+try {
+	MultiBlockTrait::vertical()->applyPlacement($invalidContext);
+	throw new RuntimeException('accepted a block without BlockStates');
+} catch(LogicException $e){
+	check(str_contains($e->getMessage(), 'BlockStates'), 'invalid context must explain the required interface');
+}
+check($tall->getState(MultiBlockTrait::PART)->getCurrentValue() === 0, 'placing extra parts must preserve origin index');
 echo "All regression checks passed\n";
 
