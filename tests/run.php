@@ -100,5 +100,29 @@ try {
 	check(str_contains($e->getMessage(), 'BlockStates'), 'invalid context must explain the required interface');
 }
 check($tall->getState(MultiBlockTrait::PART)->getCurrentValue() === 0, 'placing extra parts must preserve origin index');
+class CornerBlock extends TraitBlock {
+	public function __construct(){
+		static $id = null;
+		$this->addTrait(PlacementDirectionTrait::cornerAndCardinal());
+		parent::__construct(new BlockIdentifier($id ??= pocketmine\block\BlockTypeIds::newId()), 'Corner', new BlockTypeInfo(BlockBreakInfo::instant()));
+	}
+}
+$cornerBlock = new CornerBlock();
+$cornerBlock->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->setCurrentValue('north');
+$neighbor = clone $cornerBlock;
+$neighbor->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->setCurrentValue('west');
+$world->blocks = ['0:0:-1' => $neighbor];
+$cornerContext = new customiesdevs\customies\block\traits\BlockTraitContext(new pocketmine\world\BlockTransaction($world), $air->asItem(), $air, $air, 1, $pos, null, $cornerBlock);
+$cornerBlock->getTrait('minecraft:placement_direction')->applyPlacement($cornerContext);
+check($cornerBlock->getState('minecraft:corner')->getCurrentValue() === 'outer_left', 'corner update without a player');
+$world->blocks = ['0:0:-1' => $air];
+$cornerBlock->getTrait('minecraft:placement_direction')->update($cornerContext);
+check($cornerBlock->getState('minecraft:corner')->getCurrentValue() === 'none', 'non-state neighbors must be ignored');
+try {
+	PlacementDirectionTrait::cornerAndCardinal()->update($invalidContext);
+	throw new RuntimeException('accepted corner block without BlockStates');
+} catch(LogicException $e){
+	check(str_contains($e->getMessage(), 'BlockStates'), 'corner context must require the state interface');
+}
 echo "All regression checks passed\n";
 

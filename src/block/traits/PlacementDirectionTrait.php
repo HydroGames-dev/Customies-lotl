@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\traits;
 
 use customiesdevs\customies\block\states\BlockState;
+use customiesdevs\customies\block\states\BlockStates;
 use pocketmine\math\Facing;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
@@ -150,6 +151,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 	public function applyPlacement(BlockTraitContext $context): void {
 		$player = $context->getPlayer();
 		if($player === null){
+			$this->update($context);
 			return;
 		}
 		$horizontal = $player->getHorizontalFacing();
@@ -177,6 +179,9 @@ final class PlacementDirectionTrait implements BlockTrait {
 	public function update(BlockTraitContext $context): void {
 		if(!$this->has(self::CORNER_AND_CARDINAL_DIRECTION)){ return; }
 		$self = $context->getBlock();
+		if(!$self instanceof BlockStates){
+			throw new \LogicException("Corner placement direction requires a block implementing BlockStates");
+		}
 		$position = $context->getBlockReplace()->getPosition();
 		$faces = ["north" => Facing::NORTH, "east" => Facing::EAST, "south" => Facing::SOUTH, "west" => Facing::WEST];
 		$names = array_keys($faces);
@@ -185,10 +190,11 @@ final class PlacementDirectionTrait implements BlockTrait {
 		$half = $self->getState(PlacementPositionTrait::VERTICAL_HALF)?->getCurrentValue();
 		$neighborDirection = function(int $face) use ($context, $position, $self, $half): ?string {
 			$other = $context->getTransaction()->fetchBlock($position->getSide($face));
-			if(!$other instanceof BlockTraits || !method_exists($other, "getState")){ return null; }
+			if(!$other instanceof BlockStates){ return null; }
 			if($other->getTypeId() !== $self->getTypeId()){ return null; }
 			if($other->getState(PlacementPositionTrait::VERTICAL_HALF)?->getCurrentValue() !== $half){ return null; }
-			return $other->getState(self::CARDINAL_DIRECTION)?->getCurrentValue();
+			$direction = $other->getState(self::CARDINAL_DIRECTION)?->getCurrentValue();
+			return is_string($direction) && in_array($direction, ["north", "east", "south", "west"], true) ? $direction : null;
 		};
 		$this->corner->setCurrentValue("none");
 		foreach([1 => "outer", -1 => "inner"] as $sign => $shape){
@@ -251,7 +257,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 		 * 12 = east
 		 */
 		$rotation = (int) round($yaw / 22.5);
-		 $rotation -= match(($this->yRotationOffset % 360 + 360) % 360){
+		$rotation -= match(($this->yRotationOffset % 360 + 360) % 360){
 			90 => 4,
 			180, -180 => 8,
 			270, -90 => 12,
