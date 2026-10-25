@@ -1,0 +1,14 @@
+{
+  "format_version": "1.14.0",
+  "sound_definitions": {
+    "showcase.chime": {
+      "category": "record",
+      "sounds": [
+        {
+          "name": "sounds/showcase/chime",
+          "stream": false
+        }
+      ]
+    }
+  }
+}

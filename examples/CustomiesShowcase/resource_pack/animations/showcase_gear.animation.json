@@ -1,0 +1,445 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.showcase.prism_helmet.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "crown": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              360,
+              0
+            ]
+          },
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "1.0": [
+              0,
+              0.6,
+              0
+            ],
+            "2.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.showcase.prism_helmet.offset": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "head": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.helmet', 0)",
+            "query.get_root_locator_offset('armor_offset.helmet', 1)",
+            "query.get_root_locator_offset('armor_offset.helmet', 2)"
+          ]
+        }
+      }
+    },
+    "animation.showcase.prism_chestplate.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "satellite_l": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              360,
+              0
+            ]
+          },
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "1.0": [
+              0,
+              1,
+              0
+            ],
+            "2.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "satellite_r": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              -360,
+              0
+            ]
+          },
+          "position": {
+            "0.0": [
+              0,
+              1,
+              0
+            ],
+            "1.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              1,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.showcase.prism_chestplate.offset": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "body": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.chestplate', 0)",
+            "query.get_root_locator_offset('armor_offset.chestplate', 1)",
+            "query.get_root_locator_offset('armor_offset.chestplate', 2)"
+          ]
+        }
+      }
+    },
+    "animation.showcase.prism_leggings.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "knee_l": {
+          "scale": {
+            "0.0": 1,
+            "1.0": 1.15,
+            "2.0": 1
+          }
+        },
+        "knee_r": {
+          "scale": {
+            "0.0": 1.15,
+            "1.0": 1,
+            "2.0": 1.15
+          }
+        }
+      }
+    },
+    "animation.showcase.prism_leggings.offset": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "body": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.leggings', 0)",
+            "query.get_root_locator_offset('armor_offset.leggings', 1)",
+            "query.get_root_locator_offset('armor_offset.leggings', 2)"
+          ]
+        },
+        "leftLeg": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.left_leg', 0)",
+            "query.get_root_locator_offset('armor_offset.left_leg', 1)",
+            "query.get_root_locator_offset('armor_offset.left_leg', 2)"
+          ]
+        },
+        "rightLeg": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.right_leg', 0)",
+            "query.get_root_locator_offset('armor_offset.right_leg', 1)",
+            "query.get_root_locator_offset('armor_offset.right_leg', 2)"
+          ]
+        }
+      }
+    },
+    "animation.showcase.prism_boots.idle": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "wing_l": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              -12
+            ],
+            "0.5": [
+              0,
+              0,
+              12
+            ],
+            "1.0": [
+              0,
+              0,
+              -12
+            ]
+          }
+        },
+        "wing_r": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              12
+            ],
+            "0.5": [
+              0,
+              0,
+              -12
+            ],
+            "1.0": [
+              0,
+              0,
+              12
+            ]
+          }
+        }
+      }
+    },
+    "animation.showcase.prism_boots.offset": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "leftLeg": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.left_boot', 0)",
+            "query.get_root_locator_offset('armor_offset.left_boot', 1)",
+            "query.get_root_locator_offset('armor_offset.left_boot', 2)"
+          ]
+        },
+        "rightLeg": {
+          "position": [
+            "query.get_root_locator_offset('armor_offset.right_boot', 0)",
+            "query.get_root_locator_offset('armor_offset.right_boot', 1)",
+            "query.get_root_locator_offset('armor_offset.right_boot', 2)"
+          ]
+        }
+      }
+    },
+    "animation.showcase.clockwork_staff.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "orb": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              360,
+              0
+            ]
+          },
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "1.0": [
+              0,
+              1,
+              0
+            ],
+            "2.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "gear": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "2.0": [
+              0,
+              0,
+              360
+            ]
+          }
+        }
+      }
+    },
+    "animation.showcase.clockwork_staff.first_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            3,
+            -3,
+            -4
+          ],
+          "rotation": [
+            -15,
+            0,
+            -10
+          ],
+          "scale": 0.65
+        }
+      }
+    },
+    "animation.showcase.clockwork_staff.third_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            0,
+            -2,
+            0
+          ],
+          "rotation": [
+            -10,
+            0,
+            0
+          ],
+          "scale": 0.8
+        }
+      }
+    },
+    "animation.showcase.wind_fan.idle": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "blades": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "1.0": [
+              0,
+              0,
+              720
+            ]
+          }
+        }
+      }
+    },
+    "animation.showcase.wind_fan.first_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            3,
+            -3,
+            -4
+          ],
+          "rotation": [
+            -15,
+            0,
+            -10
+          ],
+          "scale": 0.65
+        }
+      }
+    },
+    "animation.showcase.wind_fan.third_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            0,
+            -2,
+            0
+          ],
+          "rotation": [
+            -10,
+            0,
+            0
+          ],
+          "scale": 0.8
+        }
+      }
+    },
+    "animation.showcase.frost_blade.idle": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "frost": {
+          "scale": {
+            "0.0": 1,
+            "1.0": 1.15,
+            "2.0": 1
+          }
+        }
+      }
+    },
+    "animation.showcase.frost_blade.first_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            3,
+            -3,
+            -4
+          ],
+          "rotation": [
+            -15,
+            0,
+            -10
+          ],
+          "scale": 0.65
+        }
+      }
+    },
+    "animation.showcase.frost_blade.third_person": {
+      "loop": true,
+      "animation_length": 2,
+      "bones": {
+        "handle": {
+          "position": [
+            0,
+            -2,
+            0
+          ],
+          "rotation": [
+            -10,
+            0,
+            0
+          ],
+          "scale": 0.8
+        }
+      }
+    }
+  }
+}

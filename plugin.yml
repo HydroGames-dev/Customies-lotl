@@ -3,7 +3,7 @@ description: A Axolotl-MP plugin that implements support for custom blocks, item
 
 main: customiesdevs\customies\Customies
 src-namespace-prefix: customiesdevs\customies
-version: 1.5.40
+version: 1.5.42
 api: 5.49.0
 
 authors:

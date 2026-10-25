@@ -30,14 +30,14 @@ final class SelectionBoxComponent implements BlockComponent {
 		return [
 			"enabled" => $this->useSelectionBox,
 			"origin" => [
-				$this->origin->getX(), 
-				$this->origin->getY(), 
-				$this->origin->getZ()
+				(float) $this->origin->getX(),
+				(float) $this->origin->getY(),
+				(float) $this->origin->getZ()
 			],
 			"size" => [
-				$this->size->getX(), 
-				$this->size->getY(), 
-				$this->size->getZ()
+				(float) $this->size->getX(),
+				(float) $this->size->getY(),
+				(float) $this->size->getZ()
 			]
 		];
 	}

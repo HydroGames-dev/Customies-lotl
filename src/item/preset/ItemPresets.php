@@ -1,9 +1,6 @@
 <?php
-
 declare(strict_types=1);
-
 namespace customiesdevs\customies\item\preset;
-
 use customiesdevs\customies\item\ItemComponents;
 use customiesdevs\customies\item\component\IconComponent;
 use customiesdevs\customies\item\component\DisplayNameComponent;

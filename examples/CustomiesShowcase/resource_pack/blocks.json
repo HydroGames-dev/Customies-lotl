@@ -1,0 +1,299 @@
+{
+  "format_version": [
+    1,
+    1,
+    0
+  ],
+  "showcase:prism_lamp": {
+    "sound": "stone",
+    "textures": "showcase_prism_lamp"
+  },
+  "showcase:machine": {
+    "sound": "stone",
+    "textures": "showcase_machine"
+  },
+  "showcase:orienter": {
+    "sound": "stone",
+    "textures": "showcase_orienter"
+  },
+  "showcase:face_marker": {
+    "sound": "stone",
+    "textures": "showcase_face_marker"
+  },
+  "showcase:slab": {
+    "sound": "stone",
+    "textures": "showcase_slab"
+  },
+  "showcase:cable": {
+    "sound": "stone",
+    "textures": "showcase_cable"
+  },
+  "showcase:corner_stairs": {
+    "sound": "stone",
+    "textures": "showcase_corner_stairs"
+  },
+  "showcase:totem": {
+    "sound": "stone",
+    "textures": "showcase_totem"
+  },
+  "showcase:bench": {
+    "sound": "stone",
+    "textures": "showcase_bench"
+  },
+  "showcase:rotor": {
+    "sound": "stone",
+    "textures": "showcase_rotor"
+  },
+  "showcase:phase_block": {
+    "sound": "stone",
+    "textures": "showcase_phase_block"
+  },
+  "showcase:ice_tile": {
+    "sound": "stone",
+    "textures": "showcase_ice_tile"
+  },
+  "showcase:glow_flower": {
+    "sound": "stone",
+    "textures": "showcase_glow_flower"
+  },
+  "showcase:signal_lamp": {
+    "sound": "stone",
+    "textures": "showcase_signal_lamp"
+  },
+  "showcase:lumen_cable": {
+    "sound": "stone",
+    "textures": "showcase_lumen_cable"
+  },
+  "showcase:phase_gate": {
+    "sound": "stone",
+    "textures": "showcase_phase_gate"
+  },
+  "showcase:spring_pad": {
+    "sound": "stone",
+    "textures": "showcase_spring_pad"
+  },
+  "showcase:prism_workbench": {
+    "sound": "stone",
+    "textures": "showcase_prism_workbench"
+  },
+  "showcase:sky_obelisk": {
+    "sound": "stone",
+    "textures": "showcase_sky_obelisk"
+  },
+  "showcase:crystal_reactor": {
+    "sound": "stone",
+    "textures": "showcase_crystal_reactor"
+  },
+  "showcase:suspended_chandelier": {
+    "sound": "stone",
+    "textures": "showcase_suspended_chandelier"
+  },
+  "showcase:holo_bench": {
+    "sound": "stone",
+    "textures": "showcase_holo_bench"
+  },
+  "showcase:prism_bridge": {
+    "sound": "stone",
+    "textures": "showcase_prism_bridge"
+  },
+  "showcase:prism_telescope": {
+    "sound": "stone",
+    "textures": "showcase_prism_telescope"
+  },
+  "showcase:tiny_lantern": {
+    "sound": "stone",
+    "textures": "showcase_tiny_lantern"
+  },
+  "showcase:mini_chess": {
+    "sound": "stone",
+    "textures": "showcase_mini_chess"
+  },
+  "showcase:pocket_planter": {
+    "sound": "stone",
+    "textures": "showcase_pocket_planter"
+  },
+  "showcase:runic_pedestal": {
+    "sound": "stone",
+    "textures": "showcase_runic_pedestal"
+  },
+  "showcase:runic_arch": {
+    "sound": "stone",
+    "textures": "showcase_runic_arch"
+  },
+  "showcase:thermal_forge": {
+    "sound": "stone",
+    "textures": "showcase_thermal_forge"
+  },
+  "showcase:crystal_conservatory": {
+    "sound": "stone",
+    "textures": "showcase_crystal_conservatory"
+  },
+  "showcase:sky_dock": {
+    "sound": "stone",
+    "textures": "showcase_sky_dock"
+  },
+  "showcase:storm_engine": {
+    "sound": "stone",
+    "textures": "showcase_storm_engine"
+  },
+  "showcase:molten_cell": {
+    "sound": "stone",
+    "textures": "showcase_molten_cell"
+  },
+  "showcase:tide_cell": {
+    "sound": "stone",
+    "textures": "showcase_tide_cell"
+  },
+  "showcase:aurora_tile": {
+    "sound": "stone",
+    "textures": "showcase_aurora_tile"
+  },
+  "showcase:astral_beacon": {
+    "sound": "stone",
+    "textures": "showcase_astral_beacon"
+  },
+  "showcase:prism_cottage": {
+    "sound": "stone",
+    "textures": "showcase_prism_cottage"
+  },
+  "showcase:market_hall": {
+    "sound": "stone",
+    "textures": "showcase_market_hall"
+  },
+  "showcase:grand_gateway": {
+    "sound": "stone",
+    "textures": "showcase_grand_gateway"
+  },
+  "showcase:lab_block_block_entity": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_block_entity"
+  },
+  "showcase:lab_block_block_tags": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_block_tags"
+  },
+  "showcase:lab_block_chest_obstruction": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_chest_obstruction"
+  },
+  "showcase:lab_block_collision_box": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_collision_box"
+  },
+  "showcase:lab_block_connection_rule": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_connection_rule"
+  },
+  "showcase:lab_block_crafting_table": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_crafting_table"
+  },
+  "showcase:lab_block_destructible_by_explosion": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_destructible_by_explosion"
+  },
+  "showcase:lab_block_destructible_by_mining": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_destructible_by_mining"
+  },
+  "showcase:lab_block_destruction_particles": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_destruction_particles"
+  },
+  "showcase:lab_block_display_name": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_display_name"
+  },
+  "showcase:lab_block_embedded_visual": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_embedded_visual"
+  },
+  "showcase:lab_block_entity_fall_on": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_entity_fall_on"
+  },
+  "showcase:lab_block_flammable": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_flammable"
+  },
+  "showcase:lab_block_flower_pottable": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_flower_pottable"
+  },
+  "showcase:lab_block_friction": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_friction"
+  },
+  "showcase:lab_block_geometry": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_geometry"
+  },
+  "showcase:lab_block_instrument_sound": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_instrument_sound"
+  },
+  "showcase:lab_block_item_visual": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_item_visual"
+  },
+  "showcase:lab_block_leashable": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_leashable"
+  },
+  "showcase:lab_block_light_dampening": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_light_dampening"
+  },
+  "showcase:lab_block_light_emission": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_light_emission"
+  },
+  "showcase:lab_block_liquid_detection": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_liquid_detection"
+  },
+  "showcase:lab_block_map_color": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_map_color"
+  },
+  "showcase:lab_block_material_instances": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_material_instances"
+  },
+  "showcase:lab_block_movable": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_movable"
+  },
+  "showcase:lab_block_placement_filter": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_placement_filter"
+  },
+  "showcase:lab_block_precipitation_interactions": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_precipitation_interactions"
+  },
+  "showcase:lab_block_random_offset": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_random_offset"
+  },
+  "showcase:lab_block_replaceable": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_replaceable"
+  },
+  "showcase:lab_block_selection_box": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_selection_box"
+  },
+  "showcase:lab_block_sound": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_sound"
+  },
+  "showcase:lab_block_support": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_support"
+  },
+  "showcase:lab_block_transformation": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_transformation"
+  }
+}

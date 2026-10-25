@@ -270,8 +270,7 @@ final class PlacementDirectionTrait implements BlockTrait {
 		$enabled = CompoundTag::create();
 		$enabled->setByte(
 			"minecraft:cardinal_direction",
-			$this->has(self::CARDINAL_DIRECTION) ||
-			$this->has(self::CORNER_AND_CARDINAL_DIRECTION) ? 1 : 0
+			$this->has(self::CARDINAL_DIRECTION) ? 1 : 0
 		);
 		$enabled->setByte(
 			"minecraft:corner_and_cardinal_direction",

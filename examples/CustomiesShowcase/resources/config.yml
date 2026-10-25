@@ -1,0 +1,4 @@
+# Laboratory specimens expose every component independently. Some components
+# need engine features that the server cannot implement from client metadata.
+# Enable on a test server; the playable set is registered either way.
+component-laboratory: true

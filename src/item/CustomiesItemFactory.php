@@ -234,6 +234,9 @@ final class CustomiesItemFactory {
 	 * @param Block $block The block instance to be registered as an item
 	 */
 	public function registerBlockItem(string $identifier, Block $block): void {
+		if(isset($this->itemTableEntries[$identifier])){
+			throw new InvalidArgumentException("Block Item already registered: " . $identifier);
+		}
 		$itemId = $block->getIdInfo()->getBlockTypeId();
 		StringToItemParser::getInstance()->registerBlock($identifier, fn() => clone $block);
 		$entry = new ItemTypeEntry($identifier, $itemId, false, 2, new CacheableNbt(CompoundTag::create()));

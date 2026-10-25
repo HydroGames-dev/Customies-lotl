@@ -1,0 +1,204 @@
+{
+  "resource_pack_name": "CustomiesShowcase",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "showcase_inspector": {
+      "textures": "textures/items/showcase_inspector"
+    },
+    "showcase_state_wrench": {
+      "textures": "textures/items/showcase_state_wrench"
+    },
+    "showcase_pulse_wand": {
+      "textures": "textures/items/showcase_pulse_wand"
+    },
+    "showcase_prism": {
+      "textures": "textures/items/showcase_prism"
+    },
+    "showcase_ember_fuel": {
+      "textures": "textures/items/showcase_ember_fuel"
+    },
+    "showcase_pigment": {
+      "textures": "textures/items/showcase_pigment"
+    },
+    "showcase_scout_wand": {
+      "textures": "textures/items/showcase_scout_wand"
+    },
+    "showcase_repair_kit": {
+      "textures": "textures/items/showcase_repair_kit"
+    },
+    "showcase_clockwork_staff": {
+      "textures": "textures/items/showcase_clockwork_staff"
+    },
+    "showcase_wind_fan": {
+      "textures": "textures/items/showcase_wind_fan"
+    },
+    "showcase_builder_compass": {
+      "textures": "textures/items/showcase_builder_compass"
+    },
+    "showcase_chromatic_lens": {
+      "textures": "textures/items/showcase_chromatic_lens"
+    },
+    "showcase_resonance_cell": {
+      "textures": "textures/items/showcase_resonance_cell"
+    },
+    "showcase_prism_berry": {
+      "textures": "textures/items/showcase_prism_berry"
+    },
+    "showcase_prism_pickaxe": {
+      "textures": "textures/items/showcase_prism_pickaxe"
+    },
+    "showcase_prism_helmet": {
+      "textures": "textures/items/showcase_prism_helmet"
+    },
+    "showcase_prism_pebble": {
+      "textures": "textures/items/showcase_prism_pebble"
+    },
+    "showcase_energized_ration": {
+      "textures": "textures/items/showcase_energized_ration"
+    },
+    "showcase_prism_elixir": {
+      "textures": "textures/items/showcase_prism_elixir"
+    },
+    "showcase_frost_blade": {
+      "textures": "textures/items/showcase_frost_blade"
+    },
+    "showcase_prism_chestplate": {
+      "textures": "textures/items/showcase_prism_chestplate"
+    },
+    "showcase_prism_leggings": {
+      "textures": "textures/items/showcase_prism_leggings"
+    },
+    "showcase_prism_boots": {
+      "textures": "textures/items/showcase_prism_boots"
+    },
+    "showcase_moon_mochi": {
+      "textures": "textures/items/showcase_moon_mochi"
+    },
+    "showcase_lab_item_allow_off_hand": {
+      "textures": "textures/items/showcase_lab_item_allow_off_hand"
+    },
+    "showcase_lab_item_bundle_interaction": {
+      "textures": "textures/items/showcase_lab_item_bundle_interaction"
+    },
+    "showcase_lab_item_can_destroy_in_creative": {
+      "textures": "textures/items/showcase_lab_item_can_destroy_in_creative"
+    },
+    "showcase_lab_item_compostable": {
+      "textures": "textures/items/showcase_lab_item_compostable"
+    },
+    "showcase_lab_item_cooldown": {
+      "textures": "textures/items/showcase_lab_item_cooldown"
+    },
+    "showcase_lab_item_damage_absorption": {
+      "textures": "textures/items/showcase_lab_item_damage_absorption"
+    },
+    "showcase_lab_item_damage": {
+      "textures": "textures/items/showcase_lab_item_damage"
+    },
+    "showcase_lab_item_digger": {
+      "textures": "textures/items/showcase_lab_item_digger"
+    },
+    "showcase_lab_item_display_name": {
+      "textures": "textures/items/showcase_lab_item_display_name"
+    },
+    "showcase_lab_item_durability": {
+      "textures": "textures/items/showcase_lab_item_durability"
+    },
+    "showcase_lab_item_durability_sensor": {
+      "textures": "textures/items/showcase_lab_item_durability_sensor"
+    },
+    "showcase_lab_item_dyeable": {
+      "textures": "textures/items/showcase_lab_item_dyeable"
+    },
+    "showcase_lab_item_enchantable": {
+      "textures": "textures/items/showcase_lab_item_enchantable"
+    },
+    "showcase_lab_item_fire_resistant": {
+      "textures": "textures/items/showcase_lab_item_fire_resistant"
+    },
+    "showcase_lab_item_food": {
+      "textures": "textures/items/showcase_lab_item_food"
+    },
+    "showcase_lab_item_fuel": {
+      "textures": "textures/items/showcase_lab_item_fuel"
+    },
+    "showcase_lab_item_glint": {
+      "textures": "textures/items/showcase_lab_item_glint"
+    },
+    "showcase_lab_item_hand_equipped": {
+      "textures": "textures/items/showcase_lab_item_hand_equipped"
+    },
+    "showcase_lab_item_hover_text_color": {
+      "textures": "textures/items/showcase_lab_item_hover_text_color"
+    },
+    "showcase_lab_item_icon": {
+      "textures": "textures/items/showcase_lab_item_icon"
+    },
+    "showcase_lab_item_interact_button": {
+      "textures": "textures/items/showcase_lab_item_interact_button"
+    },
+    "showcase_lab_item_item_tags": {
+      "textures": "textures/items/showcase_lab_item_item_tags"
+    },
+    "showcase_lab_item_kinetic_weapon": {
+      "textures": "textures/items/showcase_lab_item_kinetic_weapon"
+    },
+    "showcase_lab_item_liquid_clipped": {
+      "textures": "textures/items/showcase_lab_item_liquid_clipped"
+    },
+    "showcase_lab_item_max_stack_size": {
+      "textures": "textures/items/showcase_lab_item_max_stack_size"
+    },
+    "showcase_lab_item_piercing_weapon": {
+      "textures": "textures/items/showcase_lab_item_piercing_weapon"
+    },
+    "showcase_lab_item_projectile": {
+      "textures": "textures/items/showcase_lab_item_projectile"
+    },
+    "showcase_lab_item_rarity": {
+      "textures": "textures/items/showcase_lab_item_rarity"
+    },
+    "showcase_lab_item_record": {
+      "textures": "textures/items/showcase_lab_item_record"
+    },
+    "showcase_lab_item_repairable": {
+      "textures": "textures/items/showcase_lab_item_repairable"
+    },
+    "showcase_lab_item_shooter": {
+      "textures": "textures/items/showcase_lab_item_shooter"
+    },
+    "showcase_lab_item_should_despawn": {
+      "textures": "textures/items/showcase_lab_item_should_despawn"
+    },
+    "showcase_lab_item_stacked_by_data": {
+      "textures": "textures/items/showcase_lab_item_stacked_by_data"
+    },
+    "showcase_lab_item_storage_item": {
+      "textures": "textures/items/showcase_lab_item_storage_item"
+    },
+    "showcase_lab_item_storage_weight_limit": {
+      "textures": "textures/items/showcase_lab_item_storage_weight_limit"
+    },
+    "showcase_lab_item_storage_weight_modifier": {
+      "textures": "textures/items/showcase_lab_item_storage_weight_modifier"
+    },
+    "showcase_lab_item_swing_duration": {
+      "textures": "textures/items/showcase_lab_item_swing_duration"
+    },
+    "showcase_lab_item_swing_sounds": {
+      "textures": "textures/items/showcase_lab_item_swing_sounds"
+    },
+    "showcase_lab_item_throwable": {
+      "textures": "textures/items/showcase_lab_item_throwable"
+    },
+    "showcase_lab_item_use_animation": {
+      "textures": "textures/items/showcase_lab_item_use_animation"
+    },
+    "showcase_lab_item_use_modifiers": {
+      "textures": "textures/items/showcase_lab_item_use_modifiers"
+    },
+    "showcase_lab_item_wearable": {
+      "textures": "textures/items/showcase_lab_item_wearable"
+    }
+  }
+}

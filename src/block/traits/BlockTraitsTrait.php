@@ -51,8 +51,15 @@ trait BlockTraitsTrait {
 			throw new \LogicException("Trait blocks must implement BlockPermutations");
 		}
 		if($this->hasTrait("minecraft:multi_block")){
+			if($this instanceof \customiesdevs\customies\block\component\BlockComponents){
+				if(!$this->hasComponent("minecraft:movable")){
+					$this->addComponent(new \customiesdevs\customies\block\component\MovableComponent());
+				}
+				$movement = $this->getComponent("minecraft:movable")->getValue()["movement_type"] ?? null;
+				if(!in_array($movement, ["immovable", "popped"], true)){ throw new InvalidArgumentException("Multi-block movement must be immovable or popped"); }
+			}
 			foreach($this->getPermutations() as $permutation){
-				foreach(["minecraft:placement_filter", "minecraft:replaceable", "minecraft:random_offset"] as $forbidden){
+				foreach(["minecraft:movable", "minecraft:placement_filter", "minecraft:replaceable", "minecraft:random_offset"] as $forbidden){
 					if(array_key_exists($forbidden, $permutation->toArray()["components"])){ throw new InvalidArgumentException("Multi-block permutation cannot contain " . $forbidden); }
 				}
 			}
