@@ -12,7 +12,7 @@ Official Discord community chat for socializing, receiving help with the plugin,
 
 ## Usage
 
-The usage guides have been moved to the [Customies Wiki](https://github.com/CustomiesDevs/Customies/wiki)!
+The usage guides have been moved to the [GithubPage](https://hydrogames-dev.github.io/Customies-lotl/)!
 
 Follow this Wiki https://github.com/nk-archives/Customies/wiki
 
