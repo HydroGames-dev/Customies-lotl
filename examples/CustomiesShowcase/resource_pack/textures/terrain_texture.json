@@ -115,6 +115,15 @@
     "showcase_astral_beacon": {
       "textures": "textures/blocks/showcase_astral_beacon"
     },
+    "showcase_prism_cottage": {
+      "textures": "textures/blocks/showcase_prism_cottage"
+    },
+    "showcase_market_hall": {
+      "textures": "textures/blocks/showcase_market_hall"
+    },
+    "showcase_grand_gateway": {
+      "textures": "textures/blocks/showcase_grand_gateway"
+    },
     "showcase_sky_obelisk_on": {
       "textures": "textures/blocks/showcase_sky_obelisk_on"
     },
@@ -156,6 +165,42 @@
     },
     "showcase_astral_beacon_flow": {
       "textures": "textures/blocks/showcase_astral_beacon_flow"
+    },
+    "showcase_cottage_window_flow": {
+      "textures": "textures/blocks/showcase_cottage_window_flow"
+    },
+    "showcase_market_counter_flow": {
+      "textures": "textures/blocks/showcase_market_counter_flow"
+    },
+    "showcase_gateway_stone_flow": {
+      "textures": "textures/blocks/showcase_gateway_stone_flow"
+    },
+    "showcase_cottage_floor": {
+      "textures": "textures/blocks/showcase_cottage_floor"
+    },
+    "showcase_cottage_roof": {
+      "textures": "textures/blocks/showcase_cottage_roof"
+    },
+    "showcase_cottage_stone": {
+      "textures": "textures/blocks/showcase_cottage_stone"
+    },
+    "showcase_cottage_timber": {
+      "textures": "textures/blocks/showcase_cottage_timber"
+    },
+    "showcase_cottage_window": {
+      "textures": "textures/blocks/showcase_cottage_window"
+    },
+    "showcase_gateway_stone": {
+      "textures": "textures/blocks/showcase_gateway_stone"
+    },
+    "showcase_market_canopy": {
+      "textures": "textures/blocks/showcase_market_canopy"
+    },
+    "showcase_market_counter": {
+      "textures": "textures/blocks/showcase_market_counter"
+    },
+    "showcase_market_floor": {
+      "textures": "textures/blocks/showcase_market_floor"
     },
     "showcase_mini_chess_1": {
       "textures": "textures/blocks/showcase_mini_chess_1"

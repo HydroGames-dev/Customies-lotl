@@ -1,9 +1,9 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.3.0 adds arbitrary structure footprints, server-powered abilities and ten animated block materials. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
+Showcase 1.4.0 adds a hollow cottage, market hall, grand gateway, shared model roles and banked part indices. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
-**70 blocks + 66 items**, including 61 playable examples and 75 component specimens.
+**73 blocks + 66 items**, including 64 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
 example in `src/ComponentCatalog.php` and a separate laboratory specimen.
 
@@ -23,7 +23,7 @@ support; those clients have not been tested here.
 
 ## Descriptions and lore
 
-Every one of the 136 specimens has purpose-specific lore. Playable examples explain
+Every one of the 139 specimens has purpose-specific lore. Playable examples explain
 how to use them and give key values; laboratory examples explain their metadata
 and identify behavior that needs additional server support. The same descriptions
 appear in creative inventory, command kits, block drops, and inspector output.
@@ -50,6 +50,32 @@ All commands and inspector/wrench actions require `customiesshowcase.command`
 `plugins/CustomiesShowcase/config.yml` can disable `component-laboratory`; restart
 before testing changes. Keep the same registration configuration for saved test worlds.
 Removing a registered specimen can make saved blocks/items unavailable.
+
+## House and large prefabs (1.4.0)
+
+Read the [complete Customies guide](../../docs/customies-guide.md) for registration,
+all 75 components, combined features, assets, performance and server sizing. The
+install ZIP includes the guide as `GUIDE.md` and a scoped benchmark sample.
+
+| Prefab | Size / occupied cells | Interaction |
+| --- | --- | --- |
+| `prism_cottage` | 5 x 5 x 5 / 96 | Hollow room, two-high entrance, open window frames, timber, stepped roof and chimney details. Power lights the windows; Resonance grants Regeneration I 10s. |
+| `market_hall` | 7 x 5 x 5 / 96 | Covered stalls, counters and side entrances. Power animates counters; Resonance grants Haste I 20s. |
+| `grand_gateway` | 9 x 6 x 2 / 64 | Buttresses and a three-wide passage. Power animates rune stones; Resonance grants Speed I 20s. |
+
+Use `/cshow give prism_cottage`, place on a clear level site, and enter one block
+above the full-height floor. North-facing footprints extend right and north from
+the root corner; the gateway includes a buttress one cell left of the anchor.
+Interior air and entrance cells stay unoccupied. Furniture placed separately in
+that space survives grouped breaking. These are physical prefab blocks; they do
+not add land ownership, beds, storage inventories or teleportation.
+
+New templates use banked part indices (16 low values x bank count), up to 128 cells
+in multiples of 16. Old layouts retain their saved state schema. Shared model
+roles avoid emitting one identical geometry file per cell. Each role must use the
+same cubes. Edit `tools/generate_buildings.py` to change these generated prefabs;
+`generate_assets.py` regenerates their layouts and assets. Wood, roof, stone, floor,
+canopy and window materials are separate; only selected parts animate when powered.
 
 ## Structure footprints and server abilities (1.3.0)
 
@@ -83,7 +109,7 @@ crystal growth and rune flows. Animation is client-side; state, effects and ligh
 server-side. No repeating PHP timer or per-player world scan is needed.
 
 `resources/expansion_blocks.json` is the editable layout/geometry/ability catalog.
-`StructureLayout` validates unique integer offsets and supports 2-32 cells within
+`StructureLayout` validates unique integer offsets and supports legacy layouts of 2-32 cells within
 8 blocks of the origin, including irregular and hollow layouts. `showcase:structure_part`
 is a persisted custom state; each part has matching geometry, selection and collision.
 The 32-part beacon uses 256 combinations (32 parts x 4 directions x 2 power values).
@@ -99,7 +125,7 @@ are split into short lines. These controls replace long unbounded debug chat dum
 ## Size, structure and animated-gear expansion (1.2.0)
 
 Ten new blocks and seven new items are included. Each has its own icon/texture and
-lore. See `model-preview.png` for geometry drawn at a common scale, and
+lore. See `model-preview.png` for geometry drawn at the labeled scale, and
 `asset-preview.png` for the texture sheet.
 
 | Block | Occupied cells / size | Function |
@@ -144,7 +170,7 @@ Minecraft client playtest. Pose values are editable in the generated JSON and
 
 Update **both PHARs and the resource pack**, restart the server, and reconnect.
 Obtain fresh items with `/cshow kit` or `/cshow give <id>`. The pack UUID is preserved
-and its version is increased to 1.3.0 so clients can accept the update.
+and its version is increased to 1.4.0 so clients can accept the update.
 
 ## Combined-feature additions (1.1.0)
 

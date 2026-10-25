@@ -112,7 +112,7 @@ for name in ['prism_helmet','prism_chestplate','prism_leggings','prism_boots','c
     entries.append((name,[c for b in g['bones'] for c in b['cubes']]))
 W,H=240,320;cols=5
 sheet=Image.new('RGB',(W*cols,55+math.ceil(len(entries)/cols)*H),(14,25,37));draw=ImageDraw.Draw(sheet)
-draw.text((18,14),'PRISM EXPANSION / GEOMETRY AT COMMON SCALE',font=ImageFont.load_default(size=19),fill=(118,240,220))
+draw.text((18,14),'PRISM EXPANSION / MODELS AND STRUCTURES',font=ImageFont.load_default(size=19),fill=(118,240,220))
 for n,(name,cubes) in enumerate(entries):
     x=(n%cols)*W;y=55+(n//cols)*H
     faces=[]
@@ -133,8 +133,9 @@ for n,(name,cubes) in enumerate(entries):
     allpoints=[p for _,poly,_ in faces for p in poly]
     midx=(min(p[0] for p in allpoints)+max(p[0] for p in allpoints))/2
     midy=(min(p[1] for p in allpoints)+max(p[1] for p in allpoints))/2
-    for _,poly,color in sorted(faces,key=lambda f:f[0]):draw.polygon([(x+W/2+(px-midx)*1.7,y+139+(py-midy)*1.7) for px,py in poly],fill=color,outline=(20,59,71))
+    scale=min(1.7,(W-24)/(max(p[0] for p in allpoints)-min(p[0] for p in allpoints)),250/(max(p[1] for p in allpoints)-min(p[1] for p in allpoints)))
+    for _,poly,color in sorted(faces,key=lambda f:f[0]):draw.polygon([(x+W/2+(px-midx)*scale,y+139+(py-midy)*scale) for px,py in poly],fill=color,outline=(20,59,71))
     draw.text((x+10,y+286),name,font=ImageFont.load_default(size=12),fill=(215,235,237))
-    draw.text((x+10,y+304),'Rest pose / 1.7 px per model pixel',font=ImageFont.load_default(size=10),fill=(125,163,176))
+    draw.text((x+10,y+304),f'Rest pose / {scale:.2f} px per model pixel',font=ImageFont.load_default(size=10),fill=(125,163,176))
 sheet.save(BASE/'model-preview.png')
 print('Generated 4 armor rigs, 3 held rigs, 17 local animations, 2 animation controllers and model preview.')

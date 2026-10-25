@@ -8,6 +8,9 @@ use pocketmine\utils\TextFormat as F;
 final class SpecimenDescriptions {
 	/** @var array<string, list<string>> */
 	private const BLOCKS = [
+		'prism_cottage' => ['A 5 x 5 x 5 hollow cottage with entry and open windows.','96 cells; toggle warm windows; Resonance: Regeneration I 10s.'],
+		'market_hall' => ['A 7 x 5 x 5 market with canopy, counters and side aisles.','96 cells; toggle counter lights; Resonance: Haste I 20s.'],
+		'grand_gateway' => ['A 9 x 6 x 2 gate with a three-block-wide passage.','64 cells; toggle runes; Resonance: Speed I 20s.'],
 		'astral_beacon' => ['A 5 x 6 x 3 astral pavilion with 32 occupied cells.','Toggle power; offer a Resonance Cell for Night Vision 60s.'],
 		'runic_arch' => ['A 3 x 4 x 1 rune arch with a walk-through opening.','Toggle power; offer a Resonance Cell for Speed I 20s.'],
 		'thermal_forge' => ['A 3 x 2 x 2 furnace structure with flowing embers.','Toggle power; offer a Resonance Cell for Haste II 20s.'],
@@ -50,7 +53,7 @@ final class SpecimenDescriptions {
 	/** @var array<string, list<string>> */
 	private const ITEMS = [
 		'chromatic_lens' => ['A reusable server-side texture and power control.','Use on powered/color expansion blocks; updates every part.'],
-		'resonance_cell' => ['Consumable energy for six large structure abilities.','Power the complete structure, then offer one cell.'],
+		'resonance_cell' => ['Consumable energy for large structure abilities.','Power the complete structure, then offer one cell.'],
 		'prism_chestplate' => ['Crystal plate with animated shoulder satellites.','Armor: 6 | Durability: 384 | Slot: chest'],
 		'prism_leggings' => ['Prism leg plates with articulated knee crystals.','Armor: 5 | Durability: 360 | Slot: legs'],
 		'prism_boots' => ['Winglet boots that grant Jump Boost I while worn.','Armor: 2 | Durability: 300 | No flight ability'],

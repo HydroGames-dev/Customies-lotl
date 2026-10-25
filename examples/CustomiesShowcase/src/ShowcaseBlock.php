@@ -15,7 +15,7 @@ use pocketmine\math\{Vector3, AxisAlignedBB};
 use pocketmine\player\Player;
 
 final class ShowcaseBlock extends TraitBlock {
-	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench', 'sky_obelisk', 'crystal_reactor', 'suspended_chandelier', 'holo_bench', 'prism_bridge', 'prism_telescope', 'tiny_lantern', 'mini_chess', 'pocket_planter', 'runic_pedestal', 'runic_arch', 'thermal_forge', 'crystal_conservatory', 'sky_dock', 'storm_engine', 'molten_cell', 'tide_cell', 'aurora_tile', 'astral_beacon'];
+	public const PLAYABLE = ['prism_lamp', 'machine', 'orienter', 'face_marker', 'slab', 'cable', 'corner_stairs', 'totem', 'bench', 'rotor', 'phase_block', 'ice_tile', 'glow_flower', 'signal_lamp', 'lumen_cable', 'phase_gate', 'spring_pad', 'prism_workbench', 'sky_obelisk', 'crystal_reactor', 'suspended_chandelier', 'holo_bench', 'prism_bridge', 'prism_telescope', 'tiny_lantern', 'mini_chess', 'pocket_planter', 'runic_pedestal', 'runic_arch', 'thermal_forge', 'crystal_conservatory', 'sky_dock', 'storm_engine', 'molten_cell', 'tide_cell', 'aurora_tile', 'astral_beacon', 'prism_cottage', 'market_hall', 'grand_gateway'];
 
 	public function __construct(int $typeId, private readonly string $specimen){
 		$name = ucwords(str_replace('_', ' ', $specimen));
@@ -262,7 +262,7 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	public function getDrops(Item $item): array {
-		if(($this->getState(StructureLayout::PART)?->getCurrentValue() ?? $this->getState(MultiBlockTrait::PART)?->getCurrentValue() ?? 0) !== 0){ return []; }
+		if(($this->getState(StructureLayout::PART) !== null ? StructureLayout::part($this) : ($this->getState(MultiBlockTrait::PART)?->getCurrentValue() ?? 0)) !== 0){ return []; }
 		return parent::getDrops($item);
 	}
 }

@@ -126,3 +126,19 @@ $lines=customiesdevs\showcase\DebugMessages::block($world->getBlock($at));
 check(!str_contains(implode(' ',$lines),'Components:'),'Compact diagnostics must omit verbose component data');
 check(strlen(customiesdevs\showcase\DebugMessages::bounded(str_repeat('x',10000)))<1100,'NBT diagnostics must be bounded');
 echo "PASS: arbitrary footprints in four directions, every-part breaks, powered abilities, cell consumption, unrelated-block protection and bounded diagnostics.\n";
+
+// Hollow house cells are not reserved; furnishing survives grouped removal.
+$world=new ExpansionWorld();$at=new Vector3(60,70,60);$inside=$at->add(2,1,-2);
+$world->setBlock($inside,pocketmine\block\VanillaBlocks::STONE());
+$house=$factory->get('showcase:prism_cottage');$replace=$world->getBlock($at);$tx=new BlockTransaction($world);
+check($house->place($tx,$house->asItem(),$replace,$replace,1,Vector3::zero()) && $tx->apply(),'Furniture in hollow volume must not obstruct house placement');
+foreach([[2,1,0],[2,2,0],[2,2,-2]] as [$x,$y,$z]){ check($world->getBlock($at->add($x,$y,$z)) instanceof pocketmine\block\Air,'House entry and interior must be open'); }
+$tool=VanillaItems::AIR();$world->useBreakOn($at,$tool);
+check($world->getBlock($inside)->getTypeId()===pocketmine\block\VanillaBlocks::STONE()->getTypeId(),'Independent furniture must survive house removal');
+foreach(['prism_cottage'=>96,'market_hall'=>96,'grand_gateway'=>64] as $name=>$parts){
+    $block=$factory->get('showcase:'.$name);
+    check(count($block->getState(customiesdevs\showcase\StructureLayout::PART)->getValues())===16,'Banked low state stays at 16 values');
+    customiesdevs\showcase\StructureLayout::setPart($block,$parts-1);
+    check(customiesdevs\showcase\StructureLayout::part($block)===$parts-1,'High-bank indices must decode correctly');
+}
+echo "PASS: hollow house entrance, preserved furniture and banked high-part indices.\n";

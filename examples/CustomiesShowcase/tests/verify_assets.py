@@ -87,6 +87,7 @@ print(f'PASS: {len(animations)} animations, {len(controllers)} animation control
 
 # Every custom animated material must have a matching, complete eight-frame strip.
 expected={d['active_texture'] for d in json.loads((BASE/'resources/expansion_blocks.json').read_text()).values() if 'active_texture' in d}
+expected.update(seg['active_texture'] for d in json.loads((BASE/'resources/expansion_blocks.json').read_text()).values() for seg in d['segments'] if 'active_texture' in seg)
 check(expected <= {f['atlas_tile'] for f in flipbooks},'Missing state-driven flipbooks')
 for f in flipbooks:
     raw=(PACK/(f['flipbook_texture']+'.png')).read_bytes()

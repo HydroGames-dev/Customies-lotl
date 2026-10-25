@@ -1,0 +1,110 @@
+{
+    "generated_at": "2026-10-25T11:08:59+05:30",
+    "php": "8.4.16",
+    "os": "Windows",
+    "scope": "Synthetic in-memory test world on an unpinned development host; not a production capacity test",
+    "excludes": [
+        "real chunk loading/saving",
+        "lighting propagation",
+        "client rendering",
+        "network traffic/compression",
+        "protection plugins",
+        "concurrent players"
+    ],
+    "setup_validation_ms": 6367.89,
+    "php_allocated_after_validation_mib": 96,
+    "php_peak_allocated_mib": 96,
+    "worker_and_os_memory_included": false,
+    "structures": {
+        "runic_arch": {
+            "occupied_cells": 9,
+            "samples": 30,
+            "phases": {
+                "place_apply": {
+                    "median_ms": 0.2714,
+                    "p95_ms": 0.9577
+                },
+                "toggle": {
+                    "median_ms": 0.1213,
+                    "p95_ms": 0.6122
+                },
+                "break": {
+                    "median_ms": 0.1448,
+                    "p95_ms": 0.4264
+                }
+            }
+        },
+        "astral_beacon": {
+            "occupied_cells": 32,
+            "samples": 30,
+            "phases": {
+                "place_apply": {
+                    "median_ms": 0.9313,
+                    "p95_ms": 1.526
+                },
+                "toggle": {
+                    "median_ms": 0.5445,
+                    "p95_ms": 1.6822
+                },
+                "break": {
+                    "median_ms": 0.4638,
+                    "p95_ms": 0.6924
+                }
+            }
+        },
+        "prism_cottage": {
+            "occupied_cells": 96,
+            "samples": 30,
+            "phases": {
+                "place_apply": {
+                    "median_ms": 3.5465,
+                    "p95_ms": 4.7775
+                },
+                "toggle": {
+                    "median_ms": 1.9312,
+                    "p95_ms": 3.282
+                },
+                "break": {
+                    "median_ms": 1.7544,
+                    "p95_ms": 3.6502
+                }
+            }
+        },
+        "market_hall": {
+            "occupied_cells": 96,
+            "samples": 30,
+            "phases": {
+                "place_apply": {
+                    "median_ms": 3.6413,
+                    "p95_ms": 10.2196
+                },
+                "toggle": {
+                    "median_ms": 2.1552,
+                    "p95_ms": 3.0254
+                },
+                "break": {
+                    "median_ms": 1.9407,
+                    "p95_ms": 4.1192
+                }
+            }
+        },
+        "grand_gateway": {
+            "occupied_cells": 64,
+            "samples": 30,
+            "phases": {
+                "place_apply": {
+                    "median_ms": 2.3814,
+                    "p95_ms": 4.5816
+                },
+                "toggle": {
+                    "median_ms": 1.2422,
+                    "p95_ms": 2.4302
+                },
+                "break": {
+                    "median_ms": 1.0551,
+                    "p95_ms": 2.8919
+                }
+            }
+        }
+    }
+}

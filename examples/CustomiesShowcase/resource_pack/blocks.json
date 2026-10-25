@@ -152,6 +152,18 @@
     "sound": "stone",
     "textures": "showcase_astral_beacon"
   },
+  "showcase:prism_cottage": {
+    "sound": "stone",
+    "textures": "showcase_prism_cottage"
+  },
+  "showcase:market_hall": {
+    "sound": "stone",
+    "textures": "showcase_market_hall"
+  },
+  "showcase:grand_gateway": {
+    "sound": "stone",
+    "textures": "showcase_grand_gateway"
+  },
   "showcase:lab_block_block_entity": {
     "sound": "stone",
     "textures": "showcase_lab_block_block_entity"

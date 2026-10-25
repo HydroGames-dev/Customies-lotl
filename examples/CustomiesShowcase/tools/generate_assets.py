@@ -5,6 +5,7 @@ import hashlib, json, math, random, re, struct, subprocess, tempfile, uuid, wave
 
 BASE = Path(__file__).resolve().parents[1]
 PACK = BASE / 'resource_pack'
+subprocess.run([sys.executable,str(BASE/'tools/generate_buildings.py')],check=True)
 EXPANSION = json.loads((BASE/'resources/expansion_blocks.json').read_text())
 COVERAGE = json.loads((BASE / 'component-coverage.json').read_text())
 BLOCKS = re.findall(r"'([^']+)'", re.search(r'public const PLAYABLE = \[(.*?)\]', (BASE/'src/ShowcaseBlock.php').read_text()).group(1))
@@ -136,11 +137,29 @@ def texture(name, item=False):
             for y in range(5,11):
                 for x in range(5,11):
                     if seed & (1 << ((y-5)*6+x-5)): draw.point((x,y),fill=white)
+    building_palette={'cottage_timber':((81,49,36),(162,108,64)), 'cottage_roof':((34,64,65),(77,133,124)), 'cottage_floor':((89,62,43),(184,139,86)), 'cottage_window':((54,89,94),(255,215,133)), 'cottage_stone':((64,67,80),(133,140,156)), 'market_floor':((94,72,52),(194,159,100)), 'market_canopy':((99,40,69),(235,139,176)), 'market_counter':((87,51,37),(237,187,105)), 'gateway_stone':((41,57,80),(107,196,225))}
+    style=name.removeprefix('showcase_')
+    if not item and style in building_palette:
+        low,high=building_palette[style];image=Image.new('RGBA',(16,16),low+(255,));draw=ImageDraw.Draw(image)
+        if 'timber' in style or 'floor' in style or 'counter' in style:
+            for y in (0,5,10,15):draw.line((0,y,15,y),fill=high+(255,))
+            for x,y in ((4,1),(11,6),(6,11)):draw.line((x,y,x,y+3),fill=high+(255,))
+        elif 'window' in style:
+            draw.rectangle((1,1,14,14),outline=high+(255,),width=2);draw.line((7,2,7,13),fill=high+(255,));draw.line((2,7,13,7),fill=high+(255,))
+        elif 'canopy' in style:
+            for x in range(0,16,8):draw.rectangle((x,0,x+3,15),fill=high+(255,))
+        else:
+            for y in range(0,16,4):
+                draw.line((0,y,15,y),fill=high+(255,));draw.line(((y*2)%12,y,(y*2)%12,min(15,y+4)),fill=high+(255,))
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 136 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,3,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,3,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 139 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,4,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,4,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
 animated = {'showcase_reactor_flow':'reactor', **{d['active_texture']:key for key,d in EXPANSION.items() if 'active_texture' in d}}
-block_names = ['showcase_'+name for name in BLOCKS] + [*( 'showcase_'+key+'_on' for key,d in EXPANSION.items() if d['mode']=='powered' and key != 'crystal_reactor' and 'active_texture' not in d), *animated, 'showcase_mini_chess_1','showcase_mini_chess_2','showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
+segment_textures={seg[k] for d in EXPANSION.values() for seg in d['segments'] for k in ('texture','active_texture') if k in seg}
+for d in EXPANSION.values():
+    for seg in d['segments']:
+        if 'active_texture' in seg:animated[seg['active_texture']]=seg['texture'].removeprefix('showcase_')
+block_names = ['showcase_'+name for name in BLOCKS] + [*( 'showcase_'+key+'_on' for key,d in EXPANSION.items() if d['mode']=='powered' and key != 'crystal_reactor' and 'active_texture' not in d and not d.get('part_materials')), *animated, *sorted(segment_textures-set(animated)), 'showcase_mini_chess_1','showcase_mini_chess_2','showcase_signal_lamp_1','showcase_signal_lamp_2','showcase_signal_lamp_3','showcase_lumen_cable_on','showcase_spring_pad_on','showcase_machine_front','showcase_orienter_front','showcase_face_marker_front','showcase_lamp_on','showcase_totem_mid','showcase_totem_top','showcase_phase_blue','showcase_phase_ghost','showcase_lab'] + ['showcase_lab_block_'+key for key in COVERAGE['block']]
 item_names = ['showcase_'+name for name in ITEMS] + ['showcase_lab_item_'+key for key in COVERAGE['item']]
 for kind,names in [('blocks',block_names),('items',item_names)]:
     for name in names:
@@ -154,7 +173,11 @@ for name,style in animated.items():
         'tide_cell':((18,54,107),(72,224,249)), 'aurora_tile':((37,25,86),(162,255,199)),
         'runic_arch':((47,24,88),(217,148,255)), 'crystal_conservatory':((19,76,43),(153,255,109)),
         'sky_dock':((24,52,84),(162,233,255)), 'storm_engine':((36,24,77),(216,226,255)),
+        'prism_cottage':((41,63,53),(255,219,146)), 'market_hall':((61,35,67),(255,166,218)),
+        'grand_gateway':((21,46,91),(129,223,255)),
         'astral_beacon':((29,23,81),(243,224,154)),
+        'cottage_window':((54,89,94),(255,215,133)), 'market_counter':((87,51,37),(237,187,105)),
+        'gateway_stone':((41,57,80),(107,196,225)),
         'reactor':((18,72,75),(118,250,232))}
     dark,bright=palettes[style]
     for frame in range(8):
@@ -188,8 +211,14 @@ def bone(name,origin,size,**extra):
 def model(name,bones):
     write(Path('models/blocks/'+name+'.geo.json'),{'format_version':'1.12.0','minecraft:geometry':[{'description':{'identifier':'geometry.showcase.'+name,'texture_width':16,'texture_height':16,'visible_bounds_width':2,'visible_bounds_height':2,'visible_bounds_offset':[0,0.5,0]},'bones':bones}]})
 for key,definition in EXPANSION.items():
+    seen_models={}
     for i,segment in enumerate(definition['segments']):
-        model(f'{key}_{i}',[bone(f'piece_{n}',part['origin'],part['size']) for n,part in enumerate(segment['cubes'])])
+        model_id=segment.get('model',i)
+        if model_id in seen_models:
+            assert seen_models[model_id]==segment['cubes'],f'Conflicting mesh role {key}:{model_id}'
+            continue
+        seen_models[model_id]=segment['cubes']
+        model(f'{key}_{model_id}',[bone(f'piece_{n}',part['origin'],part['size']) for n,part in enumerate(segment['cubes'])])
 model('cube',[bone('root',[-8,0,-8],[16,16,16])])
 model('slab',[bone('root',[-8,0,-8],[16,8,16])])
 model('slab_top',[bone('root',[-8,8,-8],[16,8,16])])

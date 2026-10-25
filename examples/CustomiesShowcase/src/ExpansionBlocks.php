@@ -26,7 +26,10 @@ final class ExpansionBlocks {
 		$d = self::definition($block); $id = $block->getSpecimen();
 		if(isset($d['layout'])){
 			BlockPresets::cardinal($block);
-			$block->addState(BlockState::range(StructureLayout::PART,0,$d['parts']-1));
+			if($d['banked'] ?? false){
+				$block->addState(BlockState::range(StructureLayout::PART,0,15));
+				$block->addState(BlockState::range(StructureLayout::BANK,0,intdiv($d['parts'],16)-1));
+			}else{ $block->addState(BlockState::range(StructureLayout::PART,0,$d['parts']-1)); }
 			$block->addComponent(new B\MovableComponent());
 		}elseif(isset($d['direction'])){
 			if(in_array($d['direction'],['north','south','west','east'],true)){ BlockPresets::cardinal($block); }
@@ -36,11 +39,24 @@ final class ExpansionBlocks {
 		if($d['mode'] === 'color'){ $block->addState(BlockState::range('showcase:color',0,2)); }
 		$partState = isset($d['layout']) ? StructureLayout::PART : 'minecraft:multi_block_part';
 		foreach($d['segments'] as $i=>$segment){
-			if($i > 0){ $block->addPermutation(new BlockPermutation("q.block_state('$partState') == $i",new B\GeometryComponent("geometry.showcase.{$id}_{$i}"),self::shapeComponents($segment))); }
+			if($i > 0){
+				$condition = ($d['banked'] ?? false) ? "q.block_state('$partState') == ".($i%16)." && q.block_state('showcase:structure_bank') == ".intdiv($i,16) : "q.block_state('$partState') == $i";
+				$model = $segment['model'] ?? $i;
+				$components = self::shapeComponents($segment);
+				if(isset($segment['texture'])){ $components[] = new B\MaterialInstancesComponent([new Material('*',$segment['texture'])]); }
+				$block->addPermutation(new BlockPermutation($condition,new B\GeometryComponent("geometry.showcase.{$id}_{$model}"),$components));
+			}
 		}
 		if($d['mode'] === 'powered'){
 			$texture = $d['active_texture'] ?? ($id === 'crystal_reactor' ? 'showcase_reactor_flow' : 'showcase_'.$id.'_on');
-			$block->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",new B\MaterialInstancesComponent([new Material('*',$texture)]),[new B\LightEmissionComponent($d['active_light'])]));
+			if($d['part_materials'] ?? false){
+				$block->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",new B\LightEmissionComponent($d['active_light'])));
+				foreach($d['segments'] as $i=>$segment){
+					if(!isset($segment['active_texture'])){ continue; }
+					$condition = "q.block_state('showcase:powered') && q.block_state('$partState') == ".($i%16)." && q.block_state('showcase:structure_bank') == ".intdiv($i,16);
+					$block->addPermutation(new BlockPermutation($condition,new B\MaterialInstancesComponent([new Material('*',$segment['active_texture'])])));
+				}
+			}else{ $block->addPermutation(new BlockPermutation("q.block_state('showcase:powered')",new B\MaterialInstancesComponent([new Material('*',$texture)]),[new B\LightEmissionComponent($d['active_light'])])); }
 		}
 		if($d['mode'] === 'color'){
 			foreach([1,2] as $color){ $block->addPermutation(new BlockPermutation("q.block_state('showcase:color') == $color",new B\MaterialInstancesComponent([new Material('*','showcase_'.$id.'_'.$color)]))); }
@@ -57,16 +73,18 @@ final class ExpansionBlocks {
 	}
 	public static function applyComponents(ShowcaseBlock $block): void {
 		$d = self::definition($block);
-		$block->addComponent(new B\GeometryComponent('geometry.showcase.'.$block->getSpecimen().'_0'));
+		$model = $d['segments'][0]['model'] ?? 0;
+		$block->addComponent(new B\GeometryComponent('geometry.showcase.'.$block->getSpecimen().'_'.$model));
+		if(isset($d['segments'][0]['texture'])){ $block->addComponent(new B\MaterialInstancesComponent([new Material('*',$d['segments'][0]['texture'])])); }
 		foreach(self::shapeComponents($d['segments'][0]) as $component){ $block->addComponent($component); }
 	}
 	public static function light(ShowcaseBlock $block): int {
 		$d = self::definition($block);
 		if($d['mode'] === 'powered' && $block->getState('showcase:powered')->getCurrentValue()){ return $d['active_light']; }
-		return $d['segments'][$block->getState(StructureLayout::PART)?->getCurrentValue() ?? $block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0]['light'];
+		return $d['segments'][(isset($d['layout']) ? StructureLayout::part($block) : ($block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0))]['light'];
 	}
 	public static function collision(ShowcaseBlock $block): array {
-		$d = self::definition($block); $part = $block->getState(StructureLayout::PART)?->getCurrentValue() ?? $block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0;
+		$d = self::definition($block); $part = (isset($d['layout']) ? StructureLayout::part($block) : ($block->getState('minecraft:multi_block_part')?->getCurrentValue() ?? 0));
 		[$x,$y,$z,$xx,$yy,$zz] = $d['segments'][$part]['bounds'];
 		$direction = $block->getState('minecraft:cardinal_direction')?->getCurrentValue();
 		$turns = ['north'=>0,'west'=>1,'south'=>2,'east'=>3][$direction ?? 'north'];

@@ -78,3 +78,27 @@ Packaged Showcase 1.3.0 and Customies 1.5.42 loaded together on the isolated
 Axolotl server with the 1.3.0 resource pack. Startup registered all 136 specimens,
 reached Done, and shut down cleanly. Log: structures-startup.log in the local
 integration-server directory.
+
+## House and large prefabs (Showcase 1.4.0, 2026-10-25)
+
+- 73 block and 66 item registrations; all 139 specimens retain lore and every
+  runtime state survives host serialization/deserialization.
+- Cottage and market use 96 cells each; gateway uses 64. New banked states use
+  16 low values with 4 or 6 banks. Existing structures retain legacy saved schemas.
+- All four rotations place, toggle and break correctly from every target part,
+  with one drop, obstruction/bounds checks and unrelated-block preservation.
+- Cottage entry and interior cells stay empty; independent furniture survives removal.
+- Shared mesh roles deduplicate repeated segments; conflicting meshes are rejected.
+- Static wood/roof/floor/canopy materials coexist with selectively animated windows,
+  counters and rune stones. All 13 flipbooks and referenced materials resolve.
+- The guide's four PHP code blocks load/register and execute against the host APIs;
+  all 75 catalog components have guide entries.
+- benchmark-sample.json records 30 synthetic operations per phase/structure on an
+  unpinned Windows PHP 8.4.16 host. It excludes production I/O, lighting, networking,
+  concurrent players, client rendering and worker/OS memory; it is not a capacity test.
+- Client rendering/alignment, packet prediction and supported client versions still
+  require real Minecraft playtests.
+
+Packaged Showcase 1.4.0 and Customies 1.5.42 started with the matching resource
+pack on the isolated Axolotl server: 139 registrations, Done, clean shutdown.
+The ZIP contains the guide (source links rewritten to GitHub) and benchmark sample.

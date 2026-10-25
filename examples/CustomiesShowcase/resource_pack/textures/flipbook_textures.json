@@ -48,5 +48,20 @@
     "flipbook_texture": "textures/blocks/showcase_astral_beacon_flow",
     "atlas_tile": "showcase_astral_beacon_flow",
     "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_cottage_window_flow",
+    "atlas_tile": "showcase_cottage_window_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_market_counter_flow",
+    "atlas_tile": "showcase_market_counter_flow",
+    "ticks_per_frame": 3
+  },
+  {
+    "flipbook_texture": "textures/blocks/showcase_gateway_stone_flow",
+    "atlas_tile": "showcase_gateway_stone_flow",
+    "ticks_per_frame": 3
   }
 ]

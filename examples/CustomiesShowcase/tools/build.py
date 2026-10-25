@@ -1,6 +1,6 @@
 """Package committed assets; PHP with Phar is needed, no Python packages required."""
 from pathlib import Path
-import argparse, hashlib, json, subprocess, zipfile
+import argparse, hashlib, json, subprocess, zipfile, re, posixpath
 BASE=Path(__file__).resolve().parents[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--php',default='php')
@@ -17,6 +17,10 @@ with zipfile.ZipFile(out/'CustomiesShowcase-install.zip','w',zipfile.ZIP_DEFLATE
     archive.write(pack,'resource_packs/'+pack.name)
     for name in ['README.md','component-coverage.json','asset-preview.png','model-preview.png','LICENSE','VALIDATION.md']:
         archive.write(BASE/name,name)
+    guide=(BASE.parents[1]/'docs/customies-guide.md').read_text(encoding='utf-8')
+    guide=re.sub(r'\]\((?!https?://|#)([^)]+)\)',lambda m:'](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/'+posixpath.normpath('docs/'+m[1])+')',guide)
+    archive.writestr('GUIDE.md',guide)
+    archive.write(BASE/'benchmark-sample.json','benchmark-sample.json')
     archive.writestr('resource_packs/resource_packs.yml.example','force_resources: true\nresource_stack:\n  - CustomiesShowcase.mcpack\n')
 files=[out/name for name in ['CustomiesShowcase.phar','Customies-Axolotl.phar','CustomiesShowcase.mcpack','CustomiesShowcase-install.zip']]
 (out/'SHA256SUMS.txt').write_text(''.join(hashlib.sha256(f.read_bytes()).hexdigest()+'  '+f.name+'\n' for f in files),encoding='utf-8')

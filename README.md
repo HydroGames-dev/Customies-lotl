@@ -12,7 +12,9 @@ Official Discord community chat for socializing, receiving help with the plugin,
 
 ## Usage
 
-The usage guides have been moved to the [Customies Wiki](https://github.com/CustomiesDevs/Customies/wiki)!
+Start with the [developer and operator guide](docs/customies-guide.md), covering all components, examples, structures, performance and server sizing.
+
+Historical upstream usage guides are available at the [Customies Wiki](https://github.com/CustomiesDevs/Customies/wiki)!
 
 Follow this Wiki https://github.com/nk-archives/Customies/wiki
 
@@ -35,4 +37,4 @@ See [traits, presets, compatibility, and regression checks](docs/traits-and-pres
 
 ## Showcase plugin and assets
 
-[Customies Showcase](examples/CustomiesShowcase/README.md) includes 70 blocks, 66 items, a resource pack, complete component specimens, and reproducible build tools.
+[Customies Showcase](examples/CustomiesShowcase/README.md) includes 73 blocks, 66 items, a resource pack, complete component specimens, and reproducible build tools.
