@@ -61,3 +61,20 @@ for name in ('index','getting-started','coding','guide','assets','performance','
 assert '<canvas' not in (OUT/'index.html').read_text(encoding='utf-8')
 for name in showcase:assert 'data-scope="showcase"' in (OUT/(name+'.html')).read_text(encoding='utf-8')
 print('PASS: independent Customies/CustomiesShowcase navigation, search indexes, guides and downloads.')
+
+# Reflected documentation must track the actual wrapper sources.
+api=json.loads((OUT.parent/'api-reference.json').read_text(encoding='utf-8'))
+for kind,expected in [('block',33),('item',42)]:
+    assert len(api[kind])==expected
+    for key,entry in api[kind].items():
+        source=OUT.parents[1]/entry['source']
+        assert hashlib.sha256(source.read_bytes().replace(b'\r\n',b'\n')).hexdigest()==entry['source_sha256'],'Stale API export: '+key
+        page=OUT/(kind+'-component-'+key+'.html')
+        assert page in documents,'Missing component detail: '+key
+        text=page.read_text(encoding='utf-8')
+        assert all(heading in text for heading in ('Constructor parameters','PHP usage','Serialized wrapper value','Server behavior','Combining this component','Verify before shipping'))
+        for parameter in entry['parameters']:assert parameter['name'] in text
+        for method in entry.get('methods',[]):assert method['name'] in text
+assert len([p for p in documents if '-component-' in p.stem])==75
+assert 'Block traits' in (OUT/'block-traits.html').read_text(encoding='utf-8')
+print('PASS: 75 complete component articles match source hashes and parameters; dedicated state/trait/item topics exist.')

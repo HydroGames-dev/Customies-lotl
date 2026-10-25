@@ -75,3 +75,21 @@ lighting, placement prediction and animation playback with a Minecraft client.
 PHP tutorial examples are checked by `tests/guide.php`; site generation and
 `check.py` check coverage and static navigation. No changes to server behavior are
 required to edit the website.
+
+## Wiki reference data
+
+The wiki has dedicated block/state/trait/permutation/item topics and 75 component
+articles. Constructor signatures, defaults, constants and fixture serialization
+come from `api-reference.json`, exported from the actual PHP classes:
+
+```text
+php website/export-api.php /path/to/axolotl-checkout
+```
+
+Commit the export when wrapper classes change. Site checks compare normalized
+source hashes and refuse stale metadata. Building on GitHub does not need the host
+server dependencies because the validated export is checked in. `reference.py`
+adds purpose, behavior boundaries, combinations, pitfalls and source references;
+`articles/` contains the independent conceptual guides. The visual hierarchy is
+inspired by Bedrock Wiki, with original styling, topic folders, article outlines
+and a persisted light/dark preference. Showcase keeps its independent scope.

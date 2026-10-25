@@ -3,6 +3,7 @@ from pathlib import Path
 import argparse, hashlib, html, json, re, shutil, subprocess
 from urllib.parse import urlsplit, unquote
 import markdown
+from reference import detail,table_descriptions
 
 BASE=Path(__file__).resolve().parent
 ROOT=BASE.parent
@@ -69,6 +70,30 @@ pages=[
  ('showcase-downloads','Example downloads','Example content','Download the demo plugin, pack and complete bundle.',''),
  ('showcase-validation','Demo validation & benchmark','Example content','Understand the sample plugin measurements.',section('Performance and measurement')),
 ]
+# Wiki topics are intentionally separate from the Showcase section.
+for i,page in enumerate(pages):
+    key,label,category,description,source=page
+    if key in ('coding','states','block-components'):category='Blocks'
+    elif key=='item-components':category='Items'
+    elif key in ('assets','recipes'):category='Resources'
+    elif key in ('performance','troubleshooting'):category='Server & compatibility'
+    pages[i]=(key,label,category,description,source)
+articles=[('blocks','Introduction to blocks','Blocks','Understand the complete block definition pipeline.'),('block-states','Block states','Blocks','Values, runtime combinations, cloning and persistence.'),('block-traits','Block traits','Blocks','Direction, position, connections and native multi-blocks.'),('block-permutations','Block permutations','Blocks','Compose client components with state conditions.'),('items','Introduction to items','Items','Base classes, hooks, inventory correctness and persistence.')]
+for key,label,category,description in articles:
+    position=next(i for i,p in enumerate(pages) if p[0]==('block-components' if category=='Blocks' else 'item-components'))
+    pages.insert(position,(key,label,category,description,(BASE/'articles'/(key+'.md')).read_text(encoding='utf-8')))
+api=json.loads((BASE/'api-reference.json').read_text(encoding='utf-8'))
+descriptions={kind:table_descriptions(section('Every '+kind+' component')) for kind in ('block','item')}
+api_fixture=(SHOW/'src/ComponentCatalog.php').read_text(encoding='utf-8')
+for kind in ('block','item'):
+    snippet=api_fixture.split('public static function '+('blocks' if kind=='block' else 'items')+'(): array {')[1].split('\n\t}')[0]
+    for key,entry in api[kind].items():
+        usage=re.search(r"'"+re.escape(key)+r"'\s*=>\s*(.*)",snippet)[1].rstrip(',')
+        usage=usage.replace('$geometry',"new B\\GeometryComponent('minecraft:geometry.full_block')").replace('$materials',"[new Material('*', 'your_texture')]")
+        usage=re.sub(r'showcase_[a-z_0-9]+','tutorial_texture',usage).replace('showcase:','mycontent:').replace('showcase.chime','mycontent.chime').replace('Showcase Workbench','My Workbench')
+        summary,responsibility=descriptions[kind][key]
+        responsibility=responsibility.replace('showcase repair kit is a separate real action','implement a server repair action').replace('see ice tile','match client/server conventions')
+        pages.append((kind+'-component-'+key,key.replace('_',' ').title(), 'Blocks' if kind=='block' else 'Items',entry['name']+' / Customies PHP reference',detail(kind,key,entry,summary,responsibility,usage)))
 PAGE_MAP={p[0]:p[1] for p in pages}
 search=[]
 def viewer(identifier,hero=False):
@@ -80,9 +105,12 @@ def viewer(identifier,hero=False):
 def nav(current):
     result='';group=None
     for key,label,category,*_ in pages:
+        if key.startswith(('block-component-','item-component-')):continue
         if (key in SHOWCASE_KEYS) != (current in SHOWCASE_KEYS):continue
         if category!=group:result+=f'<p class="nav-group">{category}</p>';group=category
-        result+=f'<a href="{key}.html" {"aria-current=page" if key==current else ""}>{esc(label)}</a>'
+        parent_active=(key=='block-components' and current.startswith('block-component-')) or (key=='item-components' and current.startswith('item-component-'))
+        result+=f'<a href="{key}.html" {"aria-current=page" if key==current or parent_active else ""}>{esc(label)}</a>'
+    result=re.sub(r'<p class="nav-group">([^<]+)</p>(.*?)(?=<p class="nav-group">|$)',lambda m:'<details class="nav-folder" '+('open' if 'aria-current' in m[2] else '')+'><summary>'+m[1]+'</summary>'+m[2]+'</details>',result,flags=re.S)
     other='index' if current in SHOWCASE_KEYS else 'showcase'
     label='Customies Guide / Wiki' if current in SHOWCASE_KEYS else 'CustomiesShowcase example'
     return result+f'<p class="nav-group">OTHER SECTION</p><a class="section-link" href="{other}.html">{label} ↗</a>'
@@ -95,7 +123,7 @@ def layout(key,title,description,body):
     scope='showcase' if demo else 'customies'
     brand='CustomiesShowcase' if demo else 'Customies'
     version='EXAMPLE PLUGIN 1.4.0' if demo else 'LIBRARY 1.5.42'
-    scope_keys=[p[0] for p in pages if (p[0] in SHOWCASE_KEYS)==demo]
+    scope_keys=([p[0] for p in pages if p[0].startswith(key.split('-component-')[0]+'-component-')] if '-component-' in key else [p[0] for p in pages if (p[0] in SHOWCASE_KEYS)==demo and '-component-' not in p[0]])
     pos=scope_keys.index(key)
     prev=scope_keys[pos-1] if pos else None
     nxt=scope_keys[pos+1] if pos+1<len(scope_keys) else None
@@ -103,7 +131,7 @@ def layout(key,title,description,body):
     dochead='' if key in ('index','showcase') else f'<header class="article-head"><p class="eyebrow">{brand.upper()} / {esc(title.upper())}</p><h1>{esc(title)}</h1><p class="lead">{meta}</p></header>'
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{esc(title)} · Customies</title><meta name="description" content="{meta}"><meta name="theme-color" content="#122a29"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script></head>
     <body data-page="{key}" data-scope="{scope}"><a class="skip-link" href="#content">Skip to content</a>
-    <header class="topbar"><a class="brand" href="{'showcase' if demo else 'index'}.html"><span class="brand-mark">C<span>◆</span></span><span>{brand}<small>{"EXAMPLE CONTENT PLUGIN" if demo else "GUIDE / WIKI / API"}</small></span></a><div class="top-actions"><span class="version">{version}</span><button class="search-trigger" type="button">Search docs <kbd>Ctrl K</kbd></button><a class="source-link" href="{REPO}/tree/{REF}">GitHub ↗</a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu</button></div></header>
+    <header class="topbar"><a class="brand" href="{'showcase' if demo else 'index'}.html"><span class="brand-mark">C<span>◆</span></span><span>{brand}<small>{"EXAMPLE CONTENT PLUGIN" if demo else "GUIDE / WIKI / API"}</small></span></a><div class="top-actions"><span class="version">{version}</span><button id="theme-toggle" aria-label="Toggle dark theme" aria-pressed="false">◐</button><button class="search-trigger" type="button">Search docs <kbd>Ctrl K</kbd></button><a class="source-link" href="{REPO}/tree/{REF}">GitHub ↗</a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu</button></div></header>
     <div class="site-shell"><aside class="sidebar" id="navigation"><nav class="section-switch" aria-label="Documentation section"><a href="index.html" {"aria-current=page" if not demo else ""}>Customies Guide</a><a href="showcase.html" {"aria-current=page" if demo else ""}>CustomiesShowcase</a></nav><nav aria-label="Documentation">{sidebar}</nav><div class="sidebar-note"><span class="status-dot"></span> Built for Axolotl-PM<br><small>PHP behavior + Bedrock assets</small></div></aside>
     <main id="content" tabindex="-1"><div class="reading-layout"><article>{dochead}{body}<nav class="page-pager" aria-label="Page navigation">{pager}</nav><footer class="article-footer">HydroGames-dev / Customies-lotl · MIT · <a href="{REPO}/blob/{REF}/{"examples/CustomiesShowcase/README.md" if demo else "website/core-guide.md"}">Section source ↗</a><br>Server and asset checks pass. Client visuals and version-specific behavior still require in-game testing.</footer></article><aside class="on-this-page" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p>{toc}<a class="edit-link" href="{REPO}/tree/{REF}/website">Improve this site ↗</a></aside></div></main></div>
     <dialog id="search-dialog"><div class="dialog-head"><label for="site-search">Search {brand}</label><button data-close aria-label="Close search">✕</button></div><input id="site-search" type="search" placeholder="Search this section…" autocomplete="off"><p id="search-status" role="status">Type to find guides, components and examples.</p><div id="search-results"></div></dialog>
@@ -116,7 +144,7 @@ demo_home=f'''<section class="hero"><div class="hero-copy"><p class="eyebrow">CU
 <section class="path-section"><p class="eyebrow">CHOOSE YOUR NEXT BUILD</p><h2 id="learning-paths">A clear path from idea to world.</h2><div class="path-grid"><a href="showcase-walkthroughs.html#01-your-first-powered-lamp"><span>START SMALL / 01</span><h3>A lamp that really lights up.</h3><p>Register a block, add a power state, switch the material and match server lighting.</p><b>Follow the walkthrough →</b></a><a href="coding.html#create-a-working-item"><span>ADD AN ABILITY / 02</span><h3>An item with a purpose.</h3><p>Build a working wand, then explore food, weapons, worn gear and cooldowns.</p><b>Write the PHP →</b></a><a href="structures.html"><span>THINK BIGGER / 03</span><h3>A house in your hand.</h3><p>Author hollow footprints, shared model roles and grouped multi-block behavior.</p><b>Build a structure →</b></a></div></section>
 <section class="notice"><strong>Built to be honest about the boundaries.</strong><p>This guide separates working server behavior from client-only metadata. Hardware allocations are starting estimates; synthetic benchmarks are not player-capacity guarantees.</p><a href="showcase-validation.html">Example benchmark →</a></section>'''
 
-home='''<section class="hero"><div class="hero-copy"><p class="eyebrow">CUSTOMIES / GUIDE, WIKI AND API</p><h1>Your content.<br>Your <em>rules.</em></h1><p>Use Customies to register custom blocks and items. Build their behavior with PocketMine PHP, and create their appearance with your own resource pack.</p><div class="hero-actions"><a class="button primary" href="getting-started.html">Use Customies →</a><a class="button secondary" href="coding.html">Start coding →</a></div><div class="hero-meta"><span>LIBRARY PLUGIN</span><span>AXOLOTL-PM</span><span>YOUR OWN CONTENT</span></div></div><div class="core-diagram"><p class="eyebrow">FROM YOUR PLUGIN TO THE WORLD</p><div><span>01</span><h3>Register</h3><code>CustomiesBlockFactory</code><p>Identifiers · Components · States</p></div><div><span>02</span><h3>Implement</h3><code>onInteract() / onClickAir()</code><p>Authoritative PocketMine behavior</p></div><div><span>03</span><h3>Render</h3><code>your_resource_pack/</code><p>Textures · Models · Animation</p></div></div></section><div class="stat-strip"><div><strong>33</strong><span>block components</span></div><div><strong>42</strong><span>item components</span></div><div><strong>PHP</strong><span>server behavior</span></div><div><strong>3</strong><span>layers to connect</span></div></div><section class="path-section"><p class="eyebrow">LEARN THE LIBRARY</p><h2 id="learning-paths">Build something of your own.</h2><div class="path-grid"><a href="walkthroughs.html"><span>LEARN / 01</span><h3>Your first content plugin.</h3><p>Install the library, declare the dependency and register stable identifiers.</p><b>Follow the walkthroughs →</b></a><a href="block-components.html"><span>REFERENCE / 02</span><h3>Know your components.</h3><p>Find what each component describes and what PHP must implement.</p><b>Read the API →</b></a><a href="performance.html"><span>OPERATE / 03</span><h3>Measure your workload.</h3><p>Understand state growth, client rendering and server sizing.</p><b>Performance guidance →</b></a></div></section><section class="notice"><strong>Looking for a working example?</strong><p>CustomiesShowcase is a separate example plugin built with Customies. Its demo catalog, prefab houses, assets, commands and install bundle have their own section.</p><a href="showcase.html">Visit CustomiesShowcase →</a></section>'''
+home='''<header class="wiki-welcome"><p class="eyebrow">CUSTOMIES DOCUMENTATION</p><h1>Customies Wiki</h1><p>A practical reference for creating your own blocks, items and resource packs with the Customies library and PocketMine PHP.</p><a class="button primary" href="getting-started.html">Beginner’s guide →</a><a class="button secondary" href="coding.html">Create your first plugin →</a></header><div class="wiki-callout"><strong>Three layers, one working feature</strong><p>Customies defines client metadata. Your resource pack supplies visuals. PHP enforces gameplay. Each reference explains where the responsibility belongs.</p></div><h2 id="browse-topics">Browse the documentation</h2><div class="wiki-topics"><section><h3>Blocks</h3><p>Build a definition and connect its client and server behavior.</p><a href="blocks.html">Introduction to blocks</a><a href="block-components.html">33 block components</a><a href="block-states.html">Block states and persistence</a><a href="block-traits.html">Placement and connection traits</a><a href="block-permutations.html">Permutations and component overrides</a></section><section><h3>Items</h3><p>Choose the right base class and implement authoritative actions.</p><a href="items.html">Introduction to items</a><a href="item-components.html">42 item components</a><a href="coding.html#create-a-working-item">Create an ability item</a><a href="recipes.html">Food, tools, armor and other combinations</a></section><section><h3>Resources & operations</h3><p>Ship assets that match your PHP and measure the actual workload.</p><a href="assets.html">Resource packs and animation</a><a href="performance.html">Performance and server sizing</a><a href="troubleshooting.html">Troubleshooting and compatibility</a><a href="downloads.html">Get the Customies library</a></section></div><h2 id="how-to-use-this-wiki">How to use this wiki</h2><p>Start with installation and the complete PHP tutorial. Use the component indexes to find a feature, then open its dedicated reference for constructor parameters, defaults, serialized values, combinations and common mistakes.</p><p>Native Bedrock documentation and the PHP wrapper are different interfaces. Check the target host/client before adopting experimental metadata.</p><div class="wiki-callout"><strong>CustomiesShowcase is a separate example</strong><p>The demo plugin’s catalog, houses, assets, commands and bundle live in their own section.</p><a href="showcase.html">Explore the example plugin →</a></div><h2 id="external-references">External references</h2><p>Information architecture inspired by <a href="https://wiki.bedrock.dev/">Bedrock Wiki</a>. This is an independent Customies guide, not an official Bedrock Wiki or Microsoft site.</p><p><a href="https://learn.microsoft.com/en-us/minecraft/creator/documents/intro-block-traits?view=minecraft-bedrock-stable">Microsoft: block traits</a> · <a href="https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable">Block component reference</a></p>'''
 # Copy authored assets without modifying them.
 pack=SHOW/'resource_pack'
 for relative in ['textures/blocks','textures/items','textures/models','models','attachables','animations','animation_controllers','render_controllers']:
@@ -198,6 +226,7 @@ for key,title,category,description,source in pages:
     if key=='structures':body=viewer('prism_cottage')+body+'<h2 id="more-structures">Explore the larger prefabs</h2>'+viewer('market_hall')+viewer('grand_gateway')
     if key in ('block-components','item-components'):
         kind='block' if key=='block-components' else 'item'
+        body='<p class="wiki-callout">This reference documents the wrappers shipped by this Customies branch. Native Bedrock has additional components; a Microsoft entry is not a promise that the host or this library implements its entire feature. Open a component for its constructor, helper methods and server responsibilities.</p>'+body
         body='<label class="reference-filter">Filter this reference<input type="search" id="component-filter" placeholder="Try: collision, food, durability…"></label>'+body
         body+='<h2 id="constructor-examples">Constructor examples</h2><p>Use B as the block-component namespace alias and I as the item-component alias. These are constructor expressions to add in your own content class; the library implementation is linked below.</p>'
         catalogsource=(SHOW/'src/ComponentCatalog.php').read_text(encoding='utf-8').split('public static function '+('blocks' if kind=='block' else 'items')+'(): array {')[1].split('\n\t}')[0]
@@ -208,6 +237,11 @@ for key,title,category,description,source in pages:
             expr=re.sub(r"showcase_[a-z_0-9]+",'tutorial_texture',expr).replace('showcase:','mycontent:').replace('showcase.chime','mycontent.chime').replace('Showcase Workbench','My Workbench')
             implementation=re.search(r'new [BI]\\(\w+)',expr)[1]
             body+=f'<details id="component-{component}" class="component-example" data-component="{component}"><summary>{component}</summary>'+render('```php\n'+expr+';\n```')+f'<a href="{REPO}/blob/{REF}/src/{kind}/component/{implementation}.php">Library implementation ↗</a></details>'
+    if key in ('block-components','item-components'):
+        kind='block' if key=='block-components' else 'item'
+        for component in api[kind]:
+            body=body.replace('<td><code>'+component+'</code></td>','<td><a href="'+kind+'-component-'+component+'.html"><code>'+component+'</code></a></td>')
+            body=body.replace('<summary>'+component+'</summary>','<summary>'+component+'</summary><p><a href="'+kind+'-component-'+component+'.html">Full parameter, behavior and serialization reference →</a></p>')
     (OUT/(key+'.html')).write_text(layout(key,title,description,body),encoding='utf-8')
     # Page-level and heading-level records keep search results useful and small.
     search.append({'title':title,'url':key+'.html','text':re.sub(r'\s+',' ',plain(body))[:22000]})

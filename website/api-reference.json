@@ -1,0 +1,3233 @@
+{
+    "block": {
+        "block_entity": {
+            "class": "customiesdevs\\customies\\block\\component\\BlockEntityComponent",
+            "name": "minecraft:block_entity",
+            "parameters": [
+                {
+                    "name": "dynamicProperties",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": ""
+                },
+                {
+                    "name": "slotCount",
+                    "type": "?int",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [
+                {
+                    "name": "hasContainer",
+                    "parameters": [],
+                    "return_type": "bool",
+                    "documentation": ""
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "dynamic_properties": true,
+                "container": {
+                    "slot_count": 9
+                }
+            },
+            "source": "src/block/component/BlockEntityComponent.php",
+            "source_sha256": "c16e46f7e44b40bfb9e8fbb90e681a80bab494a4e4e5c40618a3a0d282b60fdb",
+            "constructor": "\tpublic function __construct(bool $dynamicProperties = false, ?int $slotCount = null){\n\t\t$this->dynamicProperties = $dynamicProperties;\n\t\tif($slotCount !== null){\n\t\t\tif($slotCount < 1 || $slotCount > 54){\n\t\t\t\tthrow new \\InvalidArgumentException(\"Block entity container slot count must be between 1 and 54, got {$slotCount}\");\n\t\t\t}\n\t\t\t$this->slotCount = $slotCount;\n\t\t}\n\t}\n"
+        },
+        "block_tags": {
+            "class": "customiesdevs\\customies\\block\\component\\BlockTagsComponent",
+            "name": "minecraft:tags",
+            "parameters": [
+                {
+                    "name": "blockTags",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "* @link [BlockTags](https://wiki.bedrock.dev/blocks/vanilla-block-tags)"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": [
+                "showcase:specimen",
+                "minecraft:stone"
+            ],
+            "source": "src/block/component/BlockTagsComponent.php",
+            "source_sha256": "31ca7ee023c734db65ec6a4075991c9bf8b92129843b43832c2dcd8a68dcb762",
+            "constructor": "\tpublic function __construct(array $blockTags = []) {\n\t\t$this->blockTags = $blockTags;\n\t}\n"
+        },
+        "chest_obstruction": {
+            "class": "customiesdevs\\customies\\block\\component\\ChestObstructionComponent",
+            "name": "minecraft:chest_obstruction",
+            "parameters": [
+                {
+                    "name": "obstructionRule",
+                    "type": "string",
+                    "required": false,
+                    "default": "shape",
+                    "default_constant": "self::OBSTRUCTION_SHAPE",
+                    "description": "The rule for determining chest obstruction when a block is directly above it. Must be one of:"
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "OBSTRUCTION_SHAPE": "shape",
+                "OBSTRUCTION_ALWAYS": "always",
+                "OBSTRUCTION_NEVER": "never"
+            },
+            "serialized_example": {
+                "obstruction_rule": "shape"
+            },
+            "source": "src/block/component/ChestObstructionComponent.php",
+            "source_sha256": "386be718f15667d2117b47a65a1062d3b6b366789372f73a18fff74a6de96461",
+            "constructor": "\tpublic function __construct(string $obstructionRule = self::OBSTRUCTION_SHAPE) {\n\t\t$this->obstructionRule = $obstructionRule;\n\t}\n"
+        },
+        "collision_box": {
+            "class": "customiesdevs\\customies\\block\\component\\CollisionBoxComponent",
+            "name": "minecraft:collision_box",
+            "parameters": [
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "If collision should be enabled"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addBox",
+                    "parameters": [
+                        {
+                            "name": "box",
+                            "type": "customiesdevs\\customies\\block\\properties\\Box",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds a single collision box.\n\t * @param Box $box\n\t * The collision box to add.\n\t */"
+                },
+                {
+                    "name": "addBoxes",
+                    "parameters": [
+                        {
+                            "name": "boxes",
+                            "type": "array",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds multiple collision boxes.\n\t * @param Box[] $boxes\n\t * An array of collision boxes to add.\n\t * @throws \\InvalidArgumentException If any element in the array is not an instance of Box.\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "boxes": [
+                    []
+                ],
+                "enabled": false
+            },
+            "source": "src/block/component/CollisionBoxComponent.php",
+            "source_sha256": "9a0b63fe22781fc6bd6a65766765cbc5b6510c2d16b76cb6ae48844d73d268d2",
+            "constructor": "\tpublic function __construct(bool $enabled = true) {\n\t\t$this->enabled = $enabled;\n\t}\n"
+        },
+        "connection_rule": {
+            "class": "customiesdevs\\customies\\block\\component\\ConnectionRuleComponent",
+            "name": "minecraft:connection_rule",
+            "parameters": [
+                {
+                    "name": "acceptsConnectionsFrom",
+                    "type": "string",
+                    "required": false,
+                    "default": "all",
+                    "default_constant": "self::RULE_ACCEPTS_ALL",
+                    "description": "* @param string[] $enabledDirections"
+                },
+                {
+                    "name": "enabledDirections",
+                    "type": "array",
+                    "required": false,
+                    "default": [
+                        "north",
+                        "south",
+                        "east",
+                        "west"
+                    ],
+                    "default_constant": "self::VALID_DIRECTIONS",
+                    "description": "*/"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "setAcceptsConnectionsFrom",
+                    "parameters": [
+                        {
+                            "name": "rule",
+                            "type": "string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setEnabledDirections",
+                    "parameters": [
+                        {
+                            "name": "directions",
+                            "type": "array",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * @param string[] $directions\n\t */"
+                },
+                {
+                    "name": "addDirection",
+                    "parameters": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "removeDirection",
+                    "parameters": [
+                        {
+                            "name": "direction",
+                            "type": "string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "clearDirections",
+                    "parameters": [],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "getEnabledDirections",
+                    "parameters": [],
+                    "return_type": "array",
+                    "documentation": "/**\n\t * @return string[]\n\t */"
+                },
+                {
+                    "name": "getAcceptsConnectionsFrom",
+                    "parameters": [],
+                    "return_type": "string",
+                    "documentation": ""
+                }
+            ],
+            "constants": {
+                "RULE_ACCEPTS_ALL": "all",
+                "RULE_ACCEPTS_ONLY_FENCES": "only_fences",
+                "RULE_ACCEPTS_NONE": "none",
+                "VALID_DIRECTIONS": [
+                    "north",
+                    "south",
+                    "east",
+                    "west"
+                ]
+            },
+            "serialized_example": {
+                "accepts_connections_from": "all",
+                "enabled_directions": [
+                    "north",
+                    "south",
+                    "east",
+                    "west"
+                ]
+            },
+            "source": "src/block/component/ConnectionRuleComponent.php",
+            "source_sha256": "ea64fb3cfa80da9833f1cb7946b045cfffb874376446e6c57ca15472b803e3ae",
+            "constructor": "\tpublic function __construct(\n\t\tstring $acceptsConnectionsFrom = self::RULE_ACCEPTS_ALL,\n\t\tarray $enabledDirections = self::VALID_DIRECTIONS\n\t) {\n\t\t$this->setAcceptsConnectionsFrom($acceptsConnectionsFrom);\n\t\t$this->setEnabledDirections($enabledDirections);\n\t}\n"
+        },
+        "crafting_table": {
+            "class": "customiesdevs\\customies\\block\\component\\CraftingTableComponent",
+            "name": "minecraft:crafting_table",
+            "parameters": [
+                {
+                    "name": "craftingTags",
+                    "type": "array",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Recipe tags accepted by this table. */"
+                },
+                {
+                    "name": "tableName",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "table_name": "Showcase Workbench",
+                "crafting_tags": [
+                    "crafting_table"
+                ]
+            },
+            "source": "src/block/component/CraftingTableComponent.php",
+            "source_sha256": "d00d3f28536891d19346e4be5a1fc04f0cb022eb1fab3dea40cc885bfbb8035d",
+            "constructor": "\tpublic function __construct(private array $craftingTags, private string $tableName = '') {\n\t\tif(count($craftingTags) > 64 || strlen($tableName) > 256){\n\t\t\tthrow new \\InvalidArgumentException('Crafting tables support at most 64 tags and a 256-character name');\n\t\t}\n\t\tforeach($craftingTags as $tag){\n\t\t\tif(!is_string($tag) || strlen($tag) > 64){\n\t\t\t\tthrow new \\InvalidArgumentException('Crafting tags must be strings of at most 64 characters');\n\t\t\t}\n\t\t}\n\t\t$this->craftingTags = array_values(array_unique($craftingTags));\n\t}\n"
+        },
+        "destructible_by_explosion": {
+            "class": "customiesdevs\\customies\\block\\component\\DestructibleByExplosionComponent",
+            "name": "minecraft:destructible_by_explosion",
+            "parameters": [
+                {
+                    "name": "explosionResistance",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "Sets the explosion resistance for the block. Greater values result in greater resistance to explosions. The scale will be different for different explosion power levels. A negative value or 0 means it will easily explode; larger numbers increase level of resistance."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": 12
+            },
+            "source": "src/block/component/DestructibleByExplosionComponent.php",
+            "source_sha256": "6e3997e1fe5809a088cc32f524a6fef301b70075b0f7bf787e4ffba6602ae8fe",
+            "constructor": "\tpublic function __construct(float $explosionResistance = 0.0) {\n\t\t$this->explosionResistance = $explosionResistance;\n\t}\n"
+        },
+        "destructible_by_mining": {
+            "class": "customiesdevs\\customies\\block\\component\\DestructibleByMiningComponent",
+            "name": "minecraft:destructible_by_mining",
+            "parameters": [
+                {
+                    "name": "secondsToDestroy",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "Sets the number of seconds it takes to destroy the block with base equipment. Greater numbers result in greater mining times."
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addItemSpeedByTags",
+                    "parameters": [
+                        {
+                            "name": "destroySpeed",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "tags",
+                            "type": "string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds an item-specific destroy speed using a Molang tag expression.\n\t * \n\t * Example:\n\t * q.all_tags('minecraft:is_pickaxe', 'minecraft:wooden_tier')\n\t * @param float $destroySpeed\n\t * @param string $tags\n\t */"
+                },
+                {
+                    "name": "addItemSpeedByItem",
+                    "parameters": [
+                        {
+                            "name": "destroySpeed",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "itemId",
+                            "type": "string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds an item-specific destroy speed using an item identifier.\n\t *\n\t * Example:\n\t * minecraft:diamond_pickaxe\n\t * @param float $destroySpeed\n\t * @param string $itemId\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "value": 1.5
+            },
+            "source": "src/block/component/DestructibleByMiningComponent.php",
+            "source_sha256": "e1ecc7186c1a7ac6ebb10f6523947ce091f263c0c0260a3b327cd46eedbe7cf9",
+            "constructor": "\tpublic function __construct(float $secondsToDestroy = 0.0) {\n\t\tif($secondsToDestroy < 0){\n\t\t\tthrow new \\InvalidArgumentException(\"secondsToDestroy must be >= 0\");\n\t\t}\n\t\t$this->secondsToDestroy = $secondsToDestroy;\n\t}\n"
+        },
+        "destruction_particles": {
+            "class": "customiesdevs\\customies\\block\\component\\DestructionParticlesComponent",
+            "name": "minecraft:destruction_particles",
+            "parameters": [
+                {
+                    "name": "particleCount",
+                    "type": "int",
+                    "required": false,
+                    "default": 100,
+                    "default_constant": null,
+                    "description": "Optional, number of particles to spawn of destruction. Default is 100, maximum is 255 inclusively"
+                },
+                {
+                    "name": "texture",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "The texture name used for the particle."
+                },
+                {
+                    "name": "tintMethod",
+                    "type": "customiesdevs\\customies\\block\\properties\\TintMethod",
+                    "required": false,
+                    "default": "none",
+                    "default_constant": "customiesdevs\\customies\\block\\properties\\TintMethod::NONE",
+                    "description": "Tint multiplied to the color. Tint method logic varies, but often refers to the \"rain\" and \"temperature\" of the biome the block is placed in to compute the tint."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "particle_count": 24,
+                "texture": "showcase_lab",
+                "tint_method": "none"
+            },
+            "source": "src/block/component/DestructionParticlesComponent.php",
+            "source_sha256": "467a4ffe4730de77750a3307f30b4905b1fdb454aeef71de98cf56bda6a3ba2d",
+            "constructor": "\tpublic function __construct(\n\t\tint $particleCount = 100,\n\t\tstring $texture = \"\",\n\t\tTintMethod $tintMethod = TintMethod::NONE\n\t) {\n\t\t$this->particleCount = max(0, min(255, $particleCount));\n\t\t$this->texture = $texture;\n\t\t$this->tintMethod = $tintMethod;\n\t}\n"
+        },
+        "display_name": {
+            "class": "customiesdevs\\customies\\block\\component\\DisplayNameComponent",
+            "name": "minecraft:display_name",
+            "parameters": [
+                {
+                    "name": "displayName",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Example using String: `\"Custom Block\"`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": "Display Name Specimen"
+            },
+            "source": "src/block/component/DisplayNameComponent.php",
+            "source_sha256": "b6b921e71eaed9944c933a9011215291084362b46c5c842aff183eb21c07ae82",
+            "constructor": "\tpublic function __construct(string $displayName) {\n\t\t$this->displayName = $displayName;\n\t}\n"
+        },
+        "embedded_visual": {
+            "class": "customiesdevs\\customies\\block\\component\\EmbeddedVisualComponent",
+            "name": "minecraft:embedded_visual",
+            "parameters": [
+                {
+                    "name": "geometry",
+                    "type": "customiesdevs\\customies\\block\\component\\GeometryComponent",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": ""
+                },
+                {
+                    "name": "materials",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "geometry": {
+                    "bone_visibility": [],
+                    "culling": "",
+                    "culling_layer": "minecraft:culling_layer.undefined",
+                    "culling_shape": "minecraft:empty",
+                    "identifier": "geometry.showcase.cube",
+                    "uv_lock": false,
+                    "ignoreGeometryForIsSolid": false,
+                    "isV1Fullblock": false,
+                    "needsLegacyTopRotation": false,
+                    "useBlockTypeLightAbsorption": false
+                },
+                "material_instances": {
+                    "*": {
+                        "alpha_masked_tint": false,
+                        "face_dimming": true,
+                        "isotropic": false,
+                        "texture": "showcase_lab",
+                        "render_method": "opaque",
+                        "tint_method": "none",
+                        "ambient_occlusion": 1,
+                        "packed_bools": 5
+                    }
+                }
+            },
+            "source": "src/block/component/EmbeddedVisualComponent.php",
+            "source_sha256": "9df2e175f12ee8bc44af03effa33cc8e0ec563917d3e822254e74c881b66eed3",
+            "constructor": "\tpublic function __construct(\n\t\tprivate readonly GeometryComponent $geometry, \n\t\tprivate readonly array $materials = []\n\t) {\n\t\tMaterial::validMaterials($materials);\n\t}\n"
+        },
+        "entity_fall_on": {
+            "class": "customiesdevs\\customies\\block\\component\\EntityFallOnComponent",
+            "name": "minecraft:entity_fall_on",
+            "parameters": [
+                {
+                    "name": "minFallDistance",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "min_fall_distance": 2
+            },
+            "source": "src/block/component/EntityFallOnComponent.php",
+            "source_sha256": "9305f44b4f3d0b86f3abe7372ad3ee8b59fc02864a9975d8356f16e9c01d2649",
+            "constructor": "\tpublic function __construct(private float $minFallDistance = 0.0) {\n\t\tif(!is_finite($minFallDistance)){\n\t\t\tthrow new \\InvalidArgumentException('minFallDistance must be finite');\n\t\t}\n\t}\n"
+        },
+        "flammable": {
+            "class": "customiesdevs\\customies\\block\\component\\FlammableComponent",
+            "name": "minecraft:flammable",
+            "parameters": [
+                {
+                    "name": "catchChanceModifier",
+                    "type": "int",
+                    "required": false,
+                    "default": 5,
+                    "default_constant": null,
+                    "description": "A modifier affecting the chance that this block will catch flame when next to a fire. Values are greater than or equal to 0, with a higher number meaning more likely to catch on fire. For a \"catch_chance_modifier\" greater than 0, the fire will continue to burn until the block is destroyed (or it will burn forever if the \"destroy_chance_modifier\" is 0). If the \"catch_chance_modifier\" is 0, and the block is directly ignited, the fire will eventually burn out without destroying the block (or it will have a chance to be destroyed if \"destroy_chance_modifier\" is greater than 0). The default value of 5 is the same as that of Planks."
+                },
+                {
+                    "name": "destroyChanceModifier",
+                    "type": "int",
+                    "required": false,
+                    "default": 20,
+                    "default_constant": null,
+                    "description": "A modifier affecting the chance that this block will be destroyed by flames when on fire. Values are greater than or equal to 0, with a higher number meaning more likely to be destroyed by fire. For a \"destroy_chance_modifier\" of 0, the block will never be destroyed by fire, and the fire will burn forever if the \"catch_chance_modifier\" is greater than 0. The default value of 20 is the same as that of Planks."
+                },
+                {
+                    "name": "lavaFlammable",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Whether the block can be ignited by adjacent lava."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "catch_chance_modifier": 5,
+                "destroy_chance_modifier": 20,
+                "lava_flammable": true
+            },
+            "source": "src/block/component/FlammableComponent.php",
+            "source_sha256": "538ad717087c273c45d29da8565ee9f3d0cab3b505f91fcddfec72a56e396861",
+            "constructor": "\tpublic function __construct(int $catchChanceModifier = 5, int $destroyChanceModifier = 20, bool $lavaFlammable = false) {\n\t\tif($catchChanceModifier < 0){\n\t\t\tthrow new \\InvalidArgumentException(\"catchChanceModifier must be greater than or equal to 0\");\n\t\t}\n\t\tif($destroyChanceModifier < 0){\n\t\t\tthrow new \\InvalidArgumentException(\"destroyChanceModifier must be greater than or equal to 0\");\n\t\t}\t\n\t\t$this->catchChanceModifier = $catchChanceModifier;\n\t\t$this->destroyChanceModifier = $destroyChanceModifier;\n\t\t$this->lavaFlammable = $lavaFlammable;\n\t}\n"
+        },
+        "flower_pottable": {
+            "class": "customiesdevs\\customies\\block\\component\\FlowerPottableComponent",
+            "name": "minecraft:flower_pottable",
+            "parameters": [],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "usePreR26U2FlowerPotOffset": false
+            },
+            "source": "src/block/component/FlowerPottableComponent.php",
+            "source_sha256": "1cf8e46e7d119271a51036ba096ab9025fd969e6d9d983e6b18d760145aeaa7b",
+            "constructor": "\tpublic function __construct() {}\n"
+        },
+        "friction": {
+            "class": "customiesdevs\\customies\\block\\component\\FrictionComponent",
+            "name": "minecraft:friction",
+            "parameters": [
+                {
+                    "name": "friction",
+                    "type": "float",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": 0.02
+            },
+            "source": "src/block/component/FrictionComponent.php",
+            "source_sha256": "34bcd27a1535f5f0c12353f090aa7dd0de13d73550aca6658881ae9078f0f9e0",
+            "constructor": "\tpublic function __construct(float $friction) {\n\t\t$this->friction = $friction;\n\t}\n"
+        },
+        "geometry": {
+            "class": "customiesdevs\\customies\\block\\component\\GeometryComponent",
+            "name": "minecraft:geometry",
+            "parameters": [
+                {
+                    "name": "identifier",
+                    "type": "string",
+                    "required": false,
+                    "default": "minecraft:geometry.full_block",
+                    "default_constant": "self::GEOMETRY_FULL_BLOCK",
+                    "description": "The description identifier of the geometry to use to render this block. This identifier must either match an existing geometry identifier in any of the loaded resource packs or be one of the currently supported Vanilla identifiers: \"minecraft:geometry.full_block\" or \"minecraft:geometry.cross\"."
+                },
+                {
+                    "name": "boneVisibility",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "An optional list of true/false values that define the visibility of individual bones in the geometry file. In order to set up 'bone_visibility', the geometry file name must be entered as an identifier. After the identifier has been specified, bone_visibility can be defined based on the names of the bones in the specified geometry file on a true/false basis. Note that all bones default to 'true,' so bones should only be defined if they are being set to 'false.' Including bones set to 'true' will work the same as the default."
+                },
+                {
+                    "name": "culling",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "An optional identifer of a culling definition. The culling definition is used to determine which faces of the block should be culled when rendering. The culling definition can be used to optimize rendering performance by reducing the number of faces that need to be rendered. This identifier must match an existing culling definition in any of the currently loaded resource packs."
+                },
+                {
+                    "name": "cullingLayer",
+                    "type": "string",
+                    "required": false,
+                    "default": "minecraft:culling_layer.undefined",
+                    "default_constant": null,
+                    "description": "[Experimental] - A string that allows culling rule to group multiple blocks together when comparing them. When using the minecraft namespace, the only allowed culling layer identifiers are : \"minecraft:culling_layer.undefined\" or \"minecraft:culling_layer.leaves\". Additionally, the feature is currently only usable behind the \"upcoming creator features\" toggle. When using no namespaces or a custom one, the names must start and end with an alpha-numeric character."
+                },
+                {
+                    "name": "cullingShape",
+                    "type": "customiesdevs\\customies\\block\\properties\\CullingShape|string",
+                    "required": false,
+                    "default": "minecraft:empty",
+                    "default_constant": "customiesdevs\\customies\\block\\properties\\CullingShape::SHAPE_EMPTY",
+                    "description": "Voxel shapes work together with culling rules and will not function if there is no culling rule defined for the block."
+                },
+                {
+                    "name": "uvLock",
+                    "type": "array|bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "A Boolean locking UV orientation of all bones in the geometry, or an array of strings locking UV orientation of specific bones in the geometry. For performance reasons it is recommended to use the Boolean. Note that for cubes using Box UVs, rather than Per-face UVs, 'uv_lock' is only supported if the cube faces are square."
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "GEOMETRY_CROSS": "minecraft:geometry.cross",
+                "GEOMETRY_FULL_BLOCK": "minecraft:geometry.full_block"
+            },
+            "serialized_example": {
+                "bone_visibility": [],
+                "culling": "",
+                "culling_layer": "minecraft:culling_layer.undefined",
+                "culling_shape": "minecraft:empty",
+                "identifier": "geometry.showcase.cube",
+                "uv_lock": false,
+                "ignoreGeometryForIsSolid": false,
+                "isV1Fullblock": false,
+                "needsLegacyTopRotation": false,
+                "useBlockTypeLightAbsorption": false
+            },
+            "source": "src/block/component/GeometryComponent.php",
+            "source_sha256": "697de41ca5020bac4f76caecb99f3137b05b6e1052a202910ab61c680a358915",
+            "constructor": "\tpublic function __construct(\n\t\tstring $identifier = self::GEOMETRY_FULL_BLOCK, \n\t\tarray $boneVisibility = [], \n\t\tstring $culling = \"\", \n\t\tstring $cullingLayer = \"minecraft:culling_layer.undefined\",\n\t\tCullingShape|string $cullingShape = CullingShape::SHAPE_EMPTY,\n\t\tarray|bool $uvLock = false\n\t) {\n\t\t$this->boneVisibility = $boneVisibility;\n\t\t$this->culling = $culling;\n\t\t$this->cullingLayer = $cullingLayer;\n\t\t$this->cullingShape = is_string($cullingShape) ? $cullingShape : $cullingShape->value;\n\t\t$this->identifier = $identifier;\n\t\t$this->uvLock = $uvLock;\n\t}\n"
+        },
+        "instrument_sound": {
+            "class": "customiesdevs\\customies\\block\\component\\InstrumentSoundComponent",
+            "name": "minecraft:instrument_sound",
+            "parameters": [
+                {
+                    "name": "upNote",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string|null",
+                    "required": false,
+                    "default": "note.harp",
+                    "default_constant": null,
+                    "description": ""
+                },
+                {
+                    "name": "downNote",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string|null",
+                    "required": false,
+                    "default": "note.none",
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "up": "note.pling",
+                "down": "note.bass"
+            },
+            "source": "src/block/component/InstrumentSoundComponent.php",
+            "source_sha256": "a6a1fa2a0ca5687032366e86bdc17e1b3c0590ec53184241c43d3974bcb8e77f",
+            "constructor": "\tpublic function __construct(\n\t\tSoundEvent|string|null $upNote = \"note.harp\",\n\t\tSoundEvent|string|null $downNote = \"note.none\"\n\t) {\n\t\tif($upNote === null && $downNote === null){\n\t\t\tthrow new \\InvalidArgumentException('At least one instrument face must be defined');\n\t\t}\n\t\t$this->upNote = $upNote instanceof SoundEvent ? (string) $upNote->value : $upNote;\n\t\t$this->downNote = $downNote instanceof SoundEvent ? (string) $downNote->value : $downNote;\n\t}\n"
+        },
+        "item_visual": {
+            "class": "customiesdevs\\customies\\block\\component\\ItemVisualComponent",
+            "name": "minecraft:item_visual",
+            "parameters": [
+                {
+                    "name": "geometry",
+                    "type": "customiesdevs\\customies\\block\\component\\GeometryComponent",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": ""
+                },
+                {
+                    "name": "materials",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "geometryDescription": {
+                    "bone_visibility": [],
+                    "culling": "",
+                    "culling_layer": "minecraft:culling_layer.undefined",
+                    "culling_shape": "minecraft:empty",
+                    "identifier": "geometry.showcase.cube",
+                    "uv_lock": false,
+                    "ignoreGeometryForIsSolid": false,
+                    "isV1Fullblock": false,
+                    "needsLegacyTopRotation": false,
+                    "useBlockTypeLightAbsorption": false
+                },
+                "materialInstancesDescription": {
+                    "mappings": [],
+                    "materials": {
+                        "*": {
+                            "texture": "showcase_lab",
+                            "render_method": "opaque",
+                            "tint_method": "none",
+                            "ambient_occlusion": 1,
+                            "packed_bools": 1
+                        }
+                    }
+                }
+            },
+            "source": "src/block/component/ItemVisualComponent.php",
+            "source_sha256": "92a303e8f0a285d2badb2b6d4c608e2cfeed6d701ab72de8d35554cde31be1d2",
+            "constructor": "\tpublic function __construct(\n\t\tprivate readonly GeometryComponent $geometry, \n\t\tprivate readonly array $materials = []\n\t) {\n\t\tMaterial::validMaterials($materials);\n\t}\n"
+        },
+        "leashable": {
+            "class": "customiesdevs\\customies\\block\\component\\LeashableComponent",
+            "name": "minecraft:leashable",
+            "parameters": [
+                {
+                    "name": "offset",
+                    "type": "array",
+                    "required": false,
+                    "default": [
+                        0,
+                        0.25,
+                        0
+                    ],
+                    "default_constant": null,
+                    "description": "An array of three floats representing the x, y, and z offsets for the leash knot position."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "offset": [
+                    0,
+                    0.5,
+                    0
+                ]
+            },
+            "source": "src/block/component/LeashableComponent.php",
+            "source_sha256": "18d063fe8378bb105e624bea055f9aca8e749269f16695b469fcf67cf07c8e24",
+            "constructor": "\tpublic function __construct(array $offset = [0.0, 0.25, 0.0]) {\n\t\tif(count($offset) !== 3){\n\t\t\tthrow new \\InvalidArgumentException(\"Leashable offset must contain exactly 3 values\");\n\t\t}\n\t\t$this->offset = array_values($offset);\n\t}\n"
+        },
+        "light_dampening": {
+            "class": "customiesdevs\\customies\\block\\component\\LightDampeningComponent",
+            "name": "minecraft:light_dampening",
+            "parameters": [
+                {
+                    "name": "dampening",
+                    "type": "int",
+                    "required": false,
+                    "default": 15,
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "lightLevel": 0
+            },
+            "source": "src/block/component/LightDampeningComponent.php",
+            "source_sha256": "2691ffad2425f5e0dba9837c59fea17c9f333a53df2d6dd1eadb8168bc75ce87",
+            "constructor": "\tpublic function __construct(int $dampening = 15) {\n\t\t$this->dampening = $dampening;\n\t}\n"
+        },
+        "light_emission": {
+            "class": "customiesdevs\\customies\\block\\component\\LightEmissionComponent",
+            "name": "minecraft:light_emission",
+            "parameters": [
+                {
+                    "name": "emission",
+                    "type": "int",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "emission": 15
+            },
+            "source": "src/block/component/LightEmissionComponent.php",
+            "source_sha256": "45930b6dc8110a32ad8ccb7ee4124a104213e1ae6ff1e84863970242c1d3b0e1",
+            "constructor": "\tpublic function __construct(int $emission = 0) {\n\t\t$this->emission = $emission;\n\t}\n"
+        },
+        "liquid_detection": {
+            "class": "customiesdevs\\customies\\block\\component\\LiquidDetectionComponent",
+            "name": "minecraft:liquid_detection",
+            "parameters": [
+                {
+                    "name": "canContainLiquid",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "* Creates a new liquid detection rule."
+                },
+                {
+                    "name": "liquidType",
+                    "type": "string",
+                    "required": false,
+                    "default": "water",
+                    "default_constant": "self::LIQUID_WATER",
+                    "description": "* Whether the block can contain the liquid (e.g. waterlogging)."
+                },
+                {
+                    "name": "onLiquidTouches",
+                    "type": "string",
+                    "required": false,
+                    "default": "blocking",
+                    "default_constant": "self::BLOCKING",
+                    "description": "* How the block reacts when liquid touches it."
+                },
+                {
+                    "name": "stopsLiquidFlowingFromDirection",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "* Directions in which liquid is prevented from flowing."
+                },
+                {
+                    "name": "liquidClipping",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "LIQUID_WATER": "water",
+                "BLOCKING": "blocking",
+                "BROKEN": "broken",
+                "POPPED": "popped",
+                "NO_REACTION": "no_reaction"
+            },
+            "serialized_example": {
+                "detectionRules": [
+                    {
+                        "canContainLiquid": true,
+                        "liquidType": "water",
+                        "onLiquidTouches": "blocking",
+                        "stopsLiquidFromDirection": 0,
+                        "use_liquid_clipping": false
+                    }
+                ]
+            },
+            "source": "src/block/component/LiquidDetectionComponent.php",
+            "source_sha256": "67e11f15f2a165e36ac2ca9a73ff8ef6de7fa86911cc74837e9013689f9c0755",
+            "constructor": "\tpublic function __construct(\n\t\tbool $canContainLiquid = false,\n\t\tstring $liquidType = self::LIQUID_WATER,\n\t\tstring $onLiquidTouches = self::BLOCKING,\n\t\tarray $stopsLiquidFlowingFromDirection = [],\n\t\tbool $liquidClipping = false\n\t) {\n\t\tif($liquidType !== self::LIQUID_WATER){\n\t\t\tthrow new \\InvalidArgumentException('Only water liquid detection is supported');\n\t\t}\n\t\tif(!in_array($onLiquidTouches, [self::BLOCKING, self::BROKEN, self::POPPED, self::NO_REACTION], true)){\n\t\t\tthrow new \\InvalidArgumentException('Invalid liquid reaction');\n\t\t}\n\t\t$this->canContainLiquid = $canContainLiquid;\n\t\t$this->liquidClipping = $liquidClipping;\n\t\t$this->liquidType = $liquidType;\n\t\t$this->onLiquidTouches = $onLiquidTouches;\n\t\t$this->stopsLiquidFlowingFromDirection = ComponentValidation::faces($stopsLiquidFlowingFromDirection);\n\t}\n"
+        },
+        "map_color": {
+            "class": "customiesdevs\\customies\\block\\component\\MapColorComponent",
+            "name": "minecraft:map_color",
+            "parameters": [
+                {
+                    "name": "color",
+                    "type": "array|string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "The color is represented as a hex value in the format \"#RRGGBB\". May also be expressed as an array of [R, G, B] from 0 to 255."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "color": "#39d8ce"
+            },
+            "source": "src/block/component/MapColorComponent.php",
+            "source_sha256": "fcc2684c225225a38755860ebc20c386d37aa553115b5110524d4593bd354f12",
+            "constructor": "\tpublic function __construct(string|array $color) {\n\t\t$this->color = $color;\n\t}\n"
+        },
+        "material_instances": {
+            "class": "customiesdevs\\customies\\block\\component\\MaterialInstancesComponent",
+            "name": "minecraft:material_instances",
+            "parameters": [
+                {
+                    "name": "materials",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "mappings": [],
+                "materials": {
+                    "*": {
+                        "texture": "showcase_lab",
+                        "render_method": "opaque",
+                        "tint_method": "none",
+                        "ambient_occlusion": 1,
+                        "packed_bools": 5
+                    }
+                }
+            },
+            "source": "src/block/component/MaterialInstancesComponent.php",
+            "source_sha256": "74ed0be68fbbcf5abfceaf74ab27a5c229121586b102419b063c53f98c194060",
+            "constructor": "\tpublic function __construct(private readonly array $materials = []) {\n\t\tMaterial::validMaterials($materials);\n\t}\n"
+        },
+        "movable": {
+            "class": "customiesdevs\\customies\\block\\component\\MovableComponent",
+            "name": "minecraft:movable",
+            "parameters": [
+                {
+                    "name": "movementType",
+                    "type": "string",
+                    "required": false,
+                    "default": "immovable",
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "movement_type": "immovable"
+            },
+            "source": "src/block/component/MovableComponent.php",
+            "source_sha256": "af38f862725df9de171548ca19a4cc2dfaa0b8073429b118b0621d43adbec508",
+            "constructor": "\tpublic function __construct(private readonly string $movementType = 'immovable') {\n\t\tif(!in_array($movementType, ['immovable', 'popped', 'push_pull', 'push'], true)){ throw new \\InvalidArgumentException('Invalid movement_type'); }\n\t}\n"
+        },
+        "placement_filter": {
+            "class": "customiesdevs\\customies\\block\\component\\PlacementFilterComponent",
+            "name": "minecraft:placement_filter",
+            "parameters": [
+                {
+                    "name": "conditions",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "(max 64)"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addCondition",
+                    "parameters": [
+                        {
+                            "name": "condition",
+                            "type": "customiesdevs\\customies\\block\\properties\\PlacementCondition",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "conditions": [
+                    {
+                        "allowed_faces": [
+                            "up"
+                        ],
+                        "block_filter": [
+                            {
+                                "name": "minecraft:stone"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "source": "src/block/component/PlacementFilterComponent.php",
+            "source_sha256": "b70064fd64b1cc1490d39dfef0b9113166ba33611ea25cbf9075977a01952604",
+            "constructor": "\tpublic function __construct(array $conditions = []) {\n\t\tif(count($conditions) > 64){\n\t\t\tthrow new InvalidArgumentException(\"Placement filter may not exceed 64 conditions\");\n\t\t}\n\t\t$this->conditions = $conditions;\n\t}\n"
+        },
+        "precipitation_interactions": {
+            "class": "customiesdevs\\customies\\block\\component\\PrecipitationInteractionsComponent",
+            "name": "minecraft:precipitation_interactions",
+            "parameters": [
+                {
+                    "name": "precipitationBehavior",
+                    "type": "string",
+                    "required": false,
+                    "default": "obstruct_rain_accumulate_snow",
+                    "default_constant": "self::OBSTRUCT_RAIN_ACCUMULATE_SNOW",
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "NONE": "none",
+                "OBSTRUCT_RAIN": "obstruct_rain",
+                "OBSTRUCT_RAIN_ACCUMULATE_SNOW": "obstruct_rain_accumulate_snow",
+                "SNOWLOGGING": "snowlogging"
+            },
+            "serialized_example": {
+                "precipitation_behavior": "obstruct_rain_accumulate_snow"
+            },
+            "source": "src/block/component/PrecipitationInteractionsComponent.php",
+            "source_sha256": "f637ce3a10cf3148230117605d99fe0bb0053576c0d386f19ffacd1ca2f51596",
+            "constructor": "\tpublic function __construct(private string $precipitationBehavior = self::OBSTRUCT_RAIN_ACCUMULATE_SNOW) {\n\t\tif(!in_array($precipitationBehavior, [self::NONE, self::OBSTRUCT_RAIN, self::OBSTRUCT_RAIN_ACCUMULATE_SNOW, self::SNOWLOGGING], true)){\n\t\t\tthrow new \\InvalidArgumentException('Invalid precipitation behavior');\n\t\t}\n\t}\n"
+        },
+        "random_offset": {
+            "class": "customiesdevs\\customies\\block\\component\\RandomOffsetComponent",
+            "name": "minecraft:random_offset",
+            "parameters": [
+                {
+                    "name": "min",
+                    "type": "?pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Minimum offset per axis (x, y, z)"
+                },
+                {
+                    "name": "max",
+                    "type": "?pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Maximum offset per axis (x, y, z)"
+                },
+                {
+                    "name": "steps",
+                    "type": "?pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Steps per axis (x, y, z)"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "getOffset",
+                    "parameters": [
+                        {
+                            "name": "x",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "z",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "pocketmine\\math\\Vector3",
+                    "documentation": "/**\n\t * Computes the horizontal (XZ) random offset vector applied at a given block position.\n\t * @param int $x Block world position X\n\t * @param int $z Block world position Z\n\t * @return Vector3 Offset vector with calculated X and Z, Y set to 0.0\n\t */"
+                },
+                {
+                    "name": "setMin",
+                    "parameters": [
+                        {
+                            "name": "min",
+                            "type": "pocketmine\\math\\Vector3",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setMax",
+                    "parameters": [
+                        {
+                            "name": "max",
+                            "type": "pocketmine\\math\\Vector3",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setSteps",
+                    "parameters": [
+                        {
+                            "name": "steps",
+                            "type": "pocketmine\\math\\Vector3",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setX",
+                    "parameters": [
+                        {
+                            "name": "min",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "max",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "steps",
+                            "type": "int",
+                            "required": false,
+                            "default": 0
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setY",
+                    "parameters": [
+                        {
+                            "name": "min",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "max",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "steps",
+                            "type": "int",
+                            "required": false,
+                            "default": 0
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                },
+                {
+                    "name": "setZ",
+                    "parameters": [
+                        {
+                            "name": "min",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "max",
+                            "type": "float",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "steps",
+                            "type": "int",
+                            "required": false,
+                            "default": 0
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": ""
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "x": {
+                    "steps": 0,
+                    "range": {
+                        "min": -0.1,
+                        "max": 0.1
+                    }
+                },
+                "y": {
+                    "steps": 0,
+                    "range": {
+                        "min": 0,
+                        "max": 0
+                    }
+                },
+                "z": {
+                    "steps": 0,
+                    "range": {
+                        "min": -0.1,
+                        "max": 0.1
+                    }
+                }
+            },
+            "source": "src/block/component/RandomOffsetComponent.php",
+            "source_sha256": "4953838db90a68f1226bffcd20d6eefcc26c6932487fa9f1e88aaef217d67e2c",
+            "constructor": "\tpublic function __construct(\n\t\t?Vector3 $min = null,\n\t\t?Vector3 $max = null,\n\t\t?Vector3 $steps = null\n\t) {\n\t\t$this->min = $min ?? new Vector3(0.0, 0.0, 0.0);\n\t\t$this->max = $max ?? new Vector3(0.0, 0.0, 0.0);\n\t\t$this->steps = $steps ?? new Vector3(0, 0, 0);\n\t}\n"
+        },
+        "replaceable": {
+            "class": "customiesdevs\\customies\\block\\component\\ReplaceableComponent",
+            "name": "minecraft:replaceable",
+            "parameters": [],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {},
+            "source": "src/block/component/ReplaceableComponent.php",
+            "source_sha256": "72b55b65380130a80048f3db990766164d3f1388d7ba84d0e62bf72889ff7a81",
+            "constructor": "\tpublic function __construct(){}\n"
+        },
+        "selection_box": {
+            "class": "customiesdevs\\customies\\block\\component\\SelectionBoxComponent",
+            "name": "minecraft:selection_box",
+            "parameters": [
+                {
+                    "name": "useSelectionBox",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "If selection should be enabled, default is set to `true`."
+                },
+                {
+                    "name": "origin",
+                    "type": "?pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": -8,
+                        "y": 0,
+                        "z": -8
+                    },
+                    "default_constant": null,
+                    "description": "MMinimal position of the bounds of the selection box. \"origin\" is specified as [x, y, z] and must be in the range (-8, 0, -8) to (8, 16, 8), inclusive."
+                },
+                {
+                    "name": "size",
+                    "type": "?pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 16,
+                        "y": 16,
+                        "z": 16
+                    },
+                    "default_constant": null,
+                    "description": "Size of each side of the selection box. Size is specified as [x, y, z]. \"origin\" + \"size\" must be in the range (-8, 0, -8) to (8, 16, 8), inclusive."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "enabled": true,
+                "origin": [
+                    -6,
+                    0,
+                    -6
+                ],
+                "size": [
+                    12,
+                    12,
+                    12
+                ]
+            },
+            "source": "src/block/component/SelectionBoxComponent.php",
+            "source_sha256": "e0816dfdde552edf284be72028c2da01b18c938dd219439499e75109eedef660",
+            "constructor": "\tpublic function __construct(bool $useSelectionBox = true, ?Vector3 $origin = new Vector3(-8.0, 0.0, -8.0), ?Vector3 $size = new Vector3(16.0, 16.0, 16.0)) {\n\t\t$this->useSelectionBox = $useSelectionBox;\n\t\t$this->origin = $origin;\n\t\t$this->size = $size;\n\t}\n"
+        },
+        "sound": {
+            "class": "customiesdevs\\customies\\block\\component\\SoundComponent",
+            "name": "minecraft:sound",
+            "parameters": [
+                {
+                    "name": "sound",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "sound": "stone"
+            },
+            "source": "src/block/component/SoundComponent.php",
+            "source_sha256": "62cf23c5f99447dab0bcfd7d11f3fad50cb9d498e2f7e5a39fa8d6fe53614da7",
+            "constructor": "\tpublic function __construct(string $sound\n\t) {\n\t\t$this->sound = $sound;\n\t}\n"
+        },
+        "support": {
+            "class": "customiesdevs\\customies\\block\\component\\SupportComponent",
+            "name": "minecraft:support",
+            "parameters": [
+                {
+                    "name": "shape",
+                    "type": "string",
+                    "required": false,
+                    "default": "stair",
+                    "default_constant": "self::TYPE_STAIRS",
+                    "description": "Support shape (e.g. \"stair\")"
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "TYPE_FENCE": "fence",
+                "TYPE_STAIRS": "stair"
+            },
+            "serialized_example": {
+                "shape": "fence"
+            },
+            "source": "src/block/component/SupportComponent.php",
+            "source_sha256": "9d70162dcbbec6fb9ee9d0555572aa881c8c9c485264ea13b6f7c5e6a11248af",
+            "constructor": "\tpublic function __construct(string $shape = self::TYPE_STAIRS) {\n\t\t$this->shape = $shape;\n\t}\n"
+        },
+        "transformation": {
+            "class": "customiesdevs\\customies\\block\\component\\TransformationComponent",
+            "name": "minecraft:transformation",
+            "parameters": [
+                {
+                    "name": "rotation",
+                    "type": "pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "default_constant": null,
+                    "description": "The block's rotation in increments of 90 degrees"
+                },
+                {
+                    "name": "rotationPivot",
+                    "type": "pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "default_constant": null,
+                    "description": "The point to apply rotation around"
+                },
+                {
+                    "name": "scale",
+                    "type": "pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 1,
+                        "y": 1,
+                        "z": 1
+                    },
+                    "default_constant": null,
+                    "description": "The block's scale"
+                },
+                {
+                    "name": "scalePivot",
+                    "type": "pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "default_constant": null,
+                    "description": "The point to apply scale around"
+                },
+                {
+                    "name": "translation",
+                    "type": "pocketmine\\math\\Vector3",
+                    "required": false,
+                    "default": {
+                        "x": 0,
+                        "y": 0,
+                        "z": 0
+                    },
+                    "default_constant": null,
+                    "description": "The block's translation"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "RX": 0,
+                "RY": 1,
+                "RZ": 0,
+                "RXP": 0,
+                "RYP": 0,
+                "RZP": 0,
+                "SX": 0.75,
+                "SY": 0.75,
+                "SZ": 0.75,
+                "SXP": 0,
+                "SYP": 0,
+                "SZP": 0,
+                "TX": 0,
+                "TY": 0,
+                "TZ": 0,
+                "hasJsonVersionBeforeValidation": false
+            },
+            "source": "src/block/component/TransformationComponent.php",
+            "source_sha256": "3f70aeba83a25c188946cc0244d3cae204e3d2e744bff4efeaa38601f8e6c370",
+            "constructor": "\tpublic function __construct(\n\t\tprivate readonly Vector3 $rotation = new Vector3(0.0, 0.0, 0.0),\n\t\tprivate readonly Vector3 $rotationPivot = new Vector3(0.0, 0.0, 0.0),\n\t\tprivate readonly Vector3 $scale = new Vector3(1.0, 1.0, 1.0),\n\t\tprivate readonly Vector3 $scalePivot = new Vector3(0.0, 0.0, 0.0),\n\t\tprivate readonly Vector3 $translation = new Vector3(0.0, 0.0, 0.0)\n\t) {}\n"
+        }
+    },
+    "item": {
+        "allow_off_hand": {
+            "class": "customiesdevs\\customies\\item\\component\\AllowOffHandComponent",
+            "name": "minecraft:allow_off_hand",
+            "parameters": [
+                {
+                    "name": "offHand",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/AllowOffHandComponent.php",
+            "source_sha256": "b2faaae039b92af0f0d4369949db6946fe7156449e5d8fb4a837a76169d581ff",
+            "constructor": "\tpublic function __construct(bool $offHand = true) {\n\t\t$this->offHand = $offHand;\n\t}\n"
+        },
+        "bundle_interaction": {
+            "class": "customiesdevs\\customies\\item\\component\\BundleInteractionComponent",
+            "name": "minecraft:bundle_interaction",
+            "parameters": [
+                {
+                    "name": "numViewableSlots",
+                    "type": "int",
+                    "required": false,
+                    "default": 12,
+                    "default_constant": null,
+                    "description": "The maximum number of slots in the bundle viewable by the player. Can be from 1 to 64. Default is 12."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "num_viewable_slots": 8
+            },
+            "source": "src/item/component/BundleInteractionComponent.php",
+            "source_sha256": "e0ba7d3c2a0b16ab236c2c68415f5a332645975eccca2b8602b7ff8f639a08be",
+            "constructor": "\tpublic function __construct(int $numViewableSlots = 12) {\n\t\tif($numViewableSlots < 1 || $numViewableSlots > 64){\n\t\t\tthrow new \\InvalidArgumentException(\"Number of viewable-slots must be between 1 and 64, $numViewableSlots given\");\n\t\t}\n\t\t$this->numViewableSlots = $numViewableSlots;\n\t}\n"
+        },
+        "can_destroy_in_creative": {
+            "class": "customiesdevs\\customies\\item\\component\\CanDestroyInCreativeComponent",
+            "name": "minecraft:can_destroy_in_creative",
+            "parameters": [
+                {
+                    "name": "canDestroyInCreative",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": false
+            },
+            "source": "src/item/component/CanDestroyInCreativeComponent.php",
+            "source_sha256": "46da76201448488df4e98b113059b24b2139cde55ac7a5964fb4268e7c4b0ffb",
+            "constructor": "\tpublic function __construct(bool $canDestroyInCreative = true) {\n\t\t$this->canDestroyInCreative = $canDestroyInCreative;\n\t}\n"
+        },
+        "compostable": {
+            "class": "customiesdevs\\customies\\item\\component\\CompostableComponent",
+            "name": "minecraft:compostable",
+            "parameters": [
+                {
+                    "name": "compostingChance",
+                    "type": "int",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "The chance of this item to create a layer upon composting with the composter."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "composting_chance": 65
+            },
+            "source": "src/item/component/CompostableComponent.php",
+            "source_sha256": "4ee1d615433f810d3e657bd2d0fbffe926bf9671cf241898fb5ded7473d676fd",
+            "constructor": "\tpublic function __construct(int $compostingChance) {\n\t\tif($compostingChance < 1 || $compostingChance > 100){\n\t\t\tthrow new \\InvalidArgumentException(\"Composting chance must be between 1 and 100, $compostingChance given\");\n\t\t}\n\t\t$this->compostingChance = $compostingChance;\n\t}\n"
+        },
+        "cooldown": {
+            "class": "customiesdevs\\customies\\item\\component\\CooldownComponent",
+            "name": "minecraft:cooldown",
+            "parameters": [
+                {
+                    "name": "category",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "All items with the same \"category\" are put on cooldown when one is used."
+                },
+                {
+                    "name": "duration",
+                    "type": "float",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "How long the item is on cooldown before being able to be used again."
+                },
+                {
+                    "name": "type",
+                    "type": "string",
+                    "required": false,
+                    "default": "use",
+                    "default_constant": "self::TYPE_USE",
+                    "description": "The type of cooldown (e.g., \"use\", \"attack\"). Default is \"use\"."
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "TYPE_ATTACK": "attack",
+                "TYPE_USE": "use",
+                "CATEGORY_CHORUS": "chorusfruit",
+                "CATEGORY_HORN": "goat_horn",
+                "CATEGORY_PEARL": "ender_pearl",
+                "CATEGORY_SHIELD": "shield",
+                "CATEGORY_SPEAR": "spear",
+                "CATEGORY_WINDCHARGE": "wind_charge"
+            },
+            "serialized_example": {
+                "category": "showcase:cooldown",
+                "duration": 2,
+                "type": "use"
+            },
+            "source": "src/item/component/CooldownComponent.php",
+            "source_sha256": "15e21183038b83496031734a2c098bfb74542edf6a98cdd49181010b58c8d795",
+            "constructor": "\tpublic function __construct(string $category, float $duration, string $type = self::TYPE_USE) {\n\t\t$this->category = $category;\n\t\t$this->duration = $duration;\n\t\t$this->type = $type;\n\t}\n"
+        },
+        "damage_absorption": {
+            "class": "customiesdevs\\customies\\item\\component\\DamageAbsorptionComponent",
+            "name": "minecraft:damage_absorption",
+            "parameters": [
+                {
+                    "name": "absorbableCauses",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "List of damage causes that can be absorbed by the item. By default, no damage cause is absorbed."
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addCause",
+                    "parameters": [
+                        {
+                            "name": "cause",
+                            "type": "customiesdevs\\customies\\item\\properties\\DamageCause|string",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds a damage cause to the absorbable list.\n\t * @param DamageCause|string $cause\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "absorbable_causes": [
+                    "fall"
+                ]
+            },
+            "source": "src/item/component/DamageAbsorptionComponent.php",
+            "source_sha256": "05b9ddfceb62872db9688baddbed8f268c66f0fdf5f80f350adb06696078a385",
+            "constructor": "\tpublic function __construct(array $absorbableCauses = []) {\n\t\tforeach($absorbableCauses as $cause){\n\t\t\t$this->addCause($cause);\n\t\t}\n\t}\n"
+        },
+        "damage": {
+            "class": "customiesdevs\\customies\\item\\component\\DamageComponent",
+            "name": "minecraft:damage",
+            "parameters": [
+                {
+                    "name": "damage",
+                    "type": "int",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "Specifies how much extra damage the item does, must be a positive number."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": 6
+            },
+            "source": "src/item/component/DamageComponent.php",
+            "source_sha256": "77cc2ca13cc58fcaed08c941eb98a58d882687d379bb322908e30cc98e36ae6c",
+            "constructor": "\tpublic function __construct(int $damage = 0) {\n\t\tif($damage < 0){\n\t\t\tthrow new \\InvalidArgumentException(\"Damage value must be a positive number, $damage given\");\n\t\t}\n\t\tif($damage > 32767){\n\t\t\tthrow new \\InvalidArgumentException(\"Damage value cannot exceed 32767, $damage given\");\n\t\t}\n\t\t$this->damage = $damage;\n\t}\n"
+        },
+        "digger": {
+            "class": "customiesdevs\\customies\\item\\component\\DiggerComponent",
+            "name": "minecraft:digger",
+            "parameters": [
+                {
+                    "name": "useEfficiency",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Determines whether the item should be impacted by the Efficiency enchantment."
+                },
+                {
+                    "name": "destroySpeeds",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [
+                {
+                    "name": "withBlocks",
+                    "parameters": [
+                        {
+                            "name": "speed",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "blocks",
+                            "type": "pocketmine\\block\\Block",
+                            "required": false,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds blocks to the `destroy_speeds` array with a specified speed.\n\t * @param int $speed Digging speed for the correlating block(s)\n\t * @param Block ...$blocks A list of blocks to dig with the given speed\n\t */"
+                },
+                {
+                    "name": "withTags",
+                    "parameters": [
+                        {
+                            "name": "speed",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "tags",
+                            "type": "string",
+                            "required": false,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds block tags to the `destroy_speeds` array with a specified speed.\n\t * @param int $speed Digging speed for the correlating blocks\n\t * @param string ...$tags A list of block tags\n\t */"
+                },
+                {
+                    "name": "withStates",
+                    "parameters": [
+                        {
+                            "name": "speed",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "block",
+                            "type": "pocketmine\\block\\Block",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "states",
+                            "type": "customiesdevs\\customies\\block\\states\\BlockState",
+                            "required": false,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * @todo: Implement this properly\n\t * \n\t * Adds block states to the `destroy_speeds` array with a specified speed.\n\t * @param int $speed Digging speed\n\t * @param Block $block Block identifier\n\t * @param BlockState ...$states A list of block states with their current values set appropriately\n\t */"
+                },
+                {
+                    "name": "getDestroySpeeds",
+                    "parameters": [],
+                    "return_type": "array",
+                    "documentation": "/**\n\t * Returns the array of destroy speeds.\n\t * @return array<int, array{block: array{name?: string, states?: array<string, mixed>, tags?: string}, speed: int}> The destroy speeds array.\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "use_efficiency": true,
+                "destroy_speeds": [
+                    {
+                        "block": {
+                            "name": "minecraft:stone"
+                        },
+                        "speed": 6
+                    }
+                ]
+            },
+            "source": "src/item/component/DiggerComponent.php",
+            "source_sha256": "6231f38948714104b5bf81897c76172e9a3e2de61e66a01ccdd5b3d187384053",
+            "constructor": "\tpublic function __construct(bool $useEfficiency = false, array $destroySpeeds = []) {\n\t\t$this->useEfficiency = $useEfficiency;\n\t\t$this->destroySpeeds = $destroySpeeds;\n\t}\n"
+        },
+        "display_name": {
+            "class": "customiesdevs\\customies\\item\\component\\DisplayNameComponent",
+            "name": "minecraft:display_name",
+            "parameters": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Name shown for an item"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": "Display Name Specimen"
+            },
+            "source": "src/item/component/DisplayNameComponent.php",
+            "source_sha256": "befc1c6f6a487aaead7c00cff9a1e8465eac37073351b822bed39b7261647cc0",
+            "constructor": "\tpublic function __construct(string $name) {\n\t\t$this->name = $name;\n\t}\n"
+        },
+        "durability": {
+            "class": "customiesdevs\\customies\\item\\component\\DurabilityComponent",
+            "name": "minecraft:durability",
+            "parameters": [
+                {
+                    "name": "maxDurability",
+                    "type": "int",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Max durability is the amount of damage that this item can take before breaking"
+                },
+                {
+                    "name": "minDamageChance",
+                    "type": "int",
+                    "required": false,
+                    "default": 100,
+                    "default_constant": null,
+                    "description": "Specifies the percentage minimum chance for durability to take damage. Range: [0, 100]. Default is set to `100`"
+                },
+                {
+                    "name": "maxDamageChance",
+                    "type": "int",
+                    "required": false,
+                    "default": 100,
+                    "default_constant": null,
+                    "description": "Specifies the percentage maximum chance for durability to take damage. Range: [0, 100]. Default is set to `100`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "damage_chance": {
+                    "max": 100,
+                    "min": 100
+                },
+                "max_durability": 256
+            },
+            "source": "src/item/component/DurabilityComponent.php",
+            "source_sha256": "892a4db1fd6a8b687017a7de830e504ae8ea216c8dc8547f04739ca90aa27ce6",
+            "constructor": "\tpublic function __construct(int $maxDurability, int $minDamageChance = 100, int $maxDamageChance = 100) {\n\t\tself::validate($minDamageChance, 'Minimum');\n\t\tself::validate($maxDamageChance, 'Maximum');\n\t\tif($minDamageChance > $maxDamageChance){\n\t\t\tthrow new \\InvalidArgumentException(\"Minimum damage chance ($minDamageChance) cannot be greater than maximum damage chance ($maxDamageChance)\");\n\t\t}\n\t\tif($maxDurability < 0 || $maxDurability > 2147483647){\n\t\t\tthrow new \\InvalidArgumentException(\"Max durability must be between 0 and 2147483647, $maxDurability given\");\n\t\t}\n\t\t$this->maxDurability = $maxDurability;\n\t\t$this->minDamageChance = $minDamageChance;\n\t\t$this->maxDamageChance = $maxDamageChance;\n\t}\n"
+        },
+        "durability_sensor": {
+            "class": "customiesdevs\\customies\\item\\component\\DurabilitySensorComponent",
+            "name": "minecraft:durability_sensor",
+            "parameters": [
+                {
+                    "name": "durabilityThresholds",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": ""
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addDurabilityThreshold",
+                    "parameters": [
+                        {
+                            "name": "durability",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "particleType",
+                            "type": "?customiesdevs\\customies\\item\\properties\\ParticleType",
+                            "required": false,
+                            "default": null
+                        },
+                        {
+                            "name": "soundEvent",
+                            "type": "?customiesdevs\\customies\\item\\properties\\SoundEvent",
+                            "required": false,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds a durability threshold that triggers effects when the item's durability reaches the specified value.\n\t * @param int $durability The durability threshold at which the effects are triggered. Must be >= 0.\n\t * @param ParticleType|null $particleType The type of particle effect to emit when the threshold is reached. If null, no particle effect is emitted.\n\t * @param SoundEvent|null $soundEvent The sound event to play when the threshold is reached. If null, no sound is played.\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "durability_thresholds": [
+                    {
+                        "durability": 32,
+                        "sound_event": "attack.critical"
+                    }
+                ]
+            },
+            "source": "src/item/component/DurabilitySensorComponent.php",
+            "source_sha256": "c51e92dcd6f6d8ae8a06859c36b3cae69e3afbd1641e5368a2793b65aca02adf",
+            "constructor": "\tpublic function __construct(array $durabilityThresholds = []) {\n\t\tif(isset($durabilityThresholds['durability'])){\n\t\t\t$durabilityThresholds = [$durabilityThresholds];\n\t\t}\n\t\tforeach($durabilityThresholds as $threshold){\n\t\t\tif(!is_array($threshold) || !isset($threshold['durability']) || !is_int($threshold['durability'])){\n\t\t\t\tthrow new \\InvalidArgumentException('Durability threshold must contain an integer durability');\n\t\t\t}\n\t\t\t$this->addDurabilityThreshold(\n\t\t\t\t$threshold['durability'],\n\t\t\t\t$threshold['particle_type'] ?? null,\n\t\t\t\t$threshold['sound_event'] ?? null\n\t\t\t);\n\t\t}\n\t}\n"
+        },
+        "dyeable": {
+            "class": "customiesdevs\\customies\\item\\component\\DyeableComponent",
+            "name": "minecraft:dyeable",
+            "parameters": [
+                {
+                    "name": "hex",
+                    "type": "string",
+                    "required": false,
+                    "default": "#ffffff",
+                    "default_constant": null,
+                    "description": "Hex color code (e.g. \"#175882\")"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "default_color": [
+                    57,
+                    216,
+                    206
+                ]
+            },
+            "source": "src/item/component/DyeableComponent.php",
+            "source_sha256": "7daaaefd663a966c155a8803905f00f3093e5f9db3fa028a5bc169c59276c993",
+            "constructor": "\tpublic function __construct(string $hex = '#ffffff') {\n\t\t$this->rgb = self::hexToRgb($hex);\n\t}\n"
+        },
+        "enchantable": {
+            "class": "customiesdevs\\customies\\item\\component\\EnchantableComponent",
+            "name": "minecraft:enchantable",
+            "parameters": [
+                {
+                    "name": "slot",
+                    "type": "string",
+                    "required": false,
+                    "default": "none",
+                    "default_constant": "self::SLOT_NONE",
+                    "description": "Specifies which types of enchantments can be applied. For example, `bow` would allow this item to be enchanted as if it were a bow"
+                },
+                {
+                    "name": "value",
+                    "type": "int",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "Specifies the value of the enchantment."
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "SLOT_NONE": "none",
+                "SLOT_ALL": "all",
+                "SLOT_ARMOR": "g_armor",
+                "SLOT_HELMET": "armor_head",
+                "SLOT_CHESTPLATE": "armor_torso",
+                "SLOT_LEGGINGS": "armor_legs",
+                "SLOT_BOOTS": "armor_feet",
+                "SLOT_SWORD": "sword",
+                "SLOT_BOW": "bow",
+                "SLOT_SPEAR": "spear",
+                "SLOT_MELEE_SPEAR": "melee_spear",
+                "SLOT_CROSSBOW": "crossbow",
+                "SLOT_TOOL_GENERIC": "g_tool",
+                "SLOT_HOE": "hoe",
+                "SLOT_SHEARS": "shears",
+                "SLOT_FLINTSTEEL": "flintsteel",
+                "SLOT_SHIELD": "shield",
+                "SLOT_DIGGING": "g_digging",
+                "SLOT_AXE": "axe",
+                "SLOT_PICKAXE": "pickaxe",
+                "SLOT_SHOVEL": "shovel",
+                "SLOT_FISHING_ROD": "fishing_rod",
+                "SLOT_CARROT_STICK": "carrot_stick",
+                "SLOT_ELYTRA": "elytra",
+                "SLOT_COSMETIC_HEAD": "cosmetic_head",
+                "ARMOR_LEATHER": 15,
+                "ARMOR_CHAIN": 12,
+                "ARMOR_COPPER": 8,
+                "ARMOR_IRON": 9,
+                "ARMOR_GOLD": 25,
+                "ARMOR_DIAMOND": 10,
+                "ARMOR_TURTLE": 9,
+                "ARMOR_NETHERITE": 15,
+                "ARMOR_OTHER": 1,
+                "TOOL_WOOD": 15,
+                "TOOL_STONE": 5,
+                "TOOL_COOPER": 13,
+                "TOOL_IRON": 14,
+                "TOOL_GOLD": 22,
+                "TOOL_DIAMOND": 10,
+                "TOOL_NETHERITE": 15,
+                "TOOL_MACE": 15,
+                "TOOL_OTHER": 1
+            },
+            "serialized_example": {
+                "slot": "sword",
+                "value": 12
+            },
+            "source": "src/item/component/EnchantableComponent.php",
+            "source_sha256": "d4a483aae4a1bbb544c38d4c869b785bb7c6783d7b84a1f0d75be05e289aafd0",
+            "constructor": "\tpublic function __construct(string $slot = self::SLOT_NONE, int $value = 0) {\n\t\tself::validate($value);\n\t\t$this->slot = $slot;\n\t\t$this->value = $value;\n\t}\n"
+        },
+        "fire_resistant": {
+            "class": "customiesdevs\\customies\\item\\component\\FireResistantComponent",
+            "name": "minecraft:fire_resistant",
+            "parameters": [
+                {
+                    "name": "fireResistant",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Determines whether the item is immune to burning when dropped in fire or lava. Default value: true."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/FireResistantComponent.php",
+            "source_sha256": "f38da34788e1a23749dd9919915c3f4af30f6670bee991925528941417f786de",
+            "constructor": "\tpublic function __construct(bool $fireResistant = true) {\n\t\t$this->fireResistant = $fireResistant;\n\t}\n"
+        },
+        "food": {
+            "class": "customiesdevs\\customies\\item\\component\\FoodComponent",
+            "name": "minecraft:food",
+            "parameters": [
+                {
+                    "name": "canAlwaysEat",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Whether the player can always eat this food, even when not hungry. Default is false."
+                },
+                {
+                    "name": "nutrition",
+                    "type": "int",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "The amount of hunger points this food item restores when eaten. Default is 0."
+                },
+                {
+                    "name": "saturationModifier",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.6,
+                    "default_constant": "self::MODIFIER_NORMAL",
+                    "description": "The saturation modifier for this food item. Default is `MODIFIER_NORMAL` (0.6)."
+                },
+                {
+                    "name": "usingConvertsTo",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "The item this food converts to after being consumed. Default is an empty string."
+                }
+            ],
+            "methods": [
+                {
+                    "name": "addCooldown",
+                    "parameters": [
+                        {
+                            "name": "time",
+                            "type": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "name": "type",
+                            "type": "string",
+                            "required": false,
+                            "default": ""
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Sets a cooldown after eating.\n\t * If `COOLDOWN_CHORUSFRUIT` is used, cooldown time is forced to 20 ticks.\n\t * @param int $time Cooldown duration in ticks\n\t * @param string $type Cooldown type\n\t */"
+                },
+                {
+                    "name": "onUseEvent",
+                    "parameters": [
+                        {
+                            "name": "action",
+                            "type": "int",
+                            "required": false,
+                            "default": -1
+                        },
+                        {
+                            "name": "x",
+                            "type": "float",
+                            "required": false,
+                            "default": 8
+                        },
+                        {
+                            "name": "y",
+                            "type": "float",
+                            "required": false,
+                            "default": 8
+                        },
+                        {
+                            "name": "z",
+                            "type": "float",
+                            "required": false,
+                            "default": 8
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Defines an on-use event action.\n\t * @param int $action One of the USE_ACTION_* constants\n\t * @param float $x Effect range X\n\t * @param float $y Effect range Y\n\t * @param float $z Effect range Z\n\t */"
+                },
+                {
+                    "name": "addEffect",
+                    "parameters": [
+                        {
+                            "name": "effect",
+                            "type": "customiesdevs\\customies\\item\\properties\\EffectType",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "duration",
+                            "type": "int",
+                            "required": true,
+                            "default": null
+                        },
+                        {
+                            "name": "amplifier",
+                            "type": "int",
+                            "required": false,
+                            "default": 0
+                        },
+                        {
+                            "name": "chance",
+                            "type": "float",
+                            "required": false,
+                            "default": 1
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Adds a potion effect applied when the food is consumed.\n\t * @param EffectType $effect Potion effect type\n\t * @param int $duration Effect duration in seconds\n\t * @param int $amplifier Effect strength (0 = level I)\n\t * @param float $chance Chance to apply the effect)\n\t */"
+                },
+                {
+                    "name": "removeEffects",
+                    "parameters": [
+                        {
+                            "name": "effects",
+                            "type": "customiesdevs\\customies\\item\\properties\\EffectType",
+                            "required": false,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * Removes one or more potion effects when the food is consumed.\n\t * @param EffectType ...$effects Effects to remove\n\t */"
+                }
+            ],
+            "constants": {
+                "USE_ACTION_NORMAL": -1,
+                "USE_ACTION_CHORUS_TELEPORT": 0,
+                "USE_ACTION_SUSPICIOUS_STEW_EFFECT": 1,
+                "MODIFIER_POOR": 0.1,
+                "MODIFIER_LOW": 0.3,
+                "MODIFIER_NORMAL": 0.6,
+                "MODIFIER_GOOD": 0.8,
+                "MODIFIER_SUPERNATURAL": 1.2,
+                "COOLDOWN_DEFAULT": "",
+                "COOLDOWN_CHORUSFRUIT": "chorusfruit"
+            },
+            "serialized_example": {
+                "can_always_eat": false,
+                "nutrition": 6,
+                "saturation_modifier": 0.6,
+                "using_converts_to": ""
+            },
+            "source": "src/item/component/FoodComponent.php",
+            "source_sha256": "168a32bd503de4a19a6c1817157c3e1c18ffcbd139338db0de3cec4bd4cd1340",
+            "constructor": "\tpublic function __construct(\n\t\tbool $canAlwaysEat = false,\n\t\tint $nutrition = 0,\n\t\tfloat $saturationModifier = self::MODIFIER_NORMAL,\n\t\tstring $usingConvertsTo = \"\"\n\t) {\n\t\t$this->canAlwaysEat = $canAlwaysEat;\n\t\t$this->nutrition = $nutrition;\n\t\t$this->saturationModifier = $saturationModifier;\n\t\t$this->usingConvertsTo = $usingConvertsTo;\n\t}\n"
+        },
+        "fuel": {
+            "class": "customiesdevs\\customies\\item\\component\\FuelComponent",
+            "name": "minecraft:fuel",
+            "parameters": [
+                {
+                    "name": "duration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.05,
+                    "default_constant": null,
+                    "description": "Amount of time, in seconds, this fuel will cook items."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "duration": 20
+            },
+            "source": "src/item/component/FuelComponent.php",
+            "source_sha256": "bf574ccddad0aa6273ea0236cd1c7a4add41075ef6891b1370fdaedef1f1bb7d",
+            "constructor": "\tpublic function __construct(float $duration = 0.05) {\n\t\tif($duration < 0.05){\n\t\t\tthrow new \\InvalidArgumentException(\"Fuel duration must be at least 0.05 seconds, $duration given\");\n\t\t}\n\t\t$this->duration = $duration;\n\t}\n"
+        },
+        "glint": {
+            "class": "customiesdevs\\customies\\item\\component\\GlintComponent",
+            "name": "minecraft:glint",
+            "parameters": [
+                {
+                    "name": "glint",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/GlintComponent.php",
+            "source_sha256": "14cf4b4fb2d050b2f2ef08aa7e50db11b9ebf4295e98bac4a1fca88abc6d0cfd",
+            "constructor": "\tpublic function __construct(bool $glint = true) {\n\t\t$this->glint = $glint;\n\t}\n"
+        },
+        "hand_equipped": {
+            "class": "customiesdevs\\customies\\item\\component\\HandEquippedComponent",
+            "name": "minecraft:hand_equipped",
+            "parameters": [
+                {
+                    "name": "handEquipped",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/HandEquippedComponent.php",
+            "source_sha256": "6f37d706cd5fe70ed6a8201f57e34fc783003c544b1f04a592b652e0195eb3bf",
+            "constructor": "\tpublic function __construct(bool $handEquipped = true) {\n\t\t$this->handEquipped = $handEquipped;\n\t}\n"
+        },
+        "hover_text_color": {
+            "class": "customiesdevs\\customies\\item\\component\\HoverTextColorComponent",
+            "name": "minecraft:hover_text_color",
+            "parameters": [
+                {
+                    "name": "hoverTextColor",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Specifies the color of the item's hover text"
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "COLOR_CODE_MAP": {
+                    "black": "\u00a70",
+                    "dark_blue": "\u00a71",
+                    "dark_green": "\u00a72",
+                    "dark_aqua": "\u00a73",
+                    "dark_red": "\u00a74",
+                    "dark_purple": "\u00a75",
+                    "gold": "\u00a76",
+                    "gray": "\u00a77",
+                    "dark_gray": "\u00a78",
+                    "blue": "\u00a79",
+                    "green": "\u00a7a",
+                    "aqua": "\u00a7b",
+                    "red": "\u00a7c",
+                    "light_purple": "\u00a7d",
+                    "yellow": "\u00a7e",
+                    "white": "\u00a7f",
+                    "minecoin_gold": "\u00a7g",
+                    "material_quartz": "\u00a7h",
+                    "material_iron": "\u00a7i",
+                    "material_netherite": "\u00a7j",
+                    "material_redstone": "\u00a7m",
+                    "material_copper": "\u00a7n",
+                    "material_gold": "\u00a7p",
+                    "material_emerald": "\u00a7q",
+                    "material_diamond": "\u00a7s",
+                    "material_lapis": "\u00a7t",
+                    "material_amethyst": "\u00a7u",
+                    "material_resin": "\u00a7v",
+                    "party_blue": "\u00a7w"
+                }
+            },
+            "serialized_example": {
+                "value": "aqua"
+            },
+            "source": "src/item/component/HoverTextColorComponent.php",
+            "source_sha256": "298272e293d164f70b96267640f0e78f3610366f2006df64481badb58f0862a3",
+            "constructor": "\tpublic function __construct(string $hoverTextColor) {\n\t\t$this->hoverTextColor = $hoverTextColor;\n\t}\n"
+        },
+        "icon": {
+            "class": "customiesdevs\\customies\\item\\component\\IconComponent",
+            "name": "minecraft:icon",
+            "parameters": [
+                {
+                    "name": "default_texture",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "the texture name should same as the `resource_pack/textures/item_texture.json` `texture_data`"
+                },
+                {
+                    "name": "dyed_texture",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "Default is set to `None`"
+                },
+                {
+                    "name": "trim_texture",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "Default is set to `None`"
+                },
+                {
+                    "name": "bundle_open_back_texture",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "Default is set to `None`"
+                },
+                {
+                    "name": "bundle_open_front_texture",
+                    "type": "string",
+                    "required": false,
+                    "default": "",
+                    "default_constant": null,
+                    "description": "Default is set to `None`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "textures": {
+                    "default": "showcase_prism"
+                }
+            },
+            "source": "src/item/component/IconComponent.php",
+            "source_sha256": "9c6a2d40caa26e33bba8d085a88bdc008026dde901e7f2daadf3d642e40c11fa",
+            "constructor": "\tpublic function __construct(\n\t\tstring $default_texture, \n\t\tstring $dyed_texture = \"\", \n\t\tstring $trim_texture = \"\", \n\t\tstring $bundle_open_back_texture = \"\", \n\t\tstring $bundle_open_front_texture = \"\"\n\t) {\n\t\t$this->default_texture = $default_texture;\n\t\t$this->dyed_texture = $dyed_texture;\n\t\t$this->trim_texture = $trim_texture;\n\t\t$this->bundle_open_back_texture = $bundle_open_back_texture;\n\t\t$this->bundle_open_front_texture = $bundle_open_front_texture;\n\t}\n"
+        },
+        "interact_button": {
+            "class": "customiesdevs\\customies\\item\\component\\InteractButtonComponent",
+            "name": "minecraft:interact_button",
+            "parameters": [
+                {
+                    "name": "interactButton",
+                    "type": "string|bool",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "*/"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "interact_text": "Inspect",
+                "requires_interact": true
+            },
+            "source": "src/item/component/InteractButtonComponent.php",
+            "source_sha256": "88e173de0dba2cf50c78b5a26319071a366f51420ec443d846c62153fbe666e4",
+            "constructor": "\tpublic function __construct(bool|string $interactButton) {\n\t\tif(is_bool($interactButton) === true){\n\t\t\t$this->interactButton = \"action.interact.use\";\n\t\t}else{\n\t\t\t$this->interactButton = (string) $interactButton;\n\t\t}\n\t}\n"
+        },
+        "item_tags": {
+            "class": "customiesdevs\\customies\\item\\component\\ItemTagsComponent",
+            "name": "minecraft:tags",
+            "parameters": [
+                {
+                    "name": "tags",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "An array that can contain multiple item tags."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "tags": [
+                    "showcase:specimen"
+                ]
+            },
+            "source": "src/item/component/ItemTagsComponent.php",
+            "source_sha256": "4402672a3779d711efbee6f865512461e1b36aaa8d26bcdcb0a5aac7325ac8a5",
+            "constructor": "\tpublic function __construct(array $tags = []) {\n\t\tforeach($tags as $tag){\n\t\t\tif(!is_string($tag)){\n\t\t\t\tthrow new \\InvalidArgumentException('All tags must be strings');\n\t\t\t}\n\t\t}\n\t\t$this->tags = $tags;\n\t}\n"
+        },
+        "kinetic_weapon": {
+            "class": "customiesdevs\\customies\\item\\component\\KineticWeaponComponent",
+            "name": "minecraft:kinetic_weapon",
+            "parameters": [
+                {
+                    "name": "creativeReach",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max": 7.5,
+                        "min": 2
+                    },
+                    "default_constant": null,
+                    "description": "The reach of the weapon in creative mode"
+                },
+                {
+                    "name": "damageConditions",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max_duration": 300,
+                        "min_relative_speed": 4.6,
+                        "min_speed": 0
+                    },
+                    "default_constant": null,
+                    "description": "Conditions that must be met for the weapon to deal damage"
+                },
+                {
+                    "name": "damageModifier",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "A flat modifier added to the damage dealt by the weapon"
+                },
+                {
+                    "name": "damageMultiplier",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.7,
+                    "default_constant": null,
+                    "description": "A multiplier applied to the damage dealt by the weapon"
+                },
+                {
+                    "name": "delay",
+                    "type": "int",
+                    "required": false,
+                    "default": 15,
+                    "default_constant": null,
+                    "description": "The delay between uses of the weapon, in ticks"
+                },
+                {
+                    "name": "dismountConditions",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max_duration": 100,
+                        "min_relative_speed": 0,
+                        "min_speed": 14
+                    },
+                    "default_constant": null,
+                    "description": "Conditions that must be met for the weapon to dismount entities"
+                },
+                {
+                    "name": "hitboxMargin",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.25,
+                    "default_constant": null,
+                    "description": "The margin added to the hitbox of the weapon"
+                },
+                {
+                    "name": "knockbackConditions",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max_duration": 130,
+                        "min_relative_speed": 0,
+                        "min_speed": 5.1
+                    },
+                    "default_constant": null,
+                    "description": "Conditions that must be met for the weapon to apply knockback"
+                },
+                {
+                    "name": "reach",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max": 4.5,
+                        "min": 2
+                    },
+                    "default_constant": null,
+                    "description": "The reach of the weapon in survival mode"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "minecraft:kinetic_weapon": {
+                    "creative_reach": {
+                        "max": 7.5,
+                        "min": 2
+                    },
+                    "damage_conditions": {
+                        "max_duration": 300,
+                        "min_relative_speed": 4.6,
+                        "min_speed": 0
+                    },
+                    "damage_modifier": 0,
+                    "damage_multiplier": 0.7,
+                    "delay": 15,
+                    "dismount_conditions": {
+                        "max_duration": 100,
+                        "min_relative_speed": 0,
+                        "min_speed": 14
+                    },
+                    "hitbox_margin": 0.25,
+                    "knockback_conditions": {
+                        "max_duration": 130,
+                        "min_relative_speed": 0,
+                        "min_speed": 5.1
+                    },
+                    "reach": {
+                        "max": 4.5,
+                        "min": 2
+                    }
+                }
+            },
+            "source": "src/item/component/KineticWeaponComponent.php",
+            "source_sha256": "2286bd2963127595d00ae6eb1f4b2ef729730eb66688ff3d17b10cc68f89494e",
+            "constructor": "\tpublic function __construct(\n\t\tarray $creativeReach = ['max' => 7.5, 'min' => 2.0],\n\t\tarray $damageConditions = [\n\t\t\t'max_duration' => 300,\n\t\t\t'min_relative_speed' => 4.6,\n\t\t\t'min_speed' => 0.0\n\t\t],\n\t\tfloat $damageModifier = 0.0,\n\t\tfloat $damageMultiplier = 0.7,\n\t\tint $delay = 15,\n\t\tarray $dismountConditions = [\n\t\t\t'max_duration' => 100,\n\t\t\t'min_relative_speed' => 0.0,\n\t\t\t'min_speed' => 14.0\n\t\t],\n\t\tfloat $hitboxMargin = 0.25,\n\t\tarray $knockbackConditions = [\n\t\t\t'max_duration' => 130,\n\t\t\t'min_relative_speed' => 0.0,\n\t\t\t'min_speed' => 5.1\n\t\t],\n\t\tarray $reach = ['max' => 4.5, 'min' => 2.0]\n\t) {\n\t\t$this->creativeReach = self::validateRange($creativeReach, 'creative_reach');\n\t\t$this->reach = self::validateRange($reach, 'reach');\n\t\t$this->damageConditions = self::validateConditions($damageConditions, 'damage_conditions');\n\t\t$this->dismountConditions = self::validateConditions($dismountConditions, 'dismount_conditions');\n\t\t$this->knockbackConditions = self::validateConditions($knockbackConditions, 'knockback_conditions');\n\t\t$this->damageModifier = $damageModifier;\n\t\t$this->damageMultiplier = $damageMultiplier;\n\t\t$this->delay = $delay;\n\t\t$this->hitboxMargin = $hitboxMargin;\n\t}\n"
+        },
+        "liquid_clipped": {
+            "class": "customiesdevs\\customies\\item\\component\\LiquidClippedComponent",
+            "name": "minecraft:liquid_clipped",
+            "parameters": [
+                {
+                    "name": "liquidClipped",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "If the item interacts with liquid blocks on use"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/LiquidClippedComponent.php",
+            "source_sha256": "3d7b7bd8907eab899fb5b15bafe4ed6dee7e79a687e5a3c96856346ffc2bd8c3",
+            "constructor": "\tpublic function __construct(bool $liquidClipped = true) {\n\t\t$this->liquidClipped = $liquidClipped;\n\t}\n"
+        },
+        "max_stack_size": {
+            "class": "customiesdevs\\customies\\item\\component\\MaxStackSizeComponent",
+            "name": "minecraft:max_stack_size",
+            "parameters": [
+                {
+                    "name": "maxStackSize",
+                    "type": "int",
+                    "required": false,
+                    "default": 64,
+                    "default_constant": null,
+                    "description": "Max Size, Default is set to `64`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": 16
+            },
+            "source": "src/item/component/MaxStackSizeComponent.php",
+            "source_sha256": "55ff84b54b2e9db15258e264b87ef84e6af730e77c863ac0f18dde32f326e084",
+            "constructor": "\tpublic function __construct(int $maxStackSize = 64) {\n\t\tif($maxStackSize < 1 || $maxStackSize > 64){\n\t\t\tthrow new \\InvalidArgumentException(\"Max stack size must be between 1 and 64, $maxStackSize given.\");\n\t\t}\n\t\t$this->maxStackSize = $maxStackSize;\n\t}\n"
+        },
+        "piercing_weapon": {
+            "class": "customiesdevs\\customies\\item\\component\\PiercingWeaponComponent",
+            "name": "minecraft:piercing_weapon",
+            "parameters": [
+                {
+                    "name": "creativeReach",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max": 7.5,
+                        "min": 2
+                    },
+                    "default_constant": null,
+                    "description": "The reach of the weapon in creative mode"
+                },
+                {
+                    "name": "hitboxMargin",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.25,
+                    "default_constant": null,
+                    "description": "The margin added to the hitbox of the weapon"
+                },
+                {
+                    "name": "reach",
+                    "type": "array",
+                    "required": false,
+                    "default": {
+                        "max": 4.5,
+                        "min": 2
+                    },
+                    "default_constant": null,
+                    "description": "The reach of the weapon in survival mode"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "creative_reach": {
+                    "max": 7.5,
+                    "min": 2
+                },
+                "hitbox_margin": 0.25,
+                "reach": {
+                    "max": 4.5,
+                    "min": 2
+                }
+            },
+            "source": "src/item/component/PiercingWeaponComponent.php",
+            "source_sha256": "5c064ab919972c0fede1a59b19d91bec06ce438eec7291df03556fcd83d1696c",
+            "constructor": "\tpublic function __construct(\n\t\tarray $creativeReach = ['max' => 7.5, 'min' => 2.0],\n\t\tfloat $hitboxMargin = 0.25,\n\t\tarray $reach = ['max' => 4.5, 'min' => 2.0]\n\t) {\n\t\t$this->creativeReach = self::validateRange($creativeReach, 'creative_reach');\n\t\t$this->reach = self::validateRange($reach, 'reach');\n\t\t$this->hitboxMargin = $hitboxMargin;\n\t}\n"
+        },
+        "projectile": {
+            "class": "customiesdevs\\customies\\item\\component\\ProjectileComponent",
+            "name": "minecraft:projectile",
+            "parameters": [
+                {
+                    "name": "minimumCriticalPower",
+                    "type": "float",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Specifies how long a player must charge a projectile for it to critically hit"
+                },
+                {
+                    "name": "projectileEntity",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Which entity is to be fired as a projectile"
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "ENTITY_ARROW": "minecraft:arrow<>",
+                "ENTITY_WINDCHARGE": "minecraft:wind_charge_projectile<>"
+            },
+            "serialized_example": {
+                "minimum_critical_power": 0.25,
+                "projectile_entity": "minecraft:snowball"
+            },
+            "source": "src/item/component/ProjectileComponent.php",
+            "source_sha256": "3fd5c5930f551b9218aa12ea5fbb55ddf8f039e072aefa27ad9da9b3b3ef5ab1",
+            "constructor": "\tpublic function __construct(float $minimumCriticalPower, string $projectileEntity) {\n\t\t$this->minimumCriticalPower = $minimumCriticalPower;\n\t\t$this->projectileEntity = $projectileEntity;\n\t}\n"
+        },
+        "rarity": {
+            "class": "customiesdevs\\customies\\item\\component\\RarityComponent",
+            "name": "minecraft:rarity",
+            "parameters": [
+                {
+                    "name": "rarity",
+                    "type": "string",
+                    "required": false,
+                    "default": "common",
+                    "default_constant": "self::COMMON",
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "COMMON": "common",
+                "UNCOMMON": "uncommon",
+                "RARE": "rare",
+                "EPIC": "epic"
+            },
+            "serialized_example": {
+                "value": "rare"
+            },
+            "source": "src/item/component/RarityComponent.php",
+            "source_sha256": "7291658edcc92e97c04671f4e655b04fb3b39df5ae02b71d912e909b5695ebb2",
+            "constructor": "\tpublic function __construct(string $rarity = self::COMMON) {\n\t\t$this->rarity = $rarity;\n\t}\n"
+        },
+        "record": {
+            "class": "customiesdevs\\customies\\item\\component\\RecordComponent",
+            "name": "minecraft:record",
+            "parameters": [
+                {
+                    "name": "comparatorSignal",
+                    "type": "int",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Specifies signal strength for comparator blocks to use, from 1 - 13"
+                },
+                {
+                    "name": "duration",
+                    "type": "float",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Specifies duration of sound event in seconds, float value"
+                },
+                {
+                    "name": "soundEvent",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Sound event type: 13, cat, blocks, chirp, far, mall, mellohi, stal, strad, ward, 11, wait, pigstep, otherside, 5, relic"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "comparator_signal": 5,
+                "duration": 1,
+                "sound_event": "showcase.chime"
+            },
+            "source": "src/item/component/RecordComponent.php",
+            "source_sha256": "2de4c9727cb6d884a44b1027f60e1607f3830377adabeea229b07470416c83e3",
+            "constructor": "\tpublic function __construct(int $comparatorSignal, float $duration, string $soundEvent) {\n\t\t$this->comparatorSignal = $comparatorSignal;\n\t\t$this->duration = $duration;\n\t\t$this->soundEvent = $soundEvent;\n\t}\n"
+        },
+        "repairable": {
+            "class": "customiesdevs\\customies\\item\\component\\RepairableComponent",
+            "name": "minecraft:repairable",
+            "parameters": [
+                {
+                    "name": "repairItems",
+                    "type": "array",
+                    "required": false,
+                    "default": [],
+                    "default_constant": null,
+                    "description": "List of repair item entries. Each entry needs to define a list of strings for items that can be used for the repair and an optional repair_amount for how much durability is gained."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "repair_items": [
+                    {
+                        "items": [
+                            {
+                                "name": "minecraft:amethyst_shard"
+                            }
+                        ],
+                        "repair_amount": 64
+                    }
+                ]
+            },
+            "source": "src/item/component/RepairableComponent.php",
+            "source_sha256": "185ce28f463109e151fe4785f06f3c4f732aab2c4ea37c87fd283545d5a2b967",
+            "constructor": "\tpublic function __construct(\n\t\tprivate readonly array $repairItems = [],\n\t) {}\n"
+        },
+        "shooter": {
+            "class": "customiesdevs\\customies\\item\\component\\ShooterComponent",
+            "name": "minecraft:shooter",
+            "parameters": [
+                {
+                    "name": "item",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Ammunition item"
+                },
+                {
+                    "name": "useOffhand",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Can use off-hand? Default is set to false"
+                },
+                {
+                    "name": "searchInventory",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Can search inventory? Default is set to fals"
+                },
+                {
+                    "name": "useInCreative",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Can use in creative mode? Default is set to false"
+                },
+                {
+                    "name": "chargeOnDraw",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Charge on draw? Default is set to false"
+                },
+                {
+                    "name": "maxDrawDuration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "Draw Duration. Default is set to 0"
+                },
+                {
+                    "name": "scalePowerByDrawDuration",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Scale power by draw duration? Default is set to false"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "ammunition": [
+                    {
+                        "item": {
+                            "name": "minecraft:arrow"
+                        },
+                        "use_offhand": false,
+                        "search_inventory": true,
+                        "use_in_creative": false
+                    }
+                ],
+                "charge_on_draw": true,
+                "max_draw_duration": 1,
+                "scale_power_by_draw_duration": true
+            },
+            "source": "src/item/component/ShooterComponent.php",
+            "source_sha256": "21d5b32b9d8da12d955fa04308b8c41d45c010e7bb659cae15e39d48ef963a28",
+            "constructor": "\tpublic function __construct(\n\t\tstring $item,\n\t\tbool $useOffhand = false, \n\t\tbool $searchInventory = false, \n\t\tbool $useInCreative = false, \n\t\tbool $chargeOnDraw = false, \n\t\tfloat $maxDrawDuration = 0.0, \n\t\tbool $scalePowerByDrawDuration = false\n\t) {\n\t\t$this->item = $item;\n\t\t$this->useOffhand = $useOffhand;\n\t\t$this->searchInventory = $searchInventory;\n\t\t$this->useInCreative = $useInCreative;\n\t\t$this->chargeOnDraw = $chargeOnDraw;\n\t\t$this->maxDrawDuration = $maxDrawDuration;\n\t\t$this->scalePowerByDrawDuration = $scalePowerByDrawDuration;\n\t}\n"
+        },
+        "should_despawn": {
+            "class": "customiesdevs\\customies\\item\\component\\ShouldDespawnComponent",
+            "name": "minecraft:should_despawn",
+            "parameters": [
+                {
+                    "name": "shouldDespawn",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "item should eventually despawn while floating in the world, Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": false
+            },
+            "source": "src/item/component/ShouldDespawnComponent.php",
+            "source_sha256": "e22faaf8cca4f69bbe2294fa2c032607e9d3bfcd5727130546362a5519aff490",
+            "constructor": "\tpublic function __construct(bool $shouldDespawn = true) {\n\t\t$this->shouldDespawn = $shouldDespawn;\n\t}\n"
+        },
+        "stacked_by_data": {
+            "class": "customiesdevs\\customies\\item\\component\\StackedByDataComponent",
+            "name": "minecraft:stacked_by_data",
+            "parameters": [
+                {
+                    "name": "stackedByData",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Should item stack, Default is set to `true`"
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": true
+            },
+            "source": "src/item/component/StackedByDataComponent.php",
+            "source_sha256": "b21d6a5c8378272812287ab782353a7b303b55413d35bd129161da0646c208d3",
+            "constructor": "\tpublic function __construct(bool $stackedByData = true) {\n\t\t$this->stackedByData = $stackedByData;\n\t}\n"
+        },
+        "storage_item": {
+            "class": "customiesdevs\\customies\\item\\component\\StorageItemComponent",
+            "name": "minecraft:storage_item",
+            "parameters": [
+                {
+                    "name": "allowNestedStorageItems",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Determines whether another Storage Item is allowed inside of this item. Default is true."
+                },
+                {
+                    "name": "maxSlots",
+                    "type": "int",
+                    "required": false,
+                    "default": 64,
+                    "default_constant": null,
+                    "description": "The maximum allowed weight of the sum of all contained items. Maximum is 64. Default is 64. Value must be >= 0."
+                }
+            ],
+            "methods": [
+                {
+                    "name": "allowItem",
+                    "parameters": [
+                        {
+                            "name": "items",
+                            "type": "pocketmine\\item\\Item|array",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * List of items that are exclusively allowed in this Storage Item.\n\t * If empty, all items are allowed.\n\t * @param Item|Item[] $items\n\t */"
+                },
+                {
+                    "name": "banItem",
+                    "parameters": [
+                        {
+                            "name": "items",
+                            "type": "pocketmine\\item\\Item|array",
+                            "required": true,
+                            "default": null
+                        }
+                    ],
+                    "return_type": "self",
+                    "documentation": "/**\n\t * List of items that are NOT allowed in this Storage Item.\n\t * @param Item|Item[] $items\n\t */"
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "allow_nested_storage_items": false,
+                "allowed_items": [],
+                "banned_items": [],
+                "max_slots": 16
+            },
+            "source": "src/item/component/StorageItemComponent.php",
+            "source_sha256": "9288763dd66b0453ada591fb8998f002fdd0c80375bd09256fa06e2c2b26aa6f",
+            "constructor": "\tpublic function __construct(\n\t\tbool $allowNestedStorageItems = true,\n\t\tint $maxSlots = 64\n\t) {\n\t\tif($maxSlots < 0 || $maxSlots > 64){\n\t\t\tthrow new \\InvalidArgumentException('maxSlots must be between 0 and 64');\n\t\t}\n\t\t$this->allowNestedStorageItems = $allowNestedStorageItems;\n\t\t$this->maxSlots = $maxSlots;\n\t}\n"
+        },
+        "storage_weight_limit": {
+            "class": "customiesdevs\\customies\\item\\component\\StorageWeightLimitComponent",
+            "name": "minecraft:storage_weight_limit",
+            "parameters": [
+                {
+                    "name": "maxWeightLimit",
+                    "type": "int",
+                    "required": false,
+                    "default": 64,
+                    "default_constant": null,
+                    "description": "The maximum allowed weight of the sum of all contained items. Maximum is 64. Default is 64. Value must be >= 0."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "max_weight_limit": 64
+            },
+            "source": "src/item/component/StorageWeightLimitComponent.php",
+            "source_sha256": "478558df84073f8a2839594bb32f0c8661e465dd296b4195f8e37454687d75ba",
+            "constructor": "\tpublic function __construct(int $maxWeightLimit = 64) {\n\t\tif($maxWeightLimit < 0 || $maxWeightLimit > 64){\n\t\t\tthrow new \\InvalidArgumentException('maxWeightLimit must be between 0 and 64');\n\t\t}\n\t\t$this->maxWeightLimit = $maxWeightLimit;\n\t}\n"
+        },
+        "storage_weight_modifier": {
+            "class": "customiesdevs\\customies\\item\\component\\StorageWeightModifierComponent",
+            "name": "minecraft:storage_weight_modifier",
+            "parameters": [
+                {
+                    "name": "weightInStorageItem",
+                    "type": "int",
+                    "required": false,
+                    "default": 4,
+                    "default_constant": null,
+                    "description": "The weight of this item when inside another Storage Item. Default is 4. 0 means item is not allowed in another Storage Item."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "weight_in_storage_item": 8
+            },
+            "source": "src/item/component/StorageWeightModifierComponent.php",
+            "source_sha256": "f2c72f451b1f941e5ac2982111507d5d7585ff7851a2248bddcaf8fc9448f466",
+            "constructor": "\tpublic function __construct(int $weightInStorageItem = 4) {\n\t\tif($weightInStorageItem < 0){\n\t\t\tthrow new \\InvalidArgumentException('weightInStorageItem must be >= 0');\n\t\t}\n\t\t$this->weightInStorageItem = $weightInStorageItem;\n\t}\n"
+        },
+        "swing_duration": {
+            "class": "customiesdevs\\customies\\item\\component\\SwingDurationComponent",
+            "name": "minecraft:swing_duration",
+            "parameters": [
+                {
+                    "name": "swingDuration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0.3,
+                    "default_constant": null,
+                    "description": "Duration, in seconds, of the item's swing animation played when mining or attacking. Affects visuals only and does not impact attack frequency or other gameplay mechanics. Default value: 0.3."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "value": 0.5
+            },
+            "source": "src/item/component/SwingDurationComponent.php",
+            "source_sha256": "d03b913b7758b446aac43ccdeac727872ed15d3e7d9abd8ce5d033757a6cabbc",
+            "constructor": "\tpublic function __construct(float $swingDuration = 0.3) {\n\t\tif($swingDuration < 0){\n\t\t\tthrow new \\InvalidArgumentException(\"Swing duration must be a positive number, $swingDuration given\");\n\t\t}\n\t\t$this->swingDuration = $swingDuration;\n\t}\n"
+        },
+        "swing_sounds": {
+            "class": "customiesdevs\\customies\\item\\component\\SwingSoundsComponent",
+            "name": "minecraft:swing_sounds",
+            "parameters": [
+                {
+                    "name": "critical",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "required": false,
+                    "default": "attack.critical",
+                    "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_CRITICAL",
+                    "description": ""
+                },
+                {
+                    "name": "hit",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "required": false,
+                    "default": "attack.strong",
+                    "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_STRONG",
+                    "description": ""
+                },
+                {
+                    "name": "miss",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "required": false,
+                    "default": "attack.nodamage",
+                    "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_NODAMAGE",
+                    "description": ""
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "attack_critical_hit": "attack.critical",
+                "attack_hit": "attack.strong",
+                "attack_miss": "attack.nodamage"
+            },
+            "source": "src/item/component/SwingSoundsComponent.php",
+            "source_sha256": "bb64c91d04b4ff8937652cdac26d4a5af8fa3da48f8a64f58499031cef3d7de0",
+            "constructor": "\tpublic function __construct(\n\t\tprivate SoundEvent $critical = SoundEvent::ATTACK_CRITICAL,\n\t\tprivate SoundEvent $hit = SoundEvent::ATTACK_STRONG,\n\t\tprivate SoundEvent $miss = SoundEvent::ATTACK_NODAMAGE,\n\t) {}\n"
+        },
+        "throwable": {
+            "class": "customiesdevs\\customies\\item\\component\\ThrowableComponent",
+            "name": "minecraft:throwable",
+            "parameters": [
+                {
+                    "name": "doSwingAnimation",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Determines whether the item should use the swing animation when thrown. Default is set to false."
+                },
+                {
+                    "name": "launchPowerScale",
+                    "type": "float",
+                    "required": false,
+                    "default": 1,
+                    "default_constant": null,
+                    "description": "The scale at which the power of the throw increases. Default is set to 1.0."
+                },
+                {
+                    "name": "maxDrawDuration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "The maximum duration to draw a throwable item. Default is set to 0.0."
+                },
+                {
+                    "name": "maxLaunchPower",
+                    "type": "float",
+                    "required": false,
+                    "default": 1,
+                    "default_constant": null,
+                    "description": "The maximum power to launch the throwable item. Default is set to 1.0."
+                },
+                {
+                    "name": "minDrawDuration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "The minimum duration to draw a throwable item. Default is set to 0.0."
+                },
+                {
+                    "name": "scalePowerByDrawDuration",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Whether or not the power of the throw increases with duration charged. Default is set to false."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "do_swing_animation": true,
+                "launch_power_scale": 1,
+                "max_draw_duration": 1,
+                "max_launch_power": 1.5,
+                "min_draw_duration": 0,
+                "scale_power_by_draw_duration": false
+            },
+            "source": "src/item/component/ThrowableComponent.php",
+            "source_sha256": "1ba79c75601be91fa5397b09a950a0cd8a1233f3900ae1046fb744275f1d017b",
+            "constructor": "\tpublic function __construct(\n\t\tbool $doSwingAnimation = false, \n\t\tfloat $launchPowerScale = 1.0, \n\t\tfloat $maxDrawDuration = 0.0, \n\t\tfloat $maxLaunchPower = 1.0, \n\t\tfloat $minDrawDuration = 0.0, \n\t\tbool $scalePowerByDrawDuration = false\n\t) {\n\t\t$this->doSwingAnimation = $doSwingAnimation;\n\t\t$this->launchPowerScale = $launchPowerScale;\n\t\t$this->maxDrawDuration = $maxDrawDuration;\n\t\t$this->maxLaunchPower = $maxLaunchPower;\n\t\t$this->minDrawDuration = $minDrawDuration;\n\t\t$this->scalePowerByDrawDuration = $scalePowerByDrawDuration;\n\t}\n"
+        },
+        "use_animation": {
+            "class": "customiesdevs\\customies\\item\\component\\UseAnimationComponent",
+            "name": "minecraft:use_animation",
+            "parameters": [
+                {
+                    "name": "animation",
+                    "type": "string",
+                    "required": false,
+                    "default": "none",
+                    "default_constant": "self::ANIMATION_NONE",
+                    "description": "Specifies which animation to play when the the item is used."
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "ANIMATION_NONE": "none",
+                "ANIMATION_EAT": "eat",
+                "ANIMATION_DRINK": "drink",
+                "ANIMATION_BLOCK": "block",
+                "ANIMATION_BOW": "bow",
+                "ANIMATION_CAMERA": "camera",
+                "ANIMATION_SPEAR": "spear",
+                "ANIMATION_CROSSBOW": "crossbow",
+                "ANIMATION_SPYGLASS": "spyglass",
+                "ANIMATION_BRUSH": "brush",
+                "STRING_TO_INT": {
+                    "none": 0,
+                    "eat": 1,
+                    "drink": 2,
+                    "block": 3,
+                    "bow": 4,
+                    "camera": 5,
+                    "spear": 6,
+                    "crossbow": 9,
+                    "spyglass": 10,
+                    "brush": 12
+                }
+            },
+            "serialized_example": {
+                "value": "drink"
+            },
+            "source": "src/item/component/UseAnimationComponent.php",
+            "source_sha256": "7a43b3b6c0b3fea07e843a14f55af3865a88e95923e0fee6d0c0db12e2258fa8",
+            "constructor": "\tpublic function __construct(string $animation = self::ANIMATION_NONE) {\n\t\t$this->animation = $animation;\n\t}\n"
+        },
+        "use_modifiers": {
+            "class": "customiesdevs\\customies\\item\\component\\UseModifiersComponent",
+            "name": "minecraft:use_modifiers",
+            "parameters": [
+                {
+                    "name": "movementModifier",
+                    "type": "float",
+                    "required": false,
+                    "default": 1,
+                    "default_constant": null,
+                    "description": "Modifier applied to player movement speed"
+                },
+                {
+                    "name": "useDuration",
+                    "type": "float",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "How long the item takes to use (seconds)"
+                },
+                {
+                    "name": "emitVibrations",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Whether the item emits vibration events"
+                },
+                {
+                    "name": "startSound",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string|null",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Sound played when item starts being used."
+                },
+                {
+                    "name": "startUsing",
+                    "type": "string",
+                    "required": false,
+                    "default": "always",
+                    "default_constant": null,
+                    "description": "When use should start: \"always\" or \"if_first\"."
+                }
+            ],
+            "methods": [],
+            "constants": [],
+            "serialized_example": {
+                "emit_vibrations": false,
+                "movement_modifier": 0.5,
+                "use_duration": 1.6,
+                "start_using": "always"
+            },
+            "source": "src/item/component/UseModifiersComponent.php",
+            "source_sha256": "42b377d6e0c1c1d0cee2a2b683ad8e2075c392527b0564d702f07fedb2724a94",
+            "constructor": "\tpublic function __construct(\n\t\tfloat $movementModifier = 1.0,\n\t\tfloat $useDuration = 0.0,\n\t\tbool $emitVibrations = false,\n\t\tSoundEvent|string|null $startSound = null,\n\t\tstring $startUsing = 'always'\n\t) {\n\t\tif(!in_array($startUsing, ['always', 'if_first'], true)){\n\t\t\tthrow new \\InvalidArgumentException('startUsing must be either \"always\" or \"if_first\", got \"' . $startUsing . '\"');\n\t\t}\n\t\t$this->movementModifier = $movementModifier;\n\t\t$this->useDuration = $useDuration;\n\t\t$this->emitVibrations = $emitVibrations;\n\t\t$this->startSound = $startSound instanceof SoundEvent ? (string) $startSound->value : $startSound;\n\t\t$this->startUsing = $startUsing;\n\t}\n"
+        },
+        "wearable": {
+            "class": "customiesdevs\\customies\\item\\component\\WearableComponent",
+            "name": "minecraft:wearable",
+            "parameters": [
+                {
+                    "name": "slot",
+                    "type": "string",
+                    "required": true,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Specifies where the item can be worn. If any non-hand slot is chosen, the max stack size is set to 1."
+                },
+                {
+                    "name": "protection",
+                    "type": "int",
+                    "required": false,
+                    "default": 0,
+                    "default_constant": null,
+                    "description": "How much protection the wearable item provides. Default is set to 0."
+                },
+                {
+                    "name": "hidePlayerLocation",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Determines whether the Player's location is hidden on Locator Maps and the Locator Bar when the wearable item is worn. Default is false."
+                }
+            ],
+            "methods": [],
+            "constants": {
+                "SLOT_ARMOR_HEAD": "slot.armor.head",
+                "SLOT_ARMOR_CHEST": "slot.armor.chest",
+                "SLOT_ARMOR_LEGS": "slot.armor.legs",
+                "SLOT_ARMOR_FEET": "slot.armor.feet",
+                "SLOT_BODY": "slot.armor.body",
+                "SLOT_WEAPON_MAIN_HAND": "slot.weapon.mainhand",
+                "SLOT_WEAPON_OFF_HAND": "slot.weapon.offhand"
+            },
+            "serialized_example": {
+                "slot": "slot.armor.head",
+                "protection": 2,
+                "hides_player_location": false
+            },
+            "source": "src/item/component/WearableComponent.php",
+            "source_sha256": "0b682c6823efb03967df4f814ac852078fef1afdff9679e2fc3d363799940784",
+            "constructor": "\tpublic function __construct(string $slot, int $protection = 0, bool $hidePlayerLocation = false) {\n\t\tif($protection < 0){\n\t\t\tthrow new \\InvalidArgumentException('protection must be >= 0');\n\t\t}\t\n\t\t$this->slot = $slot;\n\t\t$this->protection = $protection;\n\t\t$this->hidePlayerLocation = $hidePlayerLocation;\n\t}\n"
+        }
+    }
+}

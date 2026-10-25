@@ -2,6 +2,11 @@
   'use strict';
   const $ = (s, root = document) => root.querySelector(s);
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const theme = $('#theme-toggle');
+  function applyTheme(mode){document.documentElement.dataset.theme=mode;theme?.setAttribute('aria-pressed',String(mode==='dark'));if(theme){theme.textContent=mode==='dark'?'☀':'◐';theme.setAttribute('aria-label',mode==='dark'?'Switch to light theme':'Switch to dark theme');}}
+  let savedTheme;try{savedTheme=localStorage.getItem('customies-theme');}catch{}
+  applyTheme(savedTheme || (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+  theme?.addEventListener('click',()=>{const mode=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme(mode);try{localStorage.setItem('customies-theme',mode);}catch{}});
   const menu = $('.menu-toggle');
   menu?.addEventListener('click', () => {
     const open = !$('#navigation').classList.contains('open');
