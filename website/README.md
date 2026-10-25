@@ -1,0 +1,66 @@
+# Customies field guide website
+
+Static, accessible GitHub Pages documentation generated from repository sources.
+No analytics, external fonts, runtime framework or backend is required. Markdown
+guide content remains the source of truth; catalog examples, gallery entries,
+textures and interactive footprint models come from the showcase.
+
+## Build and preview
+
+```text
+python -m pip install -r website/requirements.txt
+python examples/CustomiesShowcase/tools/build.py --php php
+python website/build.py --downloads examples/CustomiesShowcase/dist
+python website/check.py
+python -m http.server 8765 --bind 127.0.0.1 --directory website/dist
+```
+
+Open http://127.0.0.1:8765/. Build output is ignored. Omit `--downloads` for a
+source-only site; download links appear only when the corresponding files exist.
+Build into a clean output directory if changing download modes, so old artifacts
+are not retained. Artifact mode uses the pack builder's SHA256SUMS for validation.
+
+## Publishing on GitHub Pages
+
+Repository: `HydroGames-dev/Customies-lotl`.
+Expected URL: https://hydrogames-dev.github.io/Customies-lotl/
+
+The workflow `.github/workflows/pages.yml` builds PHARs/resource packs, generates
+and checks the website, uploads the artifact, then deploys it with the official
+GitHub Pages actions. It runs for the documentation feature branch and the default
+branch, and can also be run manually. Pull requests build/check without deploying.
+
+One-time repository setup, if Pages is not enabled:
+
+1. Open repository **Settings → Pages**.
+2. Set **Build and deployment → Source → GitHub Actions**.
+3. In **Settings → Environments → github-pages**, ensure the publishing branch is
+   allowed by deployment branch rules. This work currently lives on
+   `feat/block-traits-presets`; after merging, use the default branch policy.
+4. Re-run the Pages workflow. Its deployment output gives the actual live URL.
+
+If a prebuilt `gh-pages` branch is provided instead, you may choose **Deploy from
+a branch → gh-pages → /(root)**. Do not enable both publication methods at once;
+disable the workflow deployment job if retaining branch publication.
+The initial prebuilt branch is a snapshot; switch to Actions for automatic updates
+from guide/catalog source changes.
+
+The connected repository tools do not expose Pages administration. A signed-in
+repository administrator may need to make that one-time setting change. Do not
+interpret an uploaded branch or artifact as proof the public URL is live.
+
+## Editing
+
+- `docs/customies-guide.md`: canonical comprehensive guide.
+- `docs/traits-and-presets.md`: trait detail and compatibility boundaries.
+- `website/walkthroughs.md`: project-oriented walkthroughs.
+- `website/build.py`: page structure, catalog extraction and asset copying.
+- `website/style.css`: responsive documentation theme, print styles and reduced motion.
+- `website/app.js`: local search, copy controls, gallery filters and canvas previews.
+
+The canvas is an explanatory geometry viewer, not a Bedrock renderer or gameplay
+simulation. Powered preview colors are illustrative. Verify real textures,
+lighting, placement prediction and animation playback with a Minecraft client.
+PHP tutorial examples are checked by `tests/guide.php`; site generation and
+`check.py` check coverage and static navigation. No changes to server behavior are
+required to edit the website.

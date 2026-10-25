@@ -1,0 +1,72 @@
+name: Customies documentation
+
+on:
+  push:
+    branches: [master, main, feat/block-traits-presets]
+    paths:
+      - 'website/**'
+      - 'docs/**'
+      - 'src/**'
+      - 'examples/CustomiesShowcase/**'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths:
+      - 'website/**'
+      - 'docs/**'
+      - 'src/**'
+      - 'examples/CustomiesShowcase/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: customies-pages-${{ github.event_name == 'pull_request' && github.ref || 'production' }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: website/requirements.txt
+      - name: Install documentation dependencies
+        run: python -m pip install -r website/requirements.txt
+      - name: Build install bundle from committed assets
+        run: python examples/CustomiesShowcase/tools/build.py --php php
+      - name: Generate documentation and verify output
+        run: |
+          python website/build.py --downloads examples/CustomiesShowcase/dist
+          python website/check.py
+          node --check website/app.js
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: customies-documentation-preview
+          path: website/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Deploy documentation
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -10,6 +10,10 @@ A Axolotl-MP plugin that implements support for custom blocks, items and entitie
 
 Official Discord community chat for socializing, receiving help with the plugin, and sharing creations. Join in on the fun!
 
+## Documentation website
+
+The [Customies field guide](https://hydrogames-dev.github.io/Customies-lotl/) contains walkthroughs, all 75 component references, coding examples, an interactive asset gallery, downloads and operator guidance. GitHub Pages must be enabled for the public URL to work. See [website build and publishing instructions](website/README.md).
+
 ## Usage
 
 Start with the [developer and operator guide](docs/customies-guide.md), covering all components, examples, structures, performance and server sizing.
