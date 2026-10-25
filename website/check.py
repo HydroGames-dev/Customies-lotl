@@ -47,3 +47,17 @@ if (OUT/'downloads').exists():
     for line in (OUT/'downloads/SHA256SUMS.txt').read_text().splitlines():
         checksum,name=line.split();assert hashlib.sha256((OUT/'downloads'/name).read_bytes()).hexdigest()==checksum,'Download checksum mismatch'
 print(f'PASS: {len(documents)} pages, all internal links/anchors/resources, 139 specimens, 75 examples, 13 flipbooks, model/search data and download checksums.')
+
+# Library and demo content must remain separate in navigation, search and downloads.
+showcase={'showcase','showcase-install','showcase-walkthroughs','structures','gallery','showcase-downloads','showcase-validation'}
+for scope in ('customies','showcase'):
+    records=json.loads((OUT/f'assets/search-{scope}.json').read_text(encoding='utf-8'))
+    assert records and all(r['scope']==scope for r in records)
+    assert all((r['url'].split('.html')[0] in showcase)==(scope=='showcase') for r in records)
+for name in ('index','getting-started','coding','guide','assets','performance','downloads'):
+    page=(OUT/(name+'.html')).read_text(encoding='utf-8')
+    assert 'data-scope="customies"' in page
+    assert '/cshow give' not in page and 'CustomiesShowcase-install.zip' not in page
+assert '<canvas' not in (OUT/'index.html').read_text(encoding='utf-8')
+for name in showcase:assert 'data-scope="showcase"' in (OUT/(name+'.html')).read_text(encoding='utf-8')
+print('PASS: independent Customies/CustomiesShowcase navigation, search indexes, guides and downloads.')

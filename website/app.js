@@ -42,7 +42,7 @@
     if (!searchDialog.open) searchDialog.showModal();
     $('#site-search').focus();
     try {
-      searchIndex ??= fetch('assets/search.json').then(r => { if (!r.ok) throw Error(); return r.json(); });
+      searchIndex ??= fetch(`assets/search-${document.body.dataset.scope || 'customies'}.json`).then(r => { if (!r.ok) throw Error(); return r.json(); });
       await searchIndex;
     } catch { $('#search-status').textContent = 'Search could not load. Use the navigation or try reloading.'; searchIndex = null; }
   }

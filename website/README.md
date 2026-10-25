@@ -2,7 +2,7 @@
 
 Static, accessible GitHub Pages documentation generated from repository sources.
 No analytics, external fonts, runtime framework or backend is required. Markdown
-guide content remains the source of truth; catalog examples, gallery entries,
+library guide is independent of the optional example plugin. Catalog examples, gallery entries,
 textures and interactive footprint models come from the showcase.
 
 ## Build and preview
@@ -49,11 +49,22 @@ The connected repository tools do not expose Pages administration. A signed-in
 repository administrator may need to make that one-time setting change. Do not
 interpret an uploaded branch or artifact as proof the public URL is live.
 
+## Sections
+
+`index.html` is the Customies library Guide/Wiki. It documents installation, your own
+plugins, API components, resource packs, performance and troubleshooting.
+`showcase.html` is the separate CustomiesShowcase example section, with its own
+installation, walkthroughs, prefab demo, catalog, downloads and benchmark.
+Navigation, previous/next links, branding and search indexes are scoped to each
+section. The section switch explicitly links between them.
+
 ## Editing
 
-- `docs/customies-guide.md`: canonical comprehensive guide.
+- `website/core-guide.md`: library-only installation, architecture, resources and operations.
+- `docs/customies-guide.md`: source of reusable API tutorial/component material.
 - `docs/traits-and-presets.md`: trait detail and compatibility boundaries.
-- `website/walkthroughs.md`: project-oriented walkthroughs.
+- `website/walkthroughs.md`: library walkthroughs for your own plugin.
+- `website/showcase-walkthroughs.md`: walkthroughs of the optional demo implementation.
 - `website/build.py`: page structure, catalog extraction and asset copying.
 - `website/style.css`: responsive documentation theme, print styles and reduced motion.
 - `website/app.js`: local search, copy controls, gallery filters and canvas previews.
