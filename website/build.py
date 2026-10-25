@@ -180,4 +180,8 @@ for name in ['style.css','app.js','favicon.svg']:shutil.copy2(BASE/name,OUT/'ass
 (OUT/'.nojekyll').write_text('')
 (OUT/'404.html').write_text( '<!doctype html><html lang="en"><meta charset="utf-8"><title>Page not found · Customies</title><h1>Page not found</h1><p><a href="/Customies-lotl/">Return to the Customies field guide</a></p></html>',encoding='utf-8')
 (OUT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>https://hydrogames-dev.github.io/Customies-lotl/{key}.html</loc></url>' for key in PAGE_MAP)+'</urlset>')
+# Keep the static snapshot byte-consistent across Windows and Linux checkouts.
+for path in OUT.rglob('*'):
+    if path.is_file() and path.suffix in ('.html','.json','.css','.js','.svg','.xml','.txt'):
+        data=path.read_bytes();path.write_bytes(data.replace(b'\r\n',b'\n'))
 print(f'Built {len(pages)} documentation pages, {len(catalog)} gallery specimens, {len(flipbooks)} animated materials and {len(models)} interactive models -> {OUT}')
