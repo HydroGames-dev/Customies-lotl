@@ -14,8 +14,6 @@ Official Discord community chat for socializing, receiving help with the plugin,
 
 The usage guides have been moved to the [GithubPage](https://hydrogames-dev.github.io/Customies-lotl/)!
 
-Follow this Wiki https://github.com/nk-archives/Customies/wiki
-
 [![Mojang Item Docs](https://img.shields.io/badge/📖-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/itemreference/examples/itemcomponentlist?view=minecraft-bedrock-stable)
 [![Mojang Block Docs](https://img.shields.io/badge/📖-Microsoft_Docs-blue)](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable)
 
