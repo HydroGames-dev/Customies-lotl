@@ -39,6 +39,9 @@ def library_section(*names):
     return '\n\n'.join(result)
 coding_source=library_section('Create a working block','Create a working item')
 states_source=library_section('States, rotation and permutations')
+states_source=re.sub(r'State combinations multiply:.*?(?=\n\n|$)',"State combinations multiply: four directions and two power values create eight runtime variants. Adding sixteen charge values increases that to 128. Keep continuous counters and inventory data in appropriate server storage instead of unnecessary block states.",states_source,flags=re.S)
+states_source+='\n\n## Native multi-block boundaries\n\nThe native multi-block trait handles straight chains of 2-4 parts. Only cardinal placement direction may accompany it; movement must be immovable or popped. Larger or non-linear footprints require placement, grouping and persistence logic in your own content plugin. They are not automatically provided by the native trait.'
+
 block_source=library_section('Every block component')
 item_source=library_section('Every item component')
 core_walkthrough=(BASE/'walkthroughs.md').read_text(encoding='utf-8')
