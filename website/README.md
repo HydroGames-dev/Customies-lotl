@@ -93,3 +93,23 @@ adds purpose, behavior boundaries, combinations, pitfalls and source references;
 `articles/` contains the independent conceptual guides. The visual hierarchy is
 inspired by Bedrock Wiki, with original styling, topic folders, article outlines
 and a persisted light/dark preference. Showcase keeps its independent scope.
+
+## Guides and browser tools
+
+Architecture, persistence, maintaining your own fork, tooling and additional
+project tutorials live in `articles/`. The library and example scopes remain
+independent. `tool_pages.py` supplies five local tool UIs; `tools-lib.js` contains
+pure calculations/validation/generation and `tools.js` binds the forms. Inputs
+are not uploaded. `tools.test.cjs` checks valid and invalid cases in CI.
+
+For host integration checks of generated starter code and the charged-item guide:
+
+```text
+node website/tools.test.cjs --fixtures website/preview/tool-starters.json
+php website/check-php.php /path/to/axolotl website/preview/tool-starters.json
+```
+
+The reader controls use local theme/text-size preferences, system-font fallbacks,
+reduced-motion handling, progress/back-to-top controls and responsive forms.
+Modern-browser desktop/tablet/mobile viewport checks supplement static output and
+Node checks; they do not constitute testing every device or browser version.

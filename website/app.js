@@ -7,6 +7,16 @@
   let savedTheme;try{savedTheme=localStorage.getItem('customies-theme');}catch{}
   applyTheme(savedTheme || (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
   theme?.addEventListener('click',()=>{const mode=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme(mode);try{localStorage.setItem('customies-theme',mode);}catch{}});
+  const sizeButton=$('#reader-size'),sizes=[100,110,120,90];
+  let textSize=100;try{const saved=Number(localStorage.getItem('customies-text-size'));if(sizes.includes(saved))textSize=saved;}catch{}
+  function applyTextSize(){document.documentElement.style.setProperty('--reader-scale',String(textSize/100));sizeButton?.setAttribute('aria-label',`Text size ${textSize} percent; activate to change`);if(sizeButton)sizeButton.title=`Text size: ${textSize}% (click to change)`;}
+  applyTextSize();sizeButton?.addEventListener('click',()=>{textSize=sizes[(sizes.indexOf(textSize)+1)%sizes.length];applyTextSize();try{localStorage.setItem('customies-text-size',String(textSize));}catch{}});
+  const progress=$('#reading-progress'),topButton=$('#back-to-top');let scrollQueued=false;
+  function updateReading(){const total=document.documentElement.scrollHeight-innerHeight;const ratio=total>0?Math.max(0,Math.min(1,scrollY/total)):0;if(progress)progress.style.transform=`scaleX(${ratio})`;if(topButton)topButton.hidden=scrollY<800;scrollQueued=false;}
+  addEventListener('scroll',()=>{if(!scrollQueued){scrollQueued=true;requestAnimationFrame(updateReading);}},{passive:true});addEventListener('resize',updateReading,{passive:true});updateReading();
+  topButton?.addEventListener('click',()=>scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'}));
+  function openDialog(dialog){if(typeof dialog.showModal==='function')dialog.showModal();else{dialog.setAttribute('open','');dialog.classList.add('dialog-fallback');}}
+  function closeDialog(dialog){if(typeof dialog.close==='function')dialog.close();else dialog.removeAttribute('open');}
   const menu = $('.menu-toggle');
   menu?.addEventListener('click', () => {
     const open = !$('#navigation').classList.contains('open');
@@ -35,16 +45,16 @@
     block.append(b);
   });
   $$('dialog').forEach(dialog => {
-    $('[data-close]', dialog)?.addEventListener('click', () => dialog.close());
+    $('[data-close]', dialog)?.addEventListener('click', () => closeDialog(dialog));
     dialog.addEventListener('click', e => { if (e.target === dialog) {
       const r = dialog.getBoundingClientRect();
-      if(e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) dialog.close();
+      if(e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) closeDialog(dialog);
     }});
   });
   let searchIndex;
   const searchDialog = $('#search-dialog');
   async function openSearch() {
-    if (!searchDialog.open) searchDialog.showModal();
+    if (!searchDialog.open) openDialog(searchDialog);
     $('#site-search').focus();
     try {
       searchIndex ??= fetch(`assets/search-${document.body.dataset.scope || 'customies'}.json`).then(r => { if (!r.ok) throw Error(); return r.json(); });
@@ -53,6 +63,7 @@
   }
   $('.search-trigger')?.addEventListener('click', openSearch);
   document.addEventListener('keydown', e => {
+    if(e.key==='Escape')$$('dialog[open].dialog-fallback').forEach(closeDialog);
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
   });
   $('#site-search')?.addEventListener('input', async e => {
@@ -176,7 +187,7 @@
     $$('[data-rotate]',container).forEach(b=>b.addEventListener('click',()=>{yaw+=Number(b.dataset.rotate)*Math.PI/4;draw();}));
     $('[data-reset]',container).addEventListener('click',()=>{yaw=-.2;powered.checked=false;draw();});
     powered.addEventListener('change',draw);
-    const observer = new ResizeObserver(() => { if(container.isConnected)draw();else observer.disconnect(); });observer.observe(canvas);draw();
+    if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(()=>{if(container.isConnected)draw();else observer.disconnect();});observer.observe(canvas);}else{addEventListener('resize',draw,{passive:true});}draw();
   }
   $$('.model-viewer').forEach(initViewer);
   $$('[data-view]').forEach(b=>b.addEventListener('click',async()=>{
@@ -184,6 +195,6 @@
     const holder=$('#model-content'); holder.replaceChildren();
     const container=document.createElement('div');container.className='model-viewer';container.dataset.model=b.dataset.view;
     container.innerHTML='<canvas width="760" height="560" role="img"></canvas><div class="viewer-toolbar"><button data-rotate="-1" aria-label="Rotate model left">↶</button><button data-rotate="1" aria-label="Rotate model right">↷</button><button data-reset>Reset</button><label><input type="checkbox" data-power> Powered</label></div><p class="viewer-caption">Drag or use arrow keys to rotate · Authored geometry, not the game renderer</p>';
-    holder.append(container);dialog.showModal();initViewer(container);
+    holder.append(container);openDialog(dialog);initViewer(container);
   }));
 })();

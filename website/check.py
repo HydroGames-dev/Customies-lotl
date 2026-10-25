@@ -78,3 +78,12 @@ for kind,expected in [('block',33),('item',42)]:
 assert len([p for p in documents if '-component-' in p.stem])==75
 assert 'Block traits' in (OUT/'block-traits.html').read_text(encoding='utf-8')
 print('PASS: 75 complete component articles match source hashes and parameters; dedicated state/trait/item topics exist.')
+
+for name in ('how-it-works','data-guide','updating-customies','toolchain','tutorial-data','tutorial-equipment','tutorial-debugging','accessibility','tools','tool-states','tool-boxes','tool-identifiers','tool-components','tool-starter'):
+    assert OUT/(name+'.html') in documents,'Missing guide/tool: '+name
+for name in ('tools-lib.js','tools.js'):assert (OUT/'assets'/name).exists()
+for name in ('tool-states','tool-boxes','tool-identifiers','tool-components','tool-starter'):
+    text=(OUT/(name+'.html')).read_text(encoding='utf-8')
+    assert 'data-tool=' in text and 'type="submit" disabled' in text,'Tools must wait for local initialization'
+assert (OUT/'assets/wrapper-api.json').exists()
+print('PASS: architecture, data, maintenance, reader guides and five browser-local tools.')

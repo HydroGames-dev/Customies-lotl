@@ -44,6 +44,9 @@ jobs:
           python website/build.py --downloads examples/CustomiesShowcase/dist
           python website/check.py
           node --check website/app.js
+          node --check website/tools-lib.js
+          node --check website/tools.js
+          node website/tools.test.cjs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: website/dist
