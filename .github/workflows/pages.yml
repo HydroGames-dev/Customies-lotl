@@ -7,6 +7,7 @@ on:
       - 'website/**'
       - 'docs/**'
       - 'src/**'
+      - 'plugin.yml'
       - 'examples/CustomiesShowcase/**'
       - '.github/workflows/pages.yml'
   pull_request:
@@ -14,6 +15,7 @@ on:
       - 'website/**'
       - 'docs/**'
       - 'src/**'
+      - 'plugin.yml'
       - 'examples/CustomiesShowcase/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:

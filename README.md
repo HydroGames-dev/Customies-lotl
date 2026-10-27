@@ -16,6 +16,22 @@ The [Customies field guide](https://hydrogames-dev.github.io/Customies-lotl/) co
 
 ## Usage
 
+Customies 1.6.0 adds host registry checks, protocol 2193/2225 regression coverage,
+runtime palette cache fixes and operator diagnostics:
+
+```text
+/customies status
+/customies report
+/customies inspect mycontent:lamp
+```
+
+Register definitions in `onLoad()`/`onEnable()` before the deferred worker snapshot.
+Late registration now fails with a restart instruction. The host owns protocol
+negotiation; 26.60 is a development API/codec target, not a live-client guarantee.
+See [compatibility](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html),
+[diagnostics](https://hydrogames-dev.github.io/Customies-lotl/diagnostics.html) and
+[1.6.0 changes](docs/changes-1.6.0.md).
+
 Start with the [developer and operator guide](docs/customies-guide.md), covering all components, examples, structures, performance and server sizing.
 
 Historical upstream usage guides are available at the [Customies Wiki](https://github.com/CustomiesDevs/Customies/wiki)!

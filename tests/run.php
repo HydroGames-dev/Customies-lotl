@@ -38,6 +38,17 @@ check(Permutations::getCartesianProduct([[true, false], [false, true]]) === [[tr
 $writer = pocketmine\data\bedrock\block\convert\BlockStateWriter::create('test:block');
 $clone->serializeState($writer);
 check($writer->getBlockStateData()->getStates()[ConnectionTrait::NORTH]->getValue() === 1, 'bool state NBT');
+$numericStateBlock = new class {
+	use customiesdevs\customies\block\states\BlockStatesTrait;
+};
+$numericStateBlock->addState(new customiesdevs\customies\block\states\BlockState('0', [0, 1]));
+$numericStateBlock->getState('0')->setCurrentValue(1);
+$numericWriter = pocketmine\data\bedrock\block\convert\BlockStateWriter::create('test:numeric_key');
+$numericStateBlock->serializeState($numericWriter);
+check($numericWriter->getBlockStateData()->getStates()['0']->getValue() === 1, 'numeric array keys must serialize using string state names');
+$numericStateBlock->getState('0')->setCurrentValue(0);
+$numericStateBlock->deserializeState(new pocketmine\data\bedrock\block\convert\BlockStateReader($numericWriter->getBlockStateData()));
+check($numericStateBlock->getState('0')->getCurrentValue() === 1, 'numeric array keys must deserialize using string state names');
 check(MultiBlockTrait::vertical(4)->getOffsetForPart(3)->y === 3, 'vertical parts');
 check(MultiBlockTrait::north()->getOffsetForPart(1, 'east')->x === 1, 'cardinal override');
 try { new customiesdevs\customies\block\states\BlockState('bad', []); throw new RuntimeException('accepted empty values'); } catch(InvalidArgumentException){}
@@ -80,7 +91,18 @@ $position = customiesdevs\customies\block\traits\PlacementPositionTrait::both();
 $position->applyPlacement(new customiesdevs\customies\block\traits\BlockTraitContext($tx, $air->asItem(), $air, $air, 1, new pocketmine\math\Vector3(0, 1, 0), null));
 check($position->getStates()[1]->getCurrentValue() === 'bottom', 'top face places bottom half');
 $factory = customiesdevs\customies\block\CustomiesBlockFactory::getInstance();
+$translator = pocketmine\network\mcpe\convert\TypeConverter::getInstance()->getBlockTranslator();
+$warmBlocks = pocketmine\block\VanillaBlocks::getAll();
+$oldNetworkIds = [];
+foreach($warmBlocks as $warmBlock){ $oldNetworkIds[$warmBlock->getStateId()] = $translator->internalIdToNetworkId($warmBlock->getStateId()); }
 $factory->registerBlock(static fn() => new TestBlock(), 'test:connections');
+$shifted = 0;
+foreach($warmBlocks as $warmBlock){
+	$expected = $translator->getBlockStateDictionary()->lookupStateIdFromData(pocketmine\world\format\io\GlobalBlockStateHandlers::getSerializer()->serialize($warmBlock->getStateId()));
+	check($translator->internalIdToNetworkId($warmBlock->getStateId()) === $expected, 'palette insertion must invalidate cached vanilla runtime IDs');
+	if($oldNetworkIds[$warmBlock->getStateId()] !== $expected){ ++$shifted; }
+}
+check($shifted > 0, 'cache regression fixture must move existing runtime IDs');
 check(count($factory->getBlockPaletteEntries()) === 1, 'palette registration');
 check(count(customiesdevs\customies\block\BlockPalette::getInstance()->getCustomStates()) === 16, 'batched palette states');
 $offset = PlacementDirectionTrait::cardinal(90);

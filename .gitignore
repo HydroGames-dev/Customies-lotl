@@ -1,5 +1,6 @@
 .idea/
 vendor/
+.compat/
 composer.lock
 website/dist/
 website/__pycache__/

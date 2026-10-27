@@ -113,3 +113,7 @@ The reader controls use local theme/text-size preferences, system-font fallbacks
 reduced-motion handling, progress/back-to-top controls and responsive forms.
 Modern-browser desktop/tablet/mobile viewport checks supplement static output and
 Node checks; they do not constitute testing every device or browser version.
+
+`articles/protocol-updates.md` records the 1.6.0 host/protocol matrix and
+`articles/diagnostics.md` documents the operator command and CLI doctor.
+The library version in page headers/download labels comes from `plugin.yml`.

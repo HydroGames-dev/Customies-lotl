@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\entity;
 
+use customiesdevs\customies\util\RegistrationGuard;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
@@ -14,10 +15,14 @@ use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 use Closure;
-use ReflectionClass;
 
 final class CustomiesEntityFactory {
 	use SingletonTrait;
+	/** @var list<string> */
+	private array $identifiers = [];
+
+	/** @return list<string> */
+	public function getRegisteredIdentifiers(): array { return $this->identifiers; }
 
 	/**
 	 * Register an entity to the EntityFactory and all the required mappings. An optional behaviour identifier can be
@@ -26,10 +31,16 @@ final class CustomiesEntityFactory {
 	 * @phpstan-param Closure(World $world, CompoundTag $nbt) : Entity $creationFunc
 	 */
 	public function registerEntity(string $className, string $identifier, ?Closure $creationFunc = null, string $behaviourId = ""): void {
+		RegistrationGuard::assertOpen($identifier);
+		RegistrationGuard::validateIdentifier($identifier);
+		if(in_array($identifier, $this->identifiers, true)){
+			throw new \InvalidArgumentException("Entity already registered: $identifier");
+		}
 		EntityFactory::getInstance()->register($className, $creationFunc ?? static function (World $world, CompoundTag $nbt) use ($className): Entity {
 			return new $className(EntityDataHelper::parseLocation($nbt, $world), $nbt);
 		}, [$identifier]);
 		$this->updateStaticPacketCache($identifier, $behaviourId);
+		$this->identifiers[] = $identifier;
 	}
 
 	/**
@@ -39,14 +50,15 @@ final class CustomiesEntityFactory {
 	 */
 	private function updateStaticPacketCache(string $identifier, string $behaviourId): void {
 		$instance = StaticPacketCache::getInstance();
-		$property = (new ReflectionClass($instance))->getProperty("availableActorIdentifiers");
 		/** @var AvailableActorIdentifiersPacket $packet */
-		$packet = $property->getValue($instance);
+		$packet = $instance->getAvailableActorIdentifiers();
 		/** @var CompoundTag $root */
-		$root = $packet->identifiers->getRoot();
-		($root->getListTag("idlist") ?? new ListTag())->push(CompoundTag::create()
+		$root = clone $packet->identifiers->getRoot();
+		$list = $root->getListTag("idlist") ?? new ListTag();
+		$list->push(CompoundTag::create()
 			->setString("id", $identifier)
 			->setString("bid", $behaviourId));
+		$root->setTag("idlist", $list);
 		$packet->identifiers = new CacheableNbt($root);
 	}
 }

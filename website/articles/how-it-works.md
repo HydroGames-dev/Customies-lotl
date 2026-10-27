@@ -9,15 +9,17 @@ runtime. Your plugin still implements gameplay in PHP.
 
 1. The Customies plugin registers its packet listener and schedules deferred worker
    initialization. Your dependent content plugin registers in `onEnable()`.
-2. `CustomiesBlockFactory` calls your block factory, initializes traits, registers
-   runtime states, and creates the block's item registration.
+2. `CustomiesBlockFactory` calls your block factory, initializes traits and checks
+   the identifier and item-ID mapping for conflicts.
 3. Components and traits are serialized into client definition NBT. State values
    are enumerated into runtime/palette combinations; permutations are included as
    client conditions, not executed as PHP.
-4. Serializer/deserializer mappings connect stable identifiers and states to the
-   host's saved-data handlers.
+4. Valid definitions are published to runtime, palette, item and saved-data
+   registries. Serializer/deserializer mappings connect stable names and states
+   to the host's saved-data handlers.
 5. The async worker initialization hook reconstructs compatible block registrations
-   in workers that need to process block data.
+   in workers that need to process block data. Main-thread registration closes
+   after the startup snapshot; adding definitions later requires a restart.
 
 Allocate one type ID outside the closure and reuse it. Do not capture a Player,
 World, mutable inventory or other live object in a worker-reconstructed factory.
@@ -25,11 +27,16 @@ Keep construction deterministic and register before the deferred initialization.
 
 ## Joining: describe content to the client
 
-The listener merges custom and host block definitions for `StartGamePacket`, sorts
-the combined palette in the required identifier order and caches it by registration
-count. It also merges the branch's required experiment flags into startup and pack
+The listener merges custom definitions with the incoming `StartGamePacket` palette,
+preserving host and other-plugin entries. It sorts the combined palette in the
+required identifier order and caches it by registration count and source entries.
+It also merges the branch's required experiment flags into startup and pack
 stack metadata. The cache is not an invitation to hot-reload arbitrary definitions:
 restart and reconnect after registration changes.
+
+The runtime block dictionary is updated in the same name order. Inserting a custom
+name can shift existing IDs, so its cached block translations are invalidated.
+See [protocol compatibility](protocol-updates.html) for the tested host targets.
 
 Item registration maps saved identifiers and the item parser, adds creative entries,
 constructs component NBT and supplies the host's item conversion mappings. Runtime

@@ -1,5 +1,26 @@
 # Validation - 2026-10-24
 
+## Customies 1.6.0 revalidation - 2026-10-27
+
+PHP 8.4.16 tests pass against pinned Axolotl stable 26.50 / protocol 2193 and
+development 26.60 / protocol 2225, with host lockfiles and selected newer protocol
+commits. See the library's compatibility guide/workflow for exact refs.
+All 73 blocks and 66 items register; every block state round-trips. The guide suite
+covers descriptive lore, slab/bench breaking, 40 corner/half/direction cases,
+structures/house placement and grouped removal, effects, inventory actions and
+equipment. The library protocol suite also checks actual join/registry packet
+codecs and startup registration guards.
+
+The packaged 1.6.0 library and 1.4.0 showcase also load/enable on isolated localhost
+26.50 and 26.60 servers using the selected newer protocol commits. Both reach
+`Done`, register 139 specimens and complete startup without reported worker
+registration errors. Console status shows 73 blocks, 3210 states and 139 item
+entries, with registration closed. Runtime report/inspect were exercised and the
+servers stopped through the console. A real Minecraft client playtest has not
+been performed for this update.
+
+## Earlier validation record
+
 - PHP 8.4.16, Axolotl-PM 5.50.1+dev, locked protocol 63.0.1+bedrock-1.26.50.
 - All 33 block component and 42 item component classes have serializable catalog fixtures.
 - All 46 block registrations and 52 item registrations succeed using real factories.

@@ -26,9 +26,17 @@ the client is different from gameplay support in PocketMine.
 
 Use the linked [Axolotl-PM](https://github.com/axolotl-pm/PocketMine-MP) server and
 its matching PHP binaries and dependencies. Validation here uses PHP 8.4.16 and
-Axolotl 5.50.1+dev with its locked Bedrock 1.26.50 protocol dependencies. Customies
+Axolotl 5.50.1+dev with 26.50 stable and 26.60 development protocol snapshots.
+See [the pinned compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html).
+Customies
 does not negotiate new Minecraft protocols: host support determines which clients
 can connect. 1.26.52/1.26.60 are not client-tested by this project.
+
+Customies 1.6.0 adds `/customies status`, `/customies report` and
+`/customies inspect namespace:name` for operators. Register definitions during
+startup before the worker snapshot; registration closes afterward and requires a
+restart. Use [runtime diagnostics](https://hydrogames-dev.github.io/Customies-lotl/diagnostics.html)
+to understand counts, inspect states and record the host's dependency versions.
 
 1. Back up the world and stop the server.
 2. Copy both PHARs from the showcase install ZIP to `plugins/`, keeping one copy

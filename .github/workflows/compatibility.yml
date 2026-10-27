@@ -1,0 +1,59 @@
+name: Axolotl protocol compatibility
+
+on:
+  push:
+    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**']
+  pull_request:
+    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: stable-lock
+            host: c96300392ade9fb4ed423c2662815be7e79c45a3
+            protocol: ''
+          - name: stable-protocol-head
+            host: c96300392ade9fb4ed423c2662815be7e79c45a3
+            protocol: 'dev-master#da83718c6e329de77dc4b9d654839bf5460dd6f8'
+          - name: preview-lock
+            host: 3bf5c010a1c05790b2ba64d12832102b62822b1f
+            protocol: ''
+          - name: preview-protocol-head
+            host: 3bf5c010a1c05790b2ba64d12832102b62822b1f
+            protocol: 'dev-bedrock-1.26.60#f9d8b40da3940cef8242b0da34ba41fe49ea7364'
+    name: ${{ matrix.name }} / PHP 8.4
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6
+        with:
+          repository: axolotl-pm/PocketMine-MP
+          ref: ${{ matrix.host }}
+          path: .compat/host
+      - uses: axolotl-pm/setup-php-action@1.0.0
+        with:
+          php-version: '8.4'
+          install-path: './bin'
+          pm-version-major: 5
+      - name: Install locked host dependencies
+        working-directory: .compat/host
+        run: composer install --no-dev --prefer-dist --no-interaction --no-progress
+      - name: Test pinned protocol development commit
+        if: matrix.protocol != ''
+        working-directory: .compat/host
+        env:
+          PROTOCOL_REF: ${{ matrix.protocol }}
+        run: composer require "axolotl-pm/bedrock-protocol:$PROTOCOL_REF" --update-no-dev --prefer-dist --no-interaction --no-progress
+      - name: Host contract report
+        run: php tools/doctor.php .compat/host
+      - name: State, cache and wire codec regressions
+        run: php tests/protocol.php .compat/host
+      - name: Showcase and documentation PHP integration
+        run: php examples/CustomiesShowcase/tests/guide.php .compat/host

@@ -51,7 +51,8 @@ trait BlockStatesTrait {
 	}
 
 	public function serializeState(\pocketmine\data\bedrock\block\convert\BlockStateWriter $out): void {
-		foreach($this->states as $name => $state){
+		foreach($this->states as $state){
+			$name = $state->getName();
 			$value = $state->getCurrentValue();
 			match(true){
 				is_bool($value) => $out->writeBool($name, $value),
@@ -62,7 +63,8 @@ trait BlockStatesTrait {
 	}
 
 	public function deserializeState(\pocketmine\data\bedrock\block\convert\BlockStateReader $in): void {
-		foreach($this->states as $name => $state){
+		foreach($this->states as $state){
+			$name = $state->getName();
 			$default = $state->getValues()[0];
 			$state->setCurrentValue(match(true){
 				is_bool($default) => $in->readBool($name),

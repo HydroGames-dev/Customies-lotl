@@ -3,8 +3,18 @@ description: A Axolotl-MP plugin that implements support for custom blocks, item
 
 main: customiesdevs\customies\Customies
 src-namespace-prefix: customiesdevs\customies
-version: 1.5.42
+version: 1.6.0
 api: 5.49.0
+
+commands:
+  customies:
+    description: Inspect Customies registries and host protocol compatibility
+    usage: "/customies [status|report|inspect <namespace:name>]"
+    permission: customies.command.status
+permissions:
+  customies.command.status:
+    description: View Customies registry and protocol diagnostics
+    default: op
 
 authors:
   - DenielWorld

@@ -14,6 +14,7 @@ use customiesdevs\customies\item\CreativeInventoryInfo;
 use customiesdevs\customies\item\CustomiesItemFactory;
 use customiesdevs\customies\task\AsyncRegisterBlocksTask;
 use customiesdevs\customies\util\NBT;
+use customiesdevs\customies\util\RegistrationGuard;
 use InvalidArgumentException;
 use pocketmine\block\Block;
 use pocketmine\block\RuntimeBlockStateRegistry;
@@ -44,6 +45,7 @@ final class CustomiesBlockFactory {
 	private array $blockPaletteEntries = [];
 	/** @var array<string, Block> Map of block identifiers to block instances */
 	private array $customBlocks = [];
+	private bool $workerHookAdded = false;
 
 	/**
 	 * Adds a worker initialize hook to the async pool to sync the BlockFactory for every thread worker that is created.
@@ -51,11 +53,13 @@ final class CustomiesBlockFactory {
 	 * can result in massive issues with almost every block showing as the wrong thing and causing lag to clients.
 	 */
 	public function addWorkerInitHook(): void {
+		if($this->workerHookAdded){ return; }
 		$server = Server::getInstance();
 		$blocks = $this->blockFuncs;
 		$server->getAsyncPool()->addWorkerStartHook(static function (int $worker) use ($server, $blocks): void {
 			$server->getAsyncPool()->submitTaskToWorker(new AsyncRegisterBlocksTask($blocks), $worker);
 		});
+		$this->workerHookAdded = true;
 	}
 
 	/**
@@ -95,6 +99,8 @@ final class CustomiesBlockFactory {
 		?Closure $serializer = null,
 		?Closure $deserializer = null
 	): void {
+		RegistrationGuard::assertOpen($identifier);
+		RegistrationGuard::validateIdentifier($identifier);
 		if(isset($this->customBlocks[$identifier])){
 			throw new InvalidArgumentException("Block already registered: " . $identifier);
 		}
@@ -104,10 +110,7 @@ final class CustomiesBlockFactory {
 		}
 
 		if($block instanceof BlockTraits){ $block->initializeTraits(); }
-
-		RuntimeBlockStateRegistry::getInstance()->register($block);
-		CustomiesItemFactory::getInstance()->registerBlockItem($identifier, $block);
-		$this->customBlocks[$identifier] = $block;
+		CustomiesItemFactory::getInstance()->assertCanRegister($identifier, $block->getTypeId());
 
 		$nbtTag = CompoundTag::create();
 		$componentsTag = CompoundTag::create();
@@ -177,7 +180,6 @@ final class CustomiesBlockFactory {
 					$meta
 				];
 			}
-			BlockPalette::getInstance()->insertStates($paletteStates);
 			$serializer ??= static function (BlockPermutations $b) use ($identifier): BlockStateWriter {
 				assert($b instanceof BlockPermutations);
 				$writer = BlockStateWriter::create($identifier);
@@ -192,22 +194,28 @@ final class CustomiesBlockFactory {
 			};
 		}else{
 			// If a block does not contain any permutations we can just insert the one state.
-			BlockPalette::getInstance()->insertState(
+			$paletteStates = [[
 				CompoundTag::create()
 					->setString(BlockStateData::TAG_NAME, $identifier)
-					->setTag(BlockStateData::TAG_STATES, CompoundTag::create())
-			);
+					->setTag(BlockStateData::TAG_STATES, CompoundTag::create()),
+				0
+			]];
 			$serializer ??= static fn(Block $b) => new BlockStateWriter($identifier);
 			$deserializer ??= static fn(BlockStateReader $in) => clone $block;
 		}
-		GlobalBlockStateHandlers::getSerializer()->map($block, $serializer);
-		GlobalBlockStateHandlers::getDeserializer()->map($identifier, $deserializer);
 		// The 'minecraft:on_player_placing' component is required for the client to predict block placement, making
 		// it a smoother experience for the end-user.
 		$componentsTag->setTag("minecraft:on_player_placing", CompoundTag::create());
 		$nbtTag->setTag("blockTags", new ListTag(array_map(static fn(string $tag) => new StringTag($tag), array_values($blockTags))));
 		$nbtTag->setTag("components", $componentsTag);
 		$nbtTag->setInt("molangVersion", 13);
+		// Build and validate the full definition before publishing it to global registries.
+		RuntimeBlockStateRegistry::getInstance()->register($block);
+		CustomiesItemFactory::getInstance()->registerBlockItem($identifier, $block);
+		$this->customBlocks[$identifier] = $block;
+		BlockPalette::getInstance()->insertStates($paletteStates);
+		GlobalBlockStateHandlers::getSerializer()->map($block, $serializer);
+		GlobalBlockStateHandlers::getDeserializer()->map($identifier, $deserializer);
 		// Registers the block to creative inventory
 		CreativeInventoryInfo::registerCreativeInfo($block, $creativeInfo);
 		$this->blockPaletteEntries[] = new BlockPaletteEntry($identifier, new CacheableNbt($nbtTag));

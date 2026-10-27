@@ -5,6 +5,7 @@ namespace customiesdevs\customies\item;
 
 use Closure;
 use customiesdevs\customies\util\NBT;
+use customiesdevs\customies\util\RegistrationGuard;
 use InvalidArgumentException;
 use pocketmine\block\Block;
 use pocketmine\data\bedrock\item\BlockItemIdMap;
@@ -96,6 +97,20 @@ final class CustomiesItemFactory {
 		return array_values($this->itemTableEntries);
 	}
 
+	/** Validate before changing any global registries. Block registration uses this too. @internal */
+	public function assertCanRegister(string $identifier, int $networkId): void {
+		RegistrationGuard::assertOpen($identifier);
+		RegistrationGuard::validateIdentifier($identifier);
+		if($networkId < -32768 || $networkId > 32767){
+			throw new InvalidArgumentException("Item '$identifier' has network ID $networkId outside the signed 16-bit registry range.");
+		}
+		foreach(TypeConverter::getInstance()->getItemTypeDictionary()->getEntries() as $entry){
+			if($entry->getStringId() === $identifier || $entry->getNumericId() === $networkId){
+				throw new InvalidArgumentException("Item '$identifier' conflicts with registered item '{$entry->getStringId()}' (network ID {$entry->getNumericId()}). Allocate a unique type ID.");
+			}
+		}
+	}
+
 	/**
 	 * Registers the item to the item factory and assigns it an ID. It also updates the required mappings and stores the
 	 * item components if present.
@@ -110,12 +125,17 @@ final class CustomiesItemFactory {
 		string $identifier, 
 		CreativeInventoryInfo $creativeInfo = new CreativeInventoryInfo(CreativeInventoryInfo::CATEGORY_EQUIPMENT)
 	): void {
+		RegistrationGuard::assertOpen($identifier);
+		RegistrationGuard::validateIdentifier($identifier);
 		if(isset($this->itemTableEntries[$identifier])){ throw new InvalidArgumentException("Item already registered: " . $identifier); }
 		$item = $itemFunc();
 		if(!$item instanceof Item){
 			throw new InvalidArgumentException("Class returned from closure is not a Item");
 		}
 		$itemId = $item->getTypeId();
+		$this->assertCanRegister($identifier, $itemId);
+		// Build before mapping, so malformed component data cannot leave a half-registered item.
+		$nbt = $this->createItemNbt($item, $identifier, $itemId, $creativeInfo);
 
 		GlobalItemDataHandlers::getDeserializer()->map($identifier, fn() => clone $item);
 		GlobalItemDataHandlers::getSerializer()->map($item, fn() => new SavedItemData($identifier));
@@ -126,7 +146,6 @@ final class CustomiesItemFactory {
 		// Registers the item to creative inventory
 		CreativeInventoryInfo::registerCreativeInfo($item, $creativeInfo);
 		// Create the NBT data for the item
-		$nbt = $this->createItemNbt($item, $identifier, $itemId, $creativeInfo);
 		$entry = new ItemTypeEntry(
 			$identifier,
 			$itemId,
@@ -158,7 +177,7 @@ final class CustomiesItemFactory {
 			foreach($item->getComponents() as $component){
 				$name = $component->getName();
 				$value = $component->getValue();
-				$tag = NBT::getTagType($value);
+				$tag = NBT::getTagType($value) ?? throw new InvalidArgumentException("Component '$name' has an unsupported NBT value.");
 				// Icon goes to item_properties
 				if($name === 'minecraft:icon'){
 					$propertiesTag->setTag('minecraft:icon', $tag);
@@ -234,6 +253,7 @@ final class CustomiesItemFactory {
 	public function registerBlockItem(string $identifier, Block $block): void {
 		if(isset($this->itemTableEntries[$identifier])){ throw new InvalidArgumentException("Item already registered: " . $identifier); }
 		$itemId = $block->getIdInfo()->getBlockTypeId();
+		$this->assertCanRegister($identifier, $itemId);
 		StringToItemParser::getInstance()->registerBlock($identifier, fn() => clone $block);
 		$entry = new ItemTypeEntry($identifier, $itemId, false, 2, new CacheableNbt(CompoundTag::create()));
 

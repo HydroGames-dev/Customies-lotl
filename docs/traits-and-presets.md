@@ -28,7 +28,9 @@ A permutation keeps its original single-component API and accepts additional com
 
 ## Compatibility and limits
 
-Validated against axolotl-pm/PocketMine-MP and its locked bedrock-protocol 63.0.1+bedrock-1.26.50 (protocol 2193). Customies does not implement protocol negotiation: acceptance of 1.26.52/1.26.60 depends on the host server and its protocol/data dependencies. No live client validation of those versions has been performed. Do not advertise them as verified based on this change.
+Customies 1.6.0 is regression-tested against Axolotl's 26.50 stable (protocol 2193) and 26.60 development (protocol 2225) host/dependency snapshots, plus pinned newer protocol commits. See [the compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html) for exact refs. The suite round-trips registry/join packets and checks runtime cache invalidation. Customies does not negotiate or translate protocols. No live client validation of 1.26.52/1.26.60 has been performed.
+
+Registration closes after the deferred startup worker snapshot. Register definitions in `onLoad()`/`onEnable()` and restart after changes. Use `/customies status`, `/customies report` and `/customies inspect namespace:name` for operator-only diagnostics. `php tools/doctor.php /path/to/host` checks a source checkout without starting a server.
 
 The sixteen-way placement state is available, but arbitrary-angle geometry/bone permutations must be authored separately; the existing transformation wire format uses quarter-turn rotation indices. Corner updates currently support matching block types and vertical halves; cross-identifier `blocks_to_corner_with` descriptors and tag-expression matching need further implementation. Permutations describe client rendering; arbitrary Molang is not evaluated on the server. Multi-block integrity after explosions, piston interaction, and external block edits requires live-world validation.
 

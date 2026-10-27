@@ -27,9 +27,10 @@ calls to put inside `onEnable()`. Obtain your registered content through
 `CustomiesBlockFactory::get()` or `CustomiesItemFactory::get()`, then give the item
 through your plugin's command or inventory logic. Example-plugin commands are not part of the library API.
 
-The tested host is Axolotl 5.50.1+dev with its locked Bedrock 1.26.50 dependencies
-and PHP 8.4.16. Customies does not implement protocol negotiation. Support for
-1.26.52/1.26.60 depends on the host and has not been client-tested here.
+Customies 1.6.0 has API/codec regression targets for Axolotl 5.50.1+dev with
+26.50 stable and 26.60 development dependencies, using PHP 8.4.16. See the
+[pinned compatibility matrix](protocol-updates.html) and [runtime diagnostics](diagnostics.html).
+Customies uses the host protocol; 1.26.52/1.26.60 have not been client-tested here.
 
 ## Library architecture
 

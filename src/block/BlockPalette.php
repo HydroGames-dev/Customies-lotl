@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace customiesdevs\customies\block;
 
+use customiesdevs\customies\network\BlockPaletteBuilder;
 use pocketmine\data\bedrock\block\BlockStateData;
 use pocketmine\data\bedrock\block\BlockTypeNames;
 use pocketmine\nbt\tag\CompoundTag;
@@ -15,9 +16,6 @@ use ReflectionProperty;
 use RuntimeException;
 use function array_keys;
 use function count;
-use function hash;
-use function strcmp;
-use function usort;
 
 final class BlockPalette {
 	use SingletonTrait;
@@ -32,6 +30,7 @@ final class BlockPalette {
 	private ReflectionProperty $stateDataToStateIdLookup;
 	private ReflectionProperty $idMetaToStateIdLookupCache;
 	private ReflectionProperty $fallbackStateId;
+	private ReflectionProperty $networkIdCache;
 
 	public function __construct() {
 		$this->translator = $instance = TypeConverter::getInstance()->getBlockTranslator();
@@ -42,6 +41,7 @@ final class BlockPalette {
 		$this->stateDataToStateIdLookup = new ReflectionProperty($dictionary, "stateDataToStateIdLookup");
 		$this->idMetaToStateIdLookupCache = new ReflectionProperty($dictionary, "idMetaToStateIdLookupCache");
 		$this->fallbackStateId = new ReflectionProperty($instance, "fallbackStateId");
+		$this->networkIdCache = new ReflectionProperty($instance, "networkIdCache");
 	}
 
 	/**
@@ -85,7 +85,7 @@ final class BlockPalette {
 
 	/**
 	 * Sorts the palette's block states in the correct order, also adding the provided state to the array.
-	 * @param BlockStateDictionaryEntry $newState
+	 * @param list<BlockStateDictionaryEntry> $newStates
 	 */
 	private function sortWith(array $newStates): void {
 		// To sort the block palette we first have to split the palette up in to groups of states. We only want to sort
@@ -98,9 +98,8 @@ final class BlockPalette {
 		// Append the new state we are sorting with at the end to preserve existing order.
 		foreach($newStates as $newState){ $states[$newState->getStateName()][] = $newState; }
 
-		$names = array_keys($states);
 		// As of 1.18.30, blocks are sorted using a fnv164 hash of their names.
-		usort($names, static fn(string $a, string $b) => strcmp(hash("fnv164", $a), hash("fnv164", $b)));
+		$names = BlockPaletteBuilder::sortNames(array_keys($states));
 		$sortedStates = [];
 		$stateId = 0;
 		$stateDataToStateIdLookup = [];
@@ -121,6 +120,8 @@ final class BlockPalette {
 		$this->bedrockKnownStates->setValue($dictionary, $sortedStates);
 		$this->stateDataToStateIdLookup->setValue($dictionary, $stateDataToStateIdLookup);
 		$this->idMetaToStateIdLookupCache->setValue($dictionary, null); //set this to null so pm can create a new cache
+		// Sorting changes IDs for existing blocks too. Any cached translation now refers to the old palette.
+		$this->networkIdCache->setValue($this->translator, []);
 		$this->fallbackStateId->setValue($this->translator, $stateDataToStateIdLookup[BlockTypeNames::INFO_UPDATE] ??
 			throw new AssumptionFailedError(BlockTypeNames::INFO_UPDATE . " should always exist")
 		);

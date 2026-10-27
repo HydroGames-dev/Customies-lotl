@@ -64,6 +64,8 @@ a passing export does not prove native engine support.
 
 ```text
 php tests/run.php /path/to/axolotl-test
+php tools/doctor.php /path/to/axolotl-test
+php tests/protocol.php /path/to/axolotl-test
 php examples/CustomiesShowcase/tests/guide.php /path/to/axolotl-test
 python examples/CustomiesShowcase/tests/verify_assets.py
 python examples/CustomiesShowcase/tools/build.py --php /path/to/server/php
@@ -71,6 +73,8 @@ python examples/CustomiesShowcase/tools/build.py --php /path/to/server/php
 
 The example plugin is optional for library users; maintainers can use it as a
 fixture-rich integration test. It remains a separate example section in this wiki.
+The [protocol matrix](protocol-updates.html) records the pinned host/dependency
+targets, and [diagnostics](diagnostics.html) explains how to inspect a live server.
 Use the asset generator first only if you changed generated assets; it needs its
 additional dependencies. The builder can package already committed assets.
 
