@@ -26,14 +26,13 @@ the client is different from gameplay support in PocketMine.
 
 Use the linked [Axolotl-PM](https://github.com/axolotl-pm/PocketMine-MP) server and
 its matching PHP binaries and dependencies. Validation here uses PHP 8.4.16 and
-Axolotl 5.50.1+dev with 26.50 stable and 26.60 development protocol snapshots.
+Axolotl 5.51.0 and the stable branch with released 26.60 dependencies (protocol 2225).
 See [the pinned compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html).
 Customies
 does not negotiate new Minecraft protocols: host support determines which clients
 can connect. 1.26.52/1.26.60 are not client-tested by this project.
 
-Customies 1.6.0 adds `/customies status`, `/customies report` and
-`/customies inspect namespace:name` for operators. Register definitions during
+Customies 1.7.0 registers no in-game commands or command permissions. Register definitions during
 startup before the worker snapshot; registration closes afterward and requires a
 restart. Use [runtime diagnostics](https://hydrogames-dev.github.io/Customies-lotl/diagnostics.html)
 to understand counts, inspect states and record the host's dependency versions.
@@ -146,7 +145,7 @@ name: TutorialContent
 main: tutorial\Main
 src-namespace-prefix: tutorial
 version: 1.0.0
-api: 5.49.0
+api: 5.51.0
 load: POSTWORLD
 depend: [Customies-Axolotl]
 ```
@@ -308,7 +307,7 @@ that all laboratory specimens implement that behavior.
 
 | Component | What it describes | PocketMine responsibility / combination |
 | --- | --- | --- |
-| `block_entity` | Client block-entity properties and slot metadata | Implement an actual Tile/inventory and persistence; metadata alone is not a chest |
+| `block_entity` | Dynamic properties, container slots/title and experimental entity-storage metadata | Implement an actual Tile/inventory and persistence; metadata alone is not a chest |
 | `block_tags` | Named tags on a block definition | Use explicit PHP matching when server rules need tags |
 | `chest_obstruction` | How the client considers obstruction above chests | Check host inventory/obstruction behavior for custom shapes |
 | `collision_box` | One or more physical client boxes, or disabled collision | Override PHP collision boxes to match |
@@ -360,7 +359,7 @@ not prove its entire Bedrock-native feature exists in the host server.
 | `digger` | Client mining targets/speeds | Extend the proper Tool class and match mining rules |
 | `display_name` | Client visible name | Keep the PHP Item name and lore consistent |
 | `durability` | Client maximum durability | Extend `Durable`/a tool/armor class and match max durability |
-| `durability_sensor` | Threshold feedback metadata | Implement/verify server feedback and wear paths |
+| `durability_sensor` | Threshold feedback with built-in or custom pack sounds | Implement/verify server feedback and wear paths |
 | `dyeable` | Dye capability/default color metadata | Implement dye application and save resulting color |
 | `enchantable` | Slot and enchantability metadata | Match host enchant compatibility and enchantment logic |
 | `fire_resistant` | Client fire-resistance metadata | Match `isFireProof()` for dropped-item behavior |
@@ -387,7 +386,7 @@ not prove its entire Bedrock-native feature exists in the host server.
 | `storage_weight_limit` | Client storage capacity by weight | Enforce capacity server-side |
 | `storage_weight_modifier` | Weight contribution metadata | Enforce nested-storage/weight rules server-side |
 | `swing_duration` | Client swing timing | Match server attack/use cooldown if gameplay depends on it |
-| `swing_sounds` | Client swing sound configuration | Supply/emit intended sounds where supported |
+| `swing_sounds` | Client swing sounds, including custom sound-definition names | Supply/emit intended sounds where supported |
 | `throwable` | Client throw/use configuration | Implement the projectile/use hook and stack consumption |
 | `use_animation` | Eat, drink, bow or other use animation | Match the server consumption/charging behavior |
 | `use_modifiers` | Use duration and movement metadata | Match server use duration and movement effects |

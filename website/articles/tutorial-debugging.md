@@ -8,8 +8,8 @@ Do not start by changing protocol numbers or deleting production worlds.
 Use a separate test server and one content plugin. Record the exact host/PHP,
 Customies and resource-pack versions. Reproduce with one block and the smallest
 state set. Preserve an old saved fixture if the failure only happens after reload.
-Use `/customies status` and `/customies report` to record the running registry and
-dependency information; these operator commands are explained in [diagnostics](diagnostics.html).
+Use the standalone `tools/doctor.php` helper or the PHP diagnostics API to record
+dependency information; see [developer diagnostics](diagnostics.html). The library registers no in-game commands.
 
 ## 2. Check registration
 

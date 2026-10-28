@@ -27,13 +27,14 @@
     if(b.some(x=>x<=0))fail('Physical box sizes must be positive. Disable collision explicitly for an empty collider.');
     if(!['pixels','blocks'].includes(units))fail('Unknown coordinate units.');
     if(!['north','west','south','east'].includes(direction))fail('Choose a cardinal direction.');
-    const origin=units==='pixels'?a:[a[0]*16-8,a[1]*16,a[2]*16-8];
+    const origin=units==='pixels'?a:[8-(a[0]+b[0])*16,a[1]*16,a[2]*16-8];
     const size=units==='pixels'?b:b.map(x=>x*16);
-    let [x,y,z]=[origin[0]/16+.5,origin[1]/16,origin[2]/16+.5],xx=x+size[0]/16,yy=y+size[1]/16,zz=z+size[2]/16;
+    let [x,y,z]=[(8-origin[0]-size[0])/16,origin[1]/16,origin[2]/16+.5],xx=(8-origin[0])/16,yy=y+size[1]/16,zz=z+size[2]/16;
+    const voxel={min:[x*16,y*16,z*16].map(rounded),max:[xx*16,yy*16,zz*16].map(rounded)};
     const warnings=[];if([x,y,z].some(v=>v<0)||[xx,yy,zz].some(v=>v>1))warnings.push('This extends outside one occupied cell; check component/host limits and reserve actual cells for structures.');
     for(let i=0;i<['north','west','south','east'].indexOf(direction);i++)[x,z,xx,zz]=[z,1-xx,zz,1-x];
     const bounds=[x,y,z,xx,yy,zz].map(rounded);
-    return {client_unrotated:{origin:origin.map(rounded),size:size.map(rounded)},server_rotated_bounds:bounds,php:`new AxisAlignedBB(${bounds.join(', ')})`,warnings,note:'Local boxes only. Client vectors remain unrotated; pair them with the corresponding visual transformation. Selection/ray behavior still needs testing.'};
+    return {client_unrotated:{origin:origin.map(rounded),size:size.map(rounded)},collision_min_max:voxel,server_rotated_bounds:bounds,php:`new AxisAlignedBB(${bounds.join(', ')})`,warnings,note:'Geometry X is mirrored when converting to 26.60 voxel min/max and server bounds. Client vectors remain unrotated; pair them with the visual transformation. Selection/ray behavior still needs testing.'};
   }
   function identifiers(text){
     if(typeof text!=='string'||text.length>65536)fail('Use at most 64 KiB of identifiers.');
@@ -75,7 +76,7 @@
     if(!Number.isInteger(stack)||stack<1||stack>64)fail('Stack size must be an integer from 1 to 64.');
     const id=namespace+':'+path,texture=namespace+'_'+path,content=kind==='item'?'StarterItem':'StarterBlock';
     const phpNamespace=plugin.toLowerCase();
-    const manifest=`name: ${plugin}\nmain: ${phpNamespace}\\Main\nsrc-namespace-prefix: ${phpNamespace}\nversion: 1.0.0\napi: 5.49.0\nload: POSTWORLD\ndepend: [Customies-Axolotl]\n`;
+    const manifest=`name: ${plugin}\nmain: ${phpNamespace}\\Main\nsrc-namespace-prefix: ${phpNamespace}\nversion: 1.0.0\napi: 5.51.0\nload: POSTWORLD\ndepend: [Customies-Axolotl]\n`;
     const main=`<?php\ndeclare(strict_types=1);\nnamespace ${phpNamespace};\n\nfinal class Main extends \\pocketmine\\plugin\\PluginBase {\n    protected function onEnable(): void {\n        $id = \\pocketmine\\${kind}\\${kind==='item'?'ItemTypeIds':'BlockTypeIds'}::newId();\n        \\customiesdevs\\customies\\${kind}\\Customies${kind==='item'?'Item':'Block'}Factory::getInstance()->register${kind==='item'?'Item':'Block'}(\n            static fn() => new ${content}($id), '${id}'\n        );\n    }\n}\n`;
     const item=`<?php\ndeclare(strict_types=1);\nnamespace ${phpNamespace};\n\nuse customiesdevs\\customies\\item\\{ItemComponents, ItemComponentsTrait};\nuse customiesdevs\\customies\\item\\preset\\ItemPresets;\nuse pocketmine\\item\\{Item, ItemIdentifier};\n\nfinal class StarterItem extends Item implements ItemComponents {\n    use ItemComponentsTrait;\n    public function __construct(int $id){\n        parent::__construct(new ItemIdentifier($id), '${plugin} Item');\n        ItemPresets::basic($this, '${texture}', '${plugin} Item', ${stack});\n    }\n    public function getMaxStackSize(): int { return ${stack}; }\n}\n`;
     const block=`<?php\ndeclare(strict_types=1);\nnamespace ${phpNamespace};\n\nuse customiesdevs\\customies\\block\\TraitBlock;\nuse customiesdevs\\customies\\block\\component as B;\nuse customiesdevs\\customies\\block\\properties\\Material;\nuse pocketmine\\block\\{BlockIdentifier, BlockTypeInfo, BlockBreakInfo};\n\nfinal class StarterBlock extends TraitBlock {\n    public function __construct(int $id){\n        $this->addComponent(new B\\GeometryComponent());\n        $this->addComponent(new B\\MaterialInstancesComponent([new Material('*', '${texture}')]));\n        $this->addComponent(new B\\CollisionBoxComponent());\n        $this->addComponent(new B\\SelectionBoxComponent());\n        $this->addComponent(new B\\DestructibleByMiningComponent(1.0));\n        parent::__construct(new BlockIdentifier($id), '${plugin} Block', new BlockTypeInfo(new BlockBreakInfo(1.0)));\n    }\n}\n`;

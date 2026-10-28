@@ -119,4 +119,25 @@ check($items['showcase:energized_ration']->getFoodRestore() === 10 && count($ite
 $shapes = [];
 foreach(['bottom','top'] as $half){ foreach(StairShapes::SHAPES as $shape){ $shapes[$shape.'_'.$half] = array_map(static fn($b) => [$b->minX,$b->minY,$b->minZ,$b->maxX,$b->maxY,$b->maxZ],StairShapes::boxes($shape,$half)); } }
 file_put_contents(dirname(__DIR__).'/stair-shapes.json',json_encode($shapes,JSON_PRETTY_PRINT)."\n");
-echo "PASS: 40 corner/half/direction cases, legacy stairs, combined-block interactions, spring, crafting, repair, effects, blade and food.\n";
+// Compare processed client collision with PHP shapes, independent of the geometry X mirror.
+$wireShapes = 0;
+foreach(BF::getInstance()->getBlockPaletteEntries() as $entry){
+	if($entry->getName() !== 'showcase:corner_stairs'){ continue; }
+	foreach($entry->getStates()->getRoot()->getListTag('permutations') as $permutation){
+		$collision = $permutation->getCompoundTag('components')?->getCompoundTag('minecraft:collision_box');
+		if($collision === null){ continue; }
+		preg_match("/minecraft:corner'\\) == '([^']+)'.*minecraft:vertical_half'\\) == '([^']+)'/", $permutation->getString('condition'), $matched);
+		check(count($matched) === 3, 'Stair wire fixture must identify its corner and half');
+		$serverBoxes = StairShapes::boxes($matched[1], $matched[2]);
+		$clientBoxes = $collision->getListTag('boxes')->getValue();
+		check(count($clientBoxes) === count($serverBoxes), 'Client must retain every stair collision box');
+		foreach($serverBoxes as $i=>$serverBox){
+			foreach(['minX','minY','minZ','maxX','maxY','maxZ'] as $coordinate){
+				check(abs($clientBoxes[$i]->getFloat($coordinate) / 16 - $serverBox->$coordinate) < 0.000001, 'Stair client/server collision mismatch after voxel conversion');
+			}
+		}
+		++$wireShapes;
+	}
+}
+check($wireShapes === 10, 'All stair corner/half wire definitions must be verified');
+echo "PASS: 40 corner/half/direction cases, legacy stairs, ten client/server wire shapes, interactions, crafting, repair, effects, blade and food.\n";

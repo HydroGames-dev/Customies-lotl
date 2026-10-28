@@ -10,7 +10,7 @@
                     "required": false,
                     "default": false,
                     "default_constant": null,
-                    "description": ""
+                    "description": "Advertise per-block dynamic property metadata."
                 },
                 {
                     "name": "slotCount",
@@ -18,7 +18,23 @@
                     "required": false,
                     "default": null,
                     "default_constant": null,
-                    "description": ""
+                    "description": "Optional container slot count, from 1 to 54."
+                },
+                {
+                    "name": "entityStorage",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Experimental 26.60 entity storage metadata (Upcoming Creator Features)."
+                },
+                {
+                    "name": "containerTitle",
+                    "type": "?string",
+                    "required": false,
+                    "default": null,
+                    "default_constant": null,
+                    "description": "Experimental literal/localization title, 1-256 characters; requires a container."
                 }
             ],
             "methods": [
@@ -32,13 +48,15 @@
             "constants": [],
             "serialized_example": {
                 "dynamic_properties": true,
+                "entity_storage": true,
                 "container": {
-                    "slot_count": 9
+                    "slot_count": 9,
+                    "title": "Showcase Storage"
                 }
             },
             "source": "src/block/component/BlockEntityComponent.php",
-            "source_sha256": "c16e46f7e44b40bfb9e8fbb90e681a80bab494a4e4e5c40618a3a0d282b60fdb",
-            "constructor": "\tpublic function __construct(bool $dynamicProperties = false, ?int $slotCount = null){\n\t\t$this->dynamicProperties = $dynamicProperties;\n\t\tif($slotCount !== null){\n\t\t\tif($slotCount < 1 || $slotCount > 54){\n\t\t\t\tthrow new \\InvalidArgumentException(\"Block entity container slot count must be between 1 and 54, got {$slotCount}\");\n\t\t\t}\n\t\t\t$this->slotCount = $slotCount;\n\t\t}\n\t}\n"
+            "source_sha256": "7867132ac6f45f904195f4e35014dc2a02ee330d5d2192abb234c910d4904282",
+            "constructor": "\tpublic function __construct(bool $dynamicProperties = false, ?int $slotCount = null, bool $entityStorage = false, ?string $containerTitle = null){\n\t\t$this->dynamicProperties = $dynamicProperties;\n\t\tif($containerTitle !== null && ($slotCount === null || !mb_check_encoding($containerTitle, 'UTF-8') || mb_strlen($containerTitle, 'UTF-8') < 1 || mb_strlen($containerTitle, 'UTF-8') > 256)){\n\t\t\tthrow new \\InvalidArgumentException('Container title requires a container and 1-256 UTF-8 characters');\n\t\t}\n\t\t$this->entityStorage = $entityStorage;\n\t\t$this->containerTitle = $containerTitle;\n\t\tif($slotCount !== null){\n\t\t\tif($slotCount < 1 || $slotCount > 54){\n\t\t\t\tthrow new \\InvalidArgumentException(\"Block entity container slot count must be between 1 and 54, got {$slotCount}\");\n\t\t\t}\n\t\t\t$this->slotCount = $slotCount;\n\t\t}\n\t}\n"
         },
         "block_tags": {
             "class": "customiesdevs\\customies\\block\\component\\BlockTagsComponent",
@@ -130,15 +148,15 @@
                     "documentation": "/**\n\t * Adds multiple collision boxes.\n\t * @param Box[] $boxes\n\t * An array of collision boxes to add.\n\t * @throws \\InvalidArgumentException If any element in the array is not an instance of Box.\n\t */"
                 }
             ],
-            "constants": [],
+            "constants": {
+                "MAX_BOXES": 16
+            },
             "serialized_example": {
-                "boxes": [
-                    []
-                ],
+                "boxes": [],
                 "enabled": false
             },
             "source": "src/block/component/CollisionBoxComponent.php",
-            "source_sha256": "9a0b63fe22781fc6bd6a65766765cbc5b6510c2d16b76cb6ae48844d73d268d2",
+            "source_sha256": "56f78cf460d5a7c299797b9dd99641ede700802aa66578bbc40c72981271c0c2",
             "constructor": "\tpublic function __construct(bool $enabled = true) {\n\t\t$this->enabled = $enabled;\n\t}\n"
         },
         "connection_rule": {
@@ -1837,13 +1855,13 @@
                         },
                         {
                             "name": "soundEvent",
-                            "type": "?customiesdevs\\customies\\item\\properties\\SoundEvent",
+                            "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string|null",
                             "required": false,
                             "default": null
                         }
                     ],
                     "return_type": "self",
-                    "documentation": "/**\n\t * Adds a durability threshold that triggers effects when the item's durability reaches the specified value.\n\t * @param int $durability The durability threshold at which the effects are triggered. Must be >= 0.\n\t * @param ParticleType|null $particleType The type of particle effect to emit when the threshold is reached. If null, no particle effect is emitted.\n\t * @param SoundEvent|null $soundEvent The sound event to play when the threshold is reached. If null, no sound is played.\n\t */"
+                    "documentation": "/**\n\t * Adds a durability threshold that triggers effects when the item's durability reaches the specified value.\n\t * @param int $durability The durability threshold at which the effects are triggered. Must be >= 0.\n\t * @param ParticleType|null $particleType The type of particle effect to emit when the threshold is reached. If null, no particle effect is emitted.\n\t * @param SoundEvent|string|null $soundEvent Built-in enum or custom sound_definitions.json event name. Null omits the sound.\n\t */"
                 }
             ],
             "constants": [],
@@ -1851,12 +1869,12 @@
                 "durability_thresholds": [
                     {
                         "durability": 32,
-                        "sound_event": "attack.critical"
+                        "sound_event": "showcase.chime"
                     }
                 ]
             },
             "source": "src/item/component/DurabilitySensorComponent.php",
-            "source_sha256": "c51e92dcd6f6d8ae8a06859c36b3cae69e3afbd1641e5368a2793b65aca02adf",
+            "source_sha256": "055718bc63fcc7c09b79b3ca2113b0c2c13fb4e50217b37b079b2b7da0f922a6",
             "constructor": "\tpublic function __construct(array $durabilityThresholds = []) {\n\t\tif(isset($durabilityThresholds['durability'])){\n\t\t\t$durabilityThresholds = [$durabilityThresholds];\n\t\t}\n\t\tforeach($durabilityThresholds as $threshold){\n\t\t\tif(!is_array($threshold) || !isset($threshold['durability']) || !is_int($threshold['durability'])){\n\t\t\t\tthrow new \\InvalidArgumentException('Durability threshold must contain an integer durability');\n\t\t\t}\n\t\t\t$this->addDurabilityThreshold(\n\t\t\t\t$threshold['durability'],\n\t\t\t\t$threshold['particle_type'] ?? null,\n\t\t\t\t$threshold['sound_event'] ?? null\n\t\t\t);\n\t\t}\n\t}\n"
         },
         "dyeable": {
@@ -2978,39 +2996,39 @@
             "parameters": [
                 {
                     "name": "critical",
-                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string",
                     "required": false,
                     "default": "attack.critical",
                     "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_CRITICAL",
-                    "description": ""
+                    "description": "Built-in enum or custom sound_definitions.json critical-hit sound."
                 },
                 {
                     "name": "hit",
-                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string",
                     "required": false,
                     "default": "attack.strong",
                     "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_STRONG",
-                    "description": ""
+                    "description": "Built-in enum or custom hit sound name."
                 },
                 {
                     "name": "miss",
-                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent",
+                    "type": "customiesdevs\\customies\\item\\properties\\SoundEvent|string",
                     "required": false,
                     "default": "attack.nodamage",
                     "default_constant": "customiesdevs\\customies\\item\\properties\\SoundEvent::ATTACK_NODAMAGE",
-                    "description": ""
+                    "description": "Built-in enum or custom miss sound name."
                 }
             ],
             "methods": [],
             "constants": [],
             "serialized_example": {
-                "attack_critical_hit": "attack.critical",
+                "attack_critical_hit": "showcase.chime",
                 "attack_hit": "attack.strong",
-                "attack_miss": "attack.nodamage"
+                "attack_miss": "showcase.chime"
             },
             "source": "src/item/component/SwingSoundsComponent.php",
-            "source_sha256": "bb64c91d04b4ff8937652cdac26d4a5af8fa3da48f8a64f58499031cef3d7de0",
-            "constructor": "\tpublic function __construct(\n\t\tprivate SoundEvent $critical = SoundEvent::ATTACK_CRITICAL,\n\t\tprivate SoundEvent $hit = SoundEvent::ATTACK_STRONG,\n\t\tprivate SoundEvent $miss = SoundEvent::ATTACK_NODAMAGE,\n\t) {}\n"
+            "source_sha256": "4224266d17d0891b8dfb26ea2b110d8eaeef7ef6f8c4cca34b895a386b0ab8a8",
+            "constructor": "\tpublic function __construct(\n\t\tprivate SoundEvent|string $critical = SoundEvent::ATTACK_CRITICAL,\n\t\tprivate SoundEvent|string $hit = SoundEvent::ATTACK_STRONG,\n\t\tprivate SoundEvent|string $miss = SoundEvent::ATTACK_NODAMAGE,\n\t) {}\n"
         },
         "throwable": {
             "class": "customiesdevs\\customies\\item\\component\\ThrowableComponent",
@@ -3175,7 +3193,8 @@
                 "emit_vibrations": false,
                 "movement_modifier": 0.5,
                 "use_duration": 1.6,
-                "start_using": "always"
+                "start_using": "always",
+                "start_sound": "showcase.chime"
             },
             "source": "src/item/component/UseModifiersComponent.php",
             "source_sha256": "42b377d6e0c1c1d0cee2a2b683ad8e2075c392527b0564d702f07fedb2724a94",

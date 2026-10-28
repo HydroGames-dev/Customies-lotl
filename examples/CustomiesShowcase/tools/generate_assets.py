@@ -153,7 +153,7 @@ def texture(name, item=False):
                 draw.line((0,y,15,y),fill=high+(255,));draw.line(((y*2)%12,y,(y*2)%12,min(15,y+4)),fill=high+(255,))
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 139 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,4,0],'min_engine_version':[1,26,50]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,4,0]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 139 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,4,1],'min_engine_version':[1,26,60]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,4,1]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
 animated = {'showcase_reactor_flow':'reactor', **{d['active_texture']:key for key,d in EXPANSION.items() if 'active_texture' in d}}
 segment_textures={seg[k] for d in EXPANSION.values() for seg in d['segments'] for k in ('texture','active_texture') if k in seg}
 for d in EXPANSION.values():

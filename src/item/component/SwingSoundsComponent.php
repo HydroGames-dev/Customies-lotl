@@ -7,10 +7,15 @@ use customiesdevs\customies\item\properties\SoundEvent;
 
 final class SwingSoundsComponent implements ItemComponent {
 
+	/**
+	 * @param SoundEvent|string $critical Built-in enum or custom sound_definitions.json critical-hit sound.
+	 * @param SoundEvent|string $hit Built-in enum or custom hit sound name.
+	 * @param SoundEvent|string $miss Built-in enum or custom miss sound name.
+	 */
 	public function __construct(
-		private SoundEvent $critical = SoundEvent::ATTACK_CRITICAL,
-		private SoundEvent $hit = SoundEvent::ATTACK_STRONG,
-		private SoundEvent $miss = SoundEvent::ATTACK_NODAMAGE,
+		private SoundEvent|string $critical = SoundEvent::ATTACK_CRITICAL,
+		private SoundEvent|string $hit = SoundEvent::ATTACK_STRONG,
+		private SoundEvent|string $miss = SoundEvent::ATTACK_NODAMAGE,
 	) {}
 
 	public function getName(): string {
@@ -19,9 +24,9 @@ final class SwingSoundsComponent implements ItemComponent {
 
 	public function getValue(): array {
 		return [
-			"attack_critical_hit" => $this->critical->value,
-			"attack_hit" => $this->hit->value,
-			"attack_miss" => $this->miss->value,
+			"attack_critical_hit" => $this->critical instanceof SoundEvent ? $this->critical->value : $this->critical,
+			"attack_hit" => $this->hit instanceof SoundEvent ? $this->hit->value : $this->hit,
+			"attack_miss" => $this->miss instanceof SoundEvent ? $this->miss->value : $this->miss,
 		];
 	}
 

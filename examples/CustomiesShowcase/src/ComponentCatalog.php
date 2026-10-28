@@ -15,7 +15,7 @@ final class ComponentCatalog {
 		$geometry = new B\GeometryComponent('geometry.showcase.cube');
 		$materials = [new Material('*', 'showcase_lab')];
 		return [
-			'block_entity' => new B\BlockEntityComponent(true, 9),
+			'block_entity' => new B\BlockEntityComponent(true, 9, true, 'Showcase Storage'),
 			'block_tags' => new B\BlockTagsComponent(['showcase:specimen', 'minecraft:stone']),
 			'chest_obstruction' => new B\ChestObstructionComponent('shape'),
 			'collision_box' => new B\CollisionBoxComponent(false),
@@ -64,7 +64,7 @@ final class ComponentCatalog {
 			'digger' => new I\DiggerComponent(true, [['block' => ['name' => 'minecraft:stone'], 'speed' => 6]]),
 			'display_name' => new I\DisplayNameComponent('Display Name Specimen'),
 			'durability' => new I\DurabilityComponent(256),
-			'durability_sensor' => new I\DurabilitySensorComponent([['durability' => 32, 'sound_event' => SoundEvent::ATTACK_CRITICAL]]),
+			'durability_sensor' => new I\DurabilitySensorComponent([['durability' => 32, 'sound_event' => 'showcase.chime']]),
 			'dyeable' => new I\DyeableComponent('#39d8ce'),
 			'enchantable' => new I\EnchantableComponent('sword', 12),
 			'fire_resistant' => new I\FireResistantComponent(),
@@ -91,10 +91,10 @@ final class ComponentCatalog {
 			'storage_weight_limit' => new I\StorageWeightLimitComponent(64),
 			'storage_weight_modifier' => new I\StorageWeightModifierComponent(8),
 			'swing_duration' => new I\SwingDurationComponent(0.5),
-			'swing_sounds' => new I\SwingSoundsComponent(),
+			'swing_sounds' => new I\SwingSoundsComponent('showcase.chime', SoundEvent::ATTACK_STRONG, 'showcase.chime'),
 			'throwable' => new I\ThrowableComponent(true, 1.0, 1.0, 1.5),
 			'use_animation' => new I\UseAnimationComponent('drink'),
-			'use_modifiers' => new I\UseModifiersComponent(0.5, 1.6),
+			'use_modifiers' => new I\UseModifiersComponent(0.5, 1.6, startSound: 'showcase.chime'),
 			'wearable' => new I\WearableComponent(I\WearableComponent::SLOT_ARMOR_HEAD, 2)
 		];
 	}

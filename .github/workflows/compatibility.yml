@@ -17,18 +17,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: stable-lock
-            host: c96300392ade9fb4ed423c2662815be7e79c45a3
+          - name: release-26.60
+            host: f5e6a67fdf2108cf63196c06db1eb5c0d400d4c8
             protocol: ''
-          - name: stable-protocol-head
-            host: c96300392ade9fb4ed423c2662815be7e79c45a3
-            protocol: 'dev-master#da83718c6e329de77dc4b9d654839bf5460dd6f8'
-          - name: preview-lock
-            host: 3bf5c010a1c05790b2ba64d12832102b62822b1f
+          - name: stable-26.60
+            host: 61eb9b4e23457145efd39ae4785825d4045c765f
             protocol: ''
-          - name: preview-protocol-head
-            host: 3bf5c010a1c05790b2ba64d12832102b62822b1f
-            protocol: 'dev-bedrock-1.26.60#f9d8b40da3940cef8242b0da34ba41fe49ea7364'
+          - name: protocol-master-26.60
+            host: 61eb9b4e23457145efd39ae4785825d4045c765f
+            protocol: 'dev-master#64eae48f05b8d1e4d474ead89711600996f1c5af'
     name: ${{ matrix.name }} / PHP 8.4
     steps:
       - uses: actions/checkout@v6
@@ -55,5 +52,7 @@ jobs:
         run: php tools/doctor.php .compat/host
       - name: State, cache and wire codec regressions
         run: php tests/protocol.php .compat/host
+      - name: Mojang 26.60 components and command removal
+        run: php tests/mc2660.php .compat/host
       - name: Showcase and documentation PHP integration
         run: php examples/CustomiesShowcase/tests/guide.php .compat/host

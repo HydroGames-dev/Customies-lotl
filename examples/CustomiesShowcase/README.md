@@ -1,7 +1,7 @@
 # Customies Showcase: Prism Laboratory
 
 A companion plugin and original Bedrock resource pack for this Customies branch.
-Showcase 1.4.0 adds a hollow cottage, market hall, grand gateway, shared model roles and banked part indices. Bundled Customies 1.5.42 includes the corrected corner-trait selector and slab/bench selection boxes.
+Showcase 1.4.1 targets Minecraft 26.60 with Customies 1.7.0 and Axolotl API 5.51.0. It retains the cottage, market hall, gateway and banked part indices, and uses explicit server-to-voxel collision conversion. Component fixtures cover the updated custom sound and block-entity metadata fields. The library registers no in-game commands; the commands below belong to this separate example plugin.
 When updating, replace both plugin PHARs, restart the server, and reconnect clients.
 **73 blocks + 66 items**, including 64 playable examples and 75 component specimens.
 Every shipped block component (33) and item component (42) has an explicit constructor
@@ -170,7 +170,7 @@ Minecraft client playtest. Pose values are editable in the generated JSON and
 
 Update **both PHARs and the resource pack**, restart the server, and reconnect.
 Obtain fresh items with `/cshow kit` or `/cshow give <id>`. The pack UUID is preserved
-and its version is increased to 1.4.0 so clients can accept the update.
+and its version is increased to 1.4.1 so clients can accept the update.
 
 ## Combined-feature additions (1.1.0)
 

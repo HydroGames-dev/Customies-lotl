@@ -67,8 +67,8 @@ final class ExpansionBlocks {
 		$origin = new Vector3($x*16-8,$y*16,$z*16-8); $size = new Vector3(($xx-$x)*16,($yy-$y)*16,($zz-$z)*16);
 		$boxes = isset($segment['collision_boxes']) ? array_map(static function(array $b){
 			[$x,$y,$z,$xx,$yy,$zz] = $b;
-			return new Box(new Vector3($x*16-8,$y*16,$z*16-8),new Vector3(($xx-$x)*16,($yy-$y)*16,($zz-$z)*16));
-		},$segment['collision_boxes']) : [new Box($origin,$size)];
+			return Box::fromBlockAABB(new \pocketmine\math\AxisAlignedBB($x,$y,$z,$xx,$yy,$zz));
+		},$segment['collision_boxes']) : [Box::fromBlockAABB(new \pocketmine\math\AxisAlignedBB($x,$y,$z,$xx,$yy,$zz))];
 		return [(new B\CollisionBoxComponent())->addBoxes($boxes),new B\SelectionBoxComponent(true,$origin,$size),new B\LightEmissionComponent($segment['light'])];
 	}
 	public static function applyComponents(ShowcaseBlock $block): void {

@@ -12,8 +12,7 @@ final class RuntimeCompatibility {
 	/** API/codec regression targets; Minecraft rendering is a separate check. */
 	public static function getProfile(int $protocol): string {
 		return match($protocol){
-			2193 => '26.50 (stable API target)',
-			2225 => '26.60 (development API target)',
+			2225 => '26.60 (stable API target)',
 			default => 'unverified host protocol'
 		};
 	}

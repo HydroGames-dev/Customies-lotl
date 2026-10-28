@@ -125,7 +125,7 @@ final class ShowcaseBlock extends TraitBlock {
 					foreach(array_keys($arms) as $i=>$direction){
 						$connected = ($bits & (1 << $i)) !== 0;
 						$conditions[] = ($connected ? '' : '!')."q.block_state('minecraft:connection_$direction')";
-						if($connected){ [$x,$y,$z,$w,$h,$d] = $arms[$direction]; $boxes[] = new Box(new Vector3($x,$y,$z),new Vector3($w,$h,$d)); }
+						if($connected){ [$x,$y,$z,$w,$h,$d] = $arms[$direction]; $boxes[] = Box::fromBlockAABB(new AxisAlignedBB(($x+8)/16,$y/16,($z+8)/16,($x+$w+8)/16,($y+$h)/16,($z+$d+8)/16)); }
 					}
 					$this->addPermutation(new BlockPermutation(implode(' && ',$conditions),(new B\CollisionBoxComponent())->addBoxes($boxes)));
 				}
@@ -139,7 +139,7 @@ final class ShowcaseBlock extends TraitBlock {
 				}
 				foreach(['bottom','top'] as $half){
 					foreach(StairShapes::SHAPES as $shape){
-						$boxes = array_map(static fn(AxisAlignedBB $b) => new Box(new Vector3($b->minX*16-8,$b->minY*16,$b->minZ*16-8),new Vector3(($b->maxX-$b->minX)*16,($b->maxY-$b->minY)*16,($b->maxZ-$b->minZ)*16)),StairShapes::boxes($shape,$half));
+						$boxes = array_map(static fn(AxisAlignedBB $b) => Box::fromBlockAABB($b),StairShapes::boxes($shape,$half));
 						$condition = "q.block_state('minecraft:corner') == '$shape' && q.block_state('minecraft:vertical_half') == '$half'";
 						$this->addPermutation(new BlockPermutation($condition,new B\GeometryComponent("geometry.showcase.stairs_{$shape}_{$half}"),[(new B\CollisionBoxComponent())->addBoxes($boxes)]));
 					}

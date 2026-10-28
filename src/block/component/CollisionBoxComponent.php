@@ -4,8 +4,10 @@ declare(strict_types=1);
 namespace customiesdevs\customies\block\component;
 
 use customiesdevs\customies\block\properties\Box;
+use pocketmine\nbt\tag\ListTag;
 
 final class CollisionBoxComponent implements BlockComponent {
+	public const MAX_BOXES = 16;
 
 	private bool $enabled;
 	/** @var Box[] */
@@ -25,19 +27,15 @@ final class CollisionBoxComponent implements BlockComponent {
 
 	public function getValue(): array {
 		$boxes = [];
-		foreach($this->boxes as $box){
+		foreach($this->enabled ? $this->boxes : [] as $box){
 			$boxes[] = $box->toNbtArray();
 		}
 		// if no boxes are defined we add a default full block box
 		if($this->enabled && $boxes === []){
 			$boxes[] = Box::defaultBox()->toNbtArray();
 		}
-		// no collision
-		if(!$this->enabled){
-			$boxes[] = [];
-		}
 		return [
-			"boxes" => $boxes,
+			"boxes" => $boxes === [] ? new ListTag() : $boxes,
 			"enabled" => $this->enabled
 		];
 	}
@@ -48,9 +46,7 @@ final class CollisionBoxComponent implements BlockComponent {
 	 * The collision box to add.
 	 */
 	public function addBox(Box $box): self {
-		if(count($this->boxes) === 1){
-			$this->boxes = [];
-		}
+		if(count($this->boxes) >= self::MAX_BOXES){ throw new \InvalidArgumentException('At most 16 collision boxes are allowed'); }
 		$this->boxes[] = $box;
 		return $this;
 	}
@@ -62,15 +58,13 @@ final class CollisionBoxComponent implements BlockComponent {
 	 * @throws \InvalidArgumentException If any element in the array is not an instance of Box.
 	 */
 	public function addBoxes(array $boxes): self {
-		if(count($this->boxes) === 1){
-			$this->boxes = [];
-		}
+		if(count($this->boxes) + count($boxes) > self::MAX_BOXES){ throw new \InvalidArgumentException('At most 16 collision boxes are allowed'); }
 		foreach($boxes as $box){
 			if(!$box instanceof Box){
 				throw new \InvalidArgumentException("All boxes must be instances of " . Box::class);
 			}
-			$this->boxes[] = $box;
 		}
+		array_push($this->boxes, ...array_values($boxes));
 		return $this;
 	}
 }

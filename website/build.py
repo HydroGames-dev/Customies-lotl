@@ -11,6 +11,7 @@ ROOT=BASE.parent
 SHOW=ROOT/'examples/CustomiesShowcase'
 REPO='https://github.com/HydroGames-dev/Customies-lotl'
 REF='feat/block-traits-presets'
+SHOWCASE_VERSION=re.search(r'^version:\s*(\S+)',(SHOW/'plugin.yml').read_text(encoding='utf-8'),re.M)[1]
 LIBRARY_VERSION=re.search(r'^version:\s*(\S+)',(ROOT/'plugin.yml').read_text(encoding='utf-8'),re.M)[1]
 parser=argparse.ArgumentParser()
 parser.add_argument('--output',type=Path,default=BASE/'dist')
@@ -148,7 +149,7 @@ def layout(key,title,description,body):
     demo=key in SHOWCASE_KEYS
     scope='showcase' if demo else 'customies'
     brand='CustomiesShowcase' if demo else 'Customies'
-    version='EXAMPLE PLUGIN 1.4.0' if demo else 'LIBRARY '+LIBRARY_VERSION
+    version='EXAMPLE PLUGIN '+SHOWCASE_VERSION if demo else 'LIBRARY '+LIBRARY_VERSION
     scope_keys=([p[0] for p in pages if p[0].startswith(key.split('-component-')[0]+'-component-')] if '-component-' in key else [p[0] for p in pages if (p[0] in SHOWCASE_KEYS)==demo and '-component-' not in p[0]])
     pos=scope_keys.index(key)
     prev=scope_keys[pos-1] if pos else None
@@ -221,7 +222,7 @@ if args.downloads:
     dest=OUT/'downloads';dest.mkdir(exist_ok=True)
     names=['CustomiesShowcase-install.zip','CustomiesShowcase.phar','Customies-Axolotl.phar','CustomiesShowcase.mcpack','SHA256SUMS.txt']
     for name in names:shutil.copy2(args.downloads/name,dest/name)
-    downloadbody+='<h2 id="ready-to-install">Ready-to-install bundle</h2><p>Showcase 1.4.0 / Customies '+LIBRARY_VERSION+'. The ZIP contains both PHARs, the resource pack, guide and benchmark sample.</p><div class="download-list">'+''.join(f'<a href="downloads/{name}" download><span>{name}</span><small>{(dest/name).stat().st_size/1024:.0f} KiB ↓</small></a>' for name in names)+'</div>'
+    downloadbody+='<h2 id="ready-to-install">Ready-to-install bundle</h2><p>Showcase '+SHOWCASE_VERSION+' / Customies '+LIBRARY_VERSION+'. The ZIP contains both PHARs, the resource pack, guide and benchmark sample.</p><div class="download-list">'+''.join(f'<a href="downloads/{name}" download><span>{name}</span><small>{(dest/name).stat().st_size/1024:.0f} KiB ↓</small></a>' for name in names)+'</div>'
 downloadbody+=render(f'''## Install safely
 
 Stop the server, replace both PHARs, update the resource pack in its existing stack,

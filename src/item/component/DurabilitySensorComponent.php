@@ -22,7 +22,7 @@ final class DurabilitySensorComponent implements ItemComponent {
 	 * @param array<int, array{
 	 *     durability: int,
 	 *     particle_type?: ParticleType|null,
-	 *     sound_event?: SoundEvent|null
+	 *     sound_event?: SoundEvent|string|null
 	 * }> $durabilityThresholds
 	 */
 	public function __construct(array $durabilityThresholds = []) {
@@ -60,12 +60,12 @@ final class DurabilitySensorComponent implements ItemComponent {
 	 * Adds a durability threshold that triggers effects when the item's durability reaches the specified value.
 	 * @param int $durability The durability threshold at which the effects are triggered. Must be >= 0.
 	 * @param ParticleType|null $particleType The type of particle effect to emit when the threshold is reached. If null, no particle effect is emitted.
-	 * @param SoundEvent|null $soundEvent The sound event to play when the threshold is reached. If null, no sound is played.
+	 * @param SoundEvent|string|null $soundEvent Built-in enum or custom sound_definitions.json event name. Null omits the sound.
 	 */
 	public function addDurabilityThreshold(
 		int $durability,
 		?ParticleType $particleType = null,
-		?SoundEvent $soundEvent = null
+		SoundEvent|string|null $soundEvent = null
 	): self {
 		if($durability < 0){
 			throw new \InvalidArgumentException("Durability threshold must be >= 0, $durability given");
@@ -78,7 +78,7 @@ final class DurabilitySensorComponent implements ItemComponent {
 			$threshold['particle_type'] = $particleType->value;
 		}
 		if($soundEvent !== null){
-			$threshold['sound_event'] = $soundEvent->value;
+			$threshold['sound_event'] = $soundEvent instanceof SoundEvent ? $soundEvent->value : $soundEvent;
 		}
 		$this->durabilityThresholds[] = $threshold;
 		return $this;

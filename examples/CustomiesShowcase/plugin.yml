@@ -1,8 +1,8 @@
 name: CustomiesShowcase
 main: customiesdevs\showcase\ShowcasePlugin
 src-namespace-prefix: customiesdevs\showcase
-version: 1.4.0
-api: 5.49.0
+version: 1.4.1
+api: 5.51.0
 load: POSTWORLD
 depend: [Customies-Axolotl]
 author: HydroGames-dev

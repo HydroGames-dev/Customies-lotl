@@ -1,5 +1,8 @@
 # Customies 1.6.0
 
+Historical notes: the library commands below were removed in 1.7.0. Use the current
+diagnostics guide for the PHP API and source-checkout helper.
+
 ## Compatibility and correctness
 
 - Add pinned Axolotl 26.50/26.60 API and wire-codec targets (protocols 2193/2225),

@@ -16,7 +16,7 @@ name: MyContent
 main: tutorial\Main
 src-namespace-prefix: tutorial
 version: 1.0.0
-api: 5.49.0
+api: 5.51.0
 load: POSTWORLD
 depend: [Customies-Axolotl]
 ```
@@ -27,8 +27,8 @@ calls to put inside `onEnable()`. Obtain your registered content through
 `CustomiesBlockFactory::get()` or `CustomiesItemFactory::get()`, then give the item
 through your plugin's command or inventory logic. Example-plugin commands are not part of the library API.
 
-Customies 1.6.0 has API/codec regression targets for Axolotl 5.50.1+dev with
-26.50 stable and 26.60 development dependencies, using PHP 8.4.16. See the
+Customies 1.7.0 targets Axolotl 5.51.0 or newer with released 26.60
+dependencies (protocol 2225), tested using PHP 8.4.16. See the
 [pinned compatibility matrix](protocol-updates.html) and [runtime diagnostics](diagnostics.html).
 Customies uses the host protocol; 1.26.52/1.26.60 have not been client-tested here.
 

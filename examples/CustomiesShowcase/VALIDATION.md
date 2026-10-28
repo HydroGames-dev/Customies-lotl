@@ -1,5 +1,23 @@
 # Validation - 2026-10-24
 
+## Customies 1.7.0 / Showcase 1.4.1 - 2026-10-28
+
+Tests target released 26.60 dependencies on Axolotl 5.51.0, the stable snapshot
+and pinned protocol master. State/packet/component suites and all 139 example
+specimens pass. Collision tests include real canonical NBT, X mirroring,
+fractional server-unit conversions, multi-box append and disabled empty lists.
+Item tests cover custom durability/swing/use sounds. API exports and assets pass.
+
+Both packaged plugins loaded/enabled on an isolated 5.51.0 server with the matching
+1.26.60-minimum resource pack. A temporary probe verified the library command and
+permission are absent, registration closes, and 73 blocks/3210 states/139 item
+entries are present. The server reached Done and shut down cleanly. This used a
+copy of the earlier task's test world: fresh-world creation encountered a Windows
+LevelDB temporary-file replacement error before plugin enable. No user world was
+modified and the host/extension code was not patched for that environment issue.
+
+Minecraft client rendering, custom sound playback and prediction were not tested.
+
 ## Customies 1.6.0 revalidation - 2026-10-27
 
 PHP 8.4.16 tests pass against pinned Axolotl stable 26.50 / protocol 2193 and
