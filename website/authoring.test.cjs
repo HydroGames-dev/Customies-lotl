@@ -21,6 +21,8 @@ for(const bad of ['{}','null','{"minecraft:block":{}}','{"minecraft:item":{},"mi
 for(const bad of ['class','Vector3','B','ContentPlugin',"X');exit();//",''] )assert.throws(()=>A.convert(block,{className:bad}));
 assert.throws(()=>A.parse('['.repeat(34)+'0'+']'.repeat(34)),/depth/);
 assert.throws(()=>A.parse('x'.repeat(131073)),/128/);
+assert.throws(()=>A.parse('{"x":1e999}'),/finite/);
+assert.throws(()=>A.parse('{"x":9007199254740993}'),/safely/);
 assert.throws(()=>A.visualize('{"collision":{"min":[0,0,0],"max":[17,8,8]}}'),/bounds/);
 assert.throws(()=>A.visualize('{"selection":[{},{}]}'),/single/);
 assert.throws(()=>A.generate({kind:'item',preset:'armor',stack:64}),/stack size/);
@@ -35,6 +37,11 @@ for(const [kind,sample] of Object.entries(nativeSamples)){
   fixtures.push({kind,preset:'adapters',className,identifier,...converted});
 }
 const archive=A.zip({'hello.txt':'Prism ◆\n','src/Test.php':'<?php\n'});assert.equal(new DataView(archive.buffer).getUint32(0,true),0x04034b50);
+const rotation={'format_version':'1.26.60','minecraft:block':{description:{identifier:'documentation:rotated',traits:{'minecraft:placement_direction':{enabled_states:['minecraft:cardinal_direction']}}},components:{'minecraft:geometry':'minecraft:geometry.full_block','minecraft:collision_box':{min:[0,0,0],max:[4,8,12]},'minecraft:selection_box':{min:[0,0,0],max:[4,8,12]}},permutations:['north','west','south','east'].map((d,i)=>({condition:"q.block_state('minecraft:cardinal_direction') == '"+d+"'",components:{'minecraft:transformation':{rotation:[0,i*90,0]}}}))}};
+const rotated=A.convert(rotation,{className:'RotatedShape'});assert.ok(Array.isArray(JSON.parse(rotated.files['source.json'])['minecraft:block'].components['minecraft:collision_box']));assert.ok(rotated.report.review.some(s=>s.includes('normalized legacy')));fixtures.push({kind:'block',preset:'rotation',className:'RotatedShape',identifier:'documentation:rotated',...rotated});
+for(const options of [{kind:'item',preset:'food',className:'ConfiguredFood',identifier:'documentation:configured_food',stack:16,nutrition:10,saturation:.9,lore:'A $& treat'},{kind:'item',preset:'armor',className:'ConfiguredArmor',identifier:'documentation:configured_armor',stack:1,durability:512,slot:'slot.armor.chest',protection:8,lore:"A 'quoted' chestplate"},{kind:'block',preset:'slab',className:'ConfiguredSlab',identifier:'documentation:configured_slab',hardness:2,light:9,lore:'A luminous slab'}]){fixtures.push({...options,preset:'configured',expectedStack:options.stack??16,configuration:options,...A.generate(options)});}
+assert.throws(()=>A.generate({kind:'item',preset:'food',nutrition:101}),/nutrition/);
+assert.throws(()=>A.generate({kind:'block',preset:'cube',hardness:-1}),/hardness/);
 const shapes=JSON.parse(fs.readFileSync(path.join(__dirname,'shape-fixtures.json'),'utf8'));assert.equal(shapes.length,40);
 function occupancy(boxes){return [.25,.75].flatMap(x=>[.25,.75].flatMap(y=>[.25,.75].map(z=>boxes.some(([a,b,c,d,e,f])=>x>a&&x<d&&y>b&&y<e&&z>c&&z<f))));}
 for(const f of shapes){assert.deepEqual(occupancy(f.client),occupancy(f.server));assert.deepEqual(occupancy(f.server),occupancy(f.vanilla));}

@@ -43,14 +43,20 @@
   function download(data,name,type){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
   document.querySelectorAll('[data-authoring]').forEach(async form=>{
     const kind=form.dataset.authoring,status=form.querySelector('.authoring-status'),result=form.querySelector('.authoring-result'),fileSelect=form.querySelector('[data-files]'),code=form.querySelector('[data-code]'),report=form.querySelector('[data-report]'),submit=form.querySelector('[type=submit]');
-    const fields=form.elements,source=fields.namedItem('source'),draw=form.querySelector('canvas')?scene(form.querySelector('canvas')):null,initial=source?.value;let files={},fixtures;
-    function show(output,message){files=output.files;fileSelect.replaceChildren();for(const path of Object.keys(files)){const o=document.createElement('option');o.value=path;o.textContent=path;fileSelect.append(o);}code.textContent=files[fileSelect.value];report.replaceChildren();
+    const fields=form.elements,source=fields.namedItem('source'),draw=form.querySelector('canvas')?scene(form.querySelector('canvas')):null,initial=source?.value;let files={},fixtures,sequence=0;
+    function renderFile(){const value=files[fileSelect.value];code.textContent=typeof value==='string'?value:'Binary asset · '+value.byteLength+' bytes · included in the ZIP.';form.querySelector('[data-authoring-copy]').disabled=typeof value!=='string';}
+    function show(output,message){files=output.files;fileSelect.replaceChildren();for(const path of Object.keys(files)){const o=document.createElement('option');o.value=path;o.textContent=path;fileSelect.append(o);}const first=Object.keys(files).find(p=>p.startsWith('src/')&&!p.endsWith('ContentPlugin.php'));if(first)fileSelect.value=first;renderFile();report.replaceChildren();
       if(output.report){const summary=document.createElement('p');summary.textContent=(output.report.state_combinations??1)+' state combination(s) · '+(output.report.converted_components??0)+' base components adapted';report.append(summary);for(const note of output.report.review??[]){const p=document.createElement('p');p.textContent=note;report.append(p);}}
       result.hidden=false;status.textContent=message;status.classList.remove('has-error');
     }
-    function run(){try{
+    async function run(){const current=++sequence;try{
       const options=Object.fromEntries(new FormData(form));
-      if(kind==='generator'){const out=A.generate(options);show(out,'Source generated. Review the files and required assets before installing.');}
+      if(kind==='generator'){const out=A.generate(options),texture=fields.textureFile?.files[0];if(texture){
+        if(texture.size>1048576)throw Error('Use a PNG of at most 1 MiB.');const bytes=new Uint8Array(await texture.arrayBuffer());if(bytes.length<24||[137,80,78,71,13,10,26,10].some((b,i)=>bytes[i]!==b))throw Error('Choose a valid PNG texture.');
+        const view=new DataView(bytes.buffer),width=view.getUint32(16),height=view.getUint32(20);if(!width||width!==height||width>1024)throw Error('Use a square PNG of at most 1024 × 1024.');
+        if(typeof createImageBitmap==='function'){const image=await createImageBitmap(new Blob([bytes],{type:'image/png'}));image.close();}
+        const path='resource_pack/textures/'+(options.kind==='item'?'items':'blocks')+'/'+options.texture+'.png';out.files[path]=bytes;out.report.review=out.report.review.filter(n=>!n.startsWith('Required asset:'));out.report.review.push('Texture included: '+path);out.files['conversion-report.json']=pretty(out.report);
+      }if(current!==sequence)return;show(out,'Source generated. Review the PHP, integration notes and resource files.');}
       if(kind==='converter'){const out=A.convert(source.value,options);show(out,'Converted '+out.report.kind+' '+out.report.identifier+'. Review '+out.report.review.length+' integration note(s).');}
       if(kind==='shapes'){const out=A.visualize(source.value,options.direction);draw([{boxes:out.collision,color:'#269d99'},{boxes:out.selection,color:'#d99a35'}]);show({files:{'collision.php':'// Local server collision bounds; add in recalculateCollisionBoxes()\nreturn ['+out.php.join(', ')+'];\n','shape.json':pretty(out)}},out.collision.length+' collision box(es), '+out.selection.length+' selection box(es). Bounds use local block units.');}
       if(kind==='rotation'){
@@ -60,18 +66,21 @@
         const colors={client:'#269d99',server:'#d99a35',vanilla:'#7973d4'};draw(['client','server','vanilla'].filter(k=>options.layer==='all'||options.layer===k).map(k=>({boxes:f[k],color:colors[k]})));
         show({files:{'tested-shape.json':pretty(f),'collision.php':'return ['+f.server.map(b=>'new AxisAlignedBB('+b.join(', ')+')').join(', ')+'];\n'}},(ok?'MATCH':'MISMATCH')+' · '+options.shape+' / '+options.half+' / '+options.direction+' · client mesh, PHP and vanilla occupancy.');
       }
-    }catch(e){result.hidden=true;files={};draw?.([]);status.textContent=e.message;status.classList.add('has-error');}}
-    fileSelect.addEventListener('change',()=>code.textContent=files[fileSelect.value]??'');
+    }catch(e){if(current!==sequence)return;result.hidden=true;files={};draw?.([]);status.textContent=e.message;status.classList.add('has-error');}}
+    fileSelect.addEventListener('change',renderFile);
     form.addEventListener('submit',e=>{e.preventDefault();run();});
     form.querySelector('[data-authoring-copy]').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(files[fileSelect.value]);status.textContent='Copied '+fileSelect.value;}catch{status.textContent='Select the code and copy it using your device’s copy action.';}});
     form.querySelector('[data-download]').addEventListener('click',()=>download(A.zip(files),'customies-'+kind+'.zip','application/zip'));
     function updatePresets(){const item=fields.kind.value==='item',preset=fields.preset;preset.replaceChildren();for(const [key,label] of (item?[['basic','Basic item'],['food','Food · restores hunger'],['durable','Durable · attack damage'],['armor','Armor · helmet']]:[['cube','Solid cube'],['cardinal','Four-direction block'],['slab','Merging slab']])){const o=document.createElement('option');o.value=key;o.textContent=label;preset.append(o);}form.querySelector('[data-stack]').hidden=!item;fields.stack.value=64;}
-    if(kind==='generator'){fields.kind.addEventListener('change',()=>{updatePresets();run();});fields.preset.addEventListener('change',()=>{if(['durable','armor'].includes(fields.preset.value))fields.stack.value=1;run();});}
+    function patternFields(){if(kind!=='generator')return;for(const label of form.querySelectorAll('[data-kind],[data-presets],[data-advanced]')){
+      let visible=label.hasAttribute('data-advanced')?fields.preset.value!=='slab':label.dataset.kind?label.dataset.kind===fields.kind.value:label.dataset.presets.split(' ').includes(fields.preset.value);if(!label.hasAttribute('data-advanced')&&label.closest('[data-advanced]')?.hidden)visible=false;label.hidden=!visible;for(const input of label.querySelectorAll('input,select,textarea'))input.disabled=!visible;
+    }}
+    if(kind==='generator'){fields.kind.addEventListener('change',()=>{updatePresets();patternFields();run();});fields.preset.addEventListener('change',()=>{if(['durable','armor'].includes(fields.preset.value))fields.stack.value=1;patternFields();run();});fields.textureFile.addEventListener('change',run);patternFields();}
     if(kind==='shapes')fields.example.addEventListener('change',()=>{source.value=pretty(samples[fields.example.value]);run();});
     if(kind==='converter')fields.example.addEventListener('change',()=>{
       if(fields.example.value==='block')source.value=initial;else{const armor=fields.example.value==='armor';source.value=pretty({format_version:'1.26.60','minecraft:item':{description:{identifier:armor?'mycontent:helmet':'mycontent:berry'},components:armor?{'minecraft:icon':'mycontent_helmet','minecraft:max_stack_size':1,'minecraft:durability':{max_durability:256},'minecraft:wearable':{slot:'slot.armor.head',protection:2}}:{'minecraft:icon':'mycontent_berry','minecraft:food':{nutrition:4,saturation_modifier:'normal'},'minecraft:use_animation':'eat'}}});}run();
     });
-    form.querySelector('[data-reset]').addEventListener('click',()=>{form.reset();if(source)source.value=initial;if(kind==='generator')updatePresets();run();});
+    form.querySelector('[data-reset]').addEventListener('click',()=>{form.reset();if(source)source.value=initial;if(kind==='generator'){updatePresets();patternFields();}run();});
     if(kind==='rotation')try{const response=await fetch('assets/shape-fixtures.json');if(!response.ok)throw Error('Fixture download failed.');fixtures=await response.json();}catch{status.textContent='Unable to load the tested stair fixtures. Reload this page to retry.';return;}
     form.querySelectorAll('select').forEach(select=>{if(select===fileSelect||select.name==='example'||(kind==='generator'&&['kind','preset'].includes(select.name)))return;select.addEventListener('change',run);});
     submit.disabled=false;run();

@@ -1,6 +1,6 @@
 ## Minecraft 26.60 is the current target
 
-Customies 1.7.0 requires Axolotl API 5.51.0 and targets protocol 2225 with released 26.60 dependencies. This replaces the earlier development-branch target. Customies extends the host's registries and uses its codecs rather than translating client protocols.
+Customies 1.9.0 requires Axolotl API 5.51.0 and targets protocol 2225 with released 26.60 dependencies. This replaces the earlier development-branch target. Customies extends the host's registries and uses its codecs rather than translating client protocols.
 
 | CI target | Axolotl commit | Protocol source |
 | --- | --- | --- |

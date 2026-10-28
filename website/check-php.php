@@ -12,7 +12,12 @@ foreach($fixtures as $fixture){
 		$id=\pocketmine\item\ItemTypeIds::newId();
 		\customiesdevs\customies\item\CustomiesItemFactory::getInstance()->registerItem(static fn()=>new $class($id),$fixture['identifier']);
 		$item=\customiesdevs\customies\item\CustomiesItemFactory::getInstance()->get($fixture['identifier']);
-		check($item->getMaxStackSize()===(in_array($fixture['preset'],['durable','armor'],true)?1:16),'Generated item stack limit');
+		check($item->getMaxStackSize()===($fixture['expectedStack']??(in_array($fixture['preset'],['durable','armor'],true)?1:16)),'Generated item stack limit');
+		if($fixture['preset']==='configured'){
+			check($item->getLore()===[$fixture['configuration']['lore']],'Generator lore is literal, including replacement tokens and quotes');
+			if($fixture['className']==='ConfiguredFood'){check($item->getFoodRestore()===10&&$item->getSaturationRestore()===18.0,'Configured food uses actual nutrition and saturation');}
+			if($fixture['className']==='ConfiguredArmor'){check($item->getMaxDurability()===512&&$item->getDefensePoints()===8&&$item->getArmorSlot()===\pocketmine\inventory\ArmorInventory::SLOT_CHEST,'Configured armor uses actual defense, durability and slot');}
+		}
 		if($fixture['preset']==='food'){ check($item instanceof \pocketmine\item\Food && $item->getFoodRestore()===6 && abs($item->getSaturationRestore()-7.2)<.001,'Generated food has server nutrition'); }
 		if($fixture['preset']==='durable'){ check($item->getMaxDurability()===256 && $item->getAttackPoints()===5,'Generated durable has actual durability and damage'); }
 		if($fixture['preset']==='armor'){ check($item instanceof \pocketmine\item\Armor && $item->getDefensePoints()===2 && $item->getMaxDurability()===256,'Generated armor slot/defense/durability'); }
@@ -21,6 +26,18 @@ foreach($fixtures as $fixture){
 		\customiesdevs\customies\block\CustomiesBlockFactory::getInstance()->registerBlock(static fn()=>new $class($id),$fixture['identifier']);
 		$block=\customiesdevs\customies\block\CustomiesBlockFactory::getInstance()->get($fixture['identifier']);
 		check($block->getComponent('minecraft:geometry')!==null,'Generated block geometry registration');
+		if($fixture['preset']==='configured'){check($block->getLightLevel()===9&&$block->getBreakInfo()->getHardness()===2.0&&$block->asItem()->getLore()===['A luminous slab'],'Configured slab matches PHP light, hardness and lore');}
+		if($fixture['preset']==='rotation'){
+			$bounds=['north'=>[0,0,0,.25,.5,.75],'west'=>[0,0,.75,.75,.5,1],'south'=>[.75,0,.25,1,.5,1],'east'=>[.25,0,0,1,.5,.25]];
+			$world=new ExpansionWorld();$at=new \pocketmine\math\Vector3(0,64,0);
+			foreach($bounds as $face=>[$x,$y,$z,$X,$Y,$Z]){
+				$block->getState('minecraft:cardinal_direction')->setCurrentValue($face);$world->setBlock($at,$block);$copy=$world->getBlock($at);$bb=$copy->getCollisionBoxes()[0];
+				check([$bb->minX,$bb->minY-64,$bb->minZ,$bb->maxX,$bb->maxY-64,$bb->maxZ]==[$x,$y,$z,$X,$Y,$Z],'Generated asymmetric collision rotates with client direction');
+				$cx=($x+$X)/2;$cz=($z+$Z)/2;
+				check($copy->calculateIntercept(new \pocketmine\math\Vector3($cx,66,$cz),new \pocketmine\math\Vector3($cx,63,$cz))!==null,'Rotated selection is targetable at its actual position');
+				check($copy->calculateIntercept(new \pocketmine\math\Vector3(1-$cx,66,1-$cz),new \pocketmine\math\Vector3(1-$cx,63,1-$cz))===null,'Rotated selection does not leave a phantom target');
+			}
+		}
 		if($fixture['preset']==='converted'){
 			check($block->getLightLevel()===0 && $block->getCollisionBoxes()[0]->maxY===.5,'Converted block base physics');
 			$block->getState('documentation:lit')->setCurrentValue(true);

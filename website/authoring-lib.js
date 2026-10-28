@@ -8,7 +8,7 @@
   function parse(text){
     if(typeof text!=='string'||text.length>131072)error('Use at most 128 KiB of JSON.');
     let d;try{d=JSON.parse(text);}catch{error('Enter valid JSON, without comments or trailing commas.');}
-    let count=0;function visit(v,depth){if(++count>20000||depth>32)error('JSON is too complex (maximum depth 32 / 20,000 values).');if(v&&typeof v==='object')for(const x of Object.values(v))visit(x,depth+1);}visit(d,0);return d;
+    let count=0;function visit(v,depth){if(++count>20000||depth>32)error('JSON is too complex (maximum depth 32 / 20,000 values).');if(typeof v==='number'&&(!Number.isFinite(v)||(Number.isInteger(v)&&!Number.isSafeInteger(v))))error('JSON numbers must be finite and integer values must be safely representable.');if(v&&typeof v==='object')for(const x of Object.values(v))visit(x,depth+1);}visit(d,0);return d;
   }
   function number(v,path,min=-1e6,max=1e6,integer=false){if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max||(integer&&!Number.isSafeInteger(v)))error(`${path}: expected ${integer?'an integer':'a finite number'} from ${min} to ${max}.`);return v;}
   function text(v,path){if(typeof v!=='string'||v.length>1024)error(`${path}: expected a string of at most 1024 characters.`);return v;}
@@ -44,6 +44,7 @@
     if(!obj(input))error('description.states must be an object.');const result={};let product=1;
     for(const [name,list] of Object.entries(input)){
       if(!name.includes(':')||!Array.isArray(list)||!list.length||list.length>16)error(name+': states need a namespaced name and 1–16 explicit values.');
+      text(name,'state name');for(const v of list)if(typeof v==='string')text(v,'state value');
       if(!list.every(v=>['string','boolean'].includes(typeof v)||(typeof v==='number'&&Number.isSafeInteger(v)))||!list.every(v=>typeof v===typeof list[0])||new Set(list).size!==list.length)error(name+': use unique values of one bool/int/string type.');
       product*=list.length;if(product>65536)error('State product exceeds the authoring tool limit of 65,536.');result[name]=list;
     }return result;
@@ -136,6 +137,11 @@
     const id=identifier(data.description.identifier),cls=className(options.className??'GeneratedContent'),ns='content'+cls.toLowerCase();
     if(['vector3','axisalignedbb','raytraceresult','box','material','rendermethod','tintmethod','b','i','blockidentifier','blocktypeinfo','blockbreakinfo','itemidentifier','traitblock','slabblock','contentplugin'].includes(cls.toLowerCase()))error('Choose a class name that does not conflict with a generated import.');
     const notes=[],components=[],setup=[],methods=[],permutations=[],states=stateDefinitions(data.description.states??{}),c=data.components;
+    if(kind==='block'){
+      for(const [map,path] of [[c,'components'],...(data.permutations??[]).map((p,i)=>[p.components,'permutations['+i+'].components'])]){
+        if(obj(map)&&obj(map['minecraft:collision_box'])){map['minecraft:collision_box']=[map['minecraft:collision_box']];notes.push(path+'.minecraft:collision_box: normalized legacy single box to an array for Minecraft 1.26.60.');}
+      }
+    }
     for(const k of Object.keys(input))if(!['format_version','minecraft:'+kind].includes(k))notes.push(k+': not converted.');
     for(const k of Object.keys(data))if(!['description','components','permutations'].includes(k))notes.push('minecraft:'+kind+'.'+k+': not converted.');
     for(const k of Object.keys(data.description))if(!['identifier','states','traits','menu_category'].includes(k))notes.push('description.'+k+': not converted.');
@@ -193,9 +199,22 @@
         return out+'        return $result;';
       }
       const localBoxes=v=>'['+boxes(v).map(b=>aabb(b.local)).join(', ')+']';
-      methods.push('    protected function recalculateCollisionBoxes(): array {\n'+physical('minecraft:collision_box',true,localBoxes)+'\n    }');
+      const shapePhysical=name=>physical(name,true,localBoxes).replace('return $result;','return $this->rotatePhysicalBoxes($result);');
+      methods.push('    protected function recalculateCollisionBoxes(): array {\n'+shapePhysical('minecraft:collision_box')+'\n    }');
       methods.push('    public function isSolid(): bool { return $this->isFullCube(); }');
-      methods.push('    private function selectionBoxes(): array {\n'+physical('minecraft:selection_box',true,localBoxes)+'\n    }');
+      methods.push('    private function selectionBoxes(): array {\n'+shapePhysical('minecraft:selection_box')+'\n    }');
+      function turns(v){if(!obj(v))return 0;const r=v.rotation??[0,0,0];if(r[0]!==0||r[2]!==0||JSON.stringify(v.scale??[1,1,1])!=='[1,1,1]'||['translation','rotation_pivot','scale_pivot'].some(k=>JSON.stringify(v[k]??[0,0,0])!=='[0,0,0]')){notes.push('transformation: non-Y rotation, scale, translation or custom pivots require matching PHP boxes manually.');return 0;}return ((r[1]/90)%4+4)%4;}
+      let turnCode='        $turns = '+turns(c['minecraft:transformation'])+';\n';
+      for(const p of permutations)if(own(p.c,'minecraft:transformation'))turnCode+='        if('+p.test+'){ $turns = '+turns(p.c['minecraft:transformation'])+'; }\n';
+      methods.push(`    private function rotatePhysicalBoxes(array $boxes): array {
+${turnCode}        $out = [];
+        foreach($boxes as $b){
+            [$x,$z,$X,$Z] = [$b->minX,$b->minZ,$b->maxX,$b->maxZ];
+            for($i=0;$i<$turns;++$i){ [$x,$z,$X,$Z] = [$z,1-$X,$Z,1-$x]; }
+            $out[] = new AxisAlignedBB($x,$b->minY,$z,$X,$b->maxY,$Z);
+        }
+        return $out;
+    }`);
       methods.push(`    public function calculateIntercept(Vector3 $pos1, Vector3 $pos2): ?RayTraceResult {
         $nearest = null; $distance = INF;
         foreach($this->selectionBoxes() as $box){
@@ -205,8 +224,6 @@
         return $nearest;
     }`);
       for(const [name,method,type,def] of [['minecraft:light_emission','getLightLevel','int',0],['minecraft:light_dampening','getLightFilter','int',15],['minecraft:friction','getFrictionFactor','float',.6]])methods.push('    public function '+method+'(): '+type+' {\n'+physical(name,def,x=>String(number(x,name,0,type==='int'?15:.9,type==='int')))+'\n    }');
-      const transforms=[c,...permutations.map(p=>p.c)].filter(map=>map['minecraft:transformation']);
-      if(transforms.length)notes.push('Transformation components rotate client visuals. Collision and selection exported here are untransformed: rotate their PHP bounds explicitly with the shape tool for directional/non-cubic content.');
       if(c['minecraft:replaceable'])methods.push('    public function canBeReplaced(): bool { return true; }');
     }else{
       const food=c['minecraft:food'],durability=c['minecraft:durability'],wearable=c['minecraft:wearable'];
@@ -239,7 +256,7 @@ use pocketmine\\item\\ItemIdentifier;`;
     const title=kind==='block'?'Block':'Item',factory='\\customiesdevs\\customies\\'+kind+'\\Customies'+title+'Factory';
     const files={'plugin.yml':`name: ${cls}Plugin\nmain: ${ns}\\ContentPlugin\nsrc-namespace-prefix: ${ns}\nversion: 1.0.0\napi: 5.51.0\nload: POSTWORLD\ndepend: [Customies-Axolotl]\n`,['src/'+cls+'.php']:code,'src/ContentPlugin.php':`<?php\ndeclare(strict_types=1);\nnamespace ${ns};\nfinal class ContentPlugin extends \\pocketmine\\plugin\\PluginBase {\n    protected function onEnable(): void {\n        $id = \\pocketmine\\${kind}\\${title}TypeIds::newId();\n        ${factory}::getInstance()->register${title}(static fn() => new ${cls}($id), ${php(id)});\n    }\n}\n`,'source.json':json(input)};
     const report={kind,identifier:id,class:ns+'\\'+cls,state_combinations:stateProduct,converted_components:components.length,review:notes};
-    files['conversion-report.json']=json(report);files['README.txt']='Target: Customies 1.8.0, Axolotl API 5.51.0, Minecraft 26.60.\nReview conversion-report.json. Component metadata is not a replacement for server gameplay.\nAdd required PNGs/geometries/attachables to a resource pack, run PHP host tests, then test a Bedrock client.\n';
+    files['conversion-report.json']=json(report);files['README.txt']='Target: Customies 1.9.0, Axolotl API 5.51.0, Minecraft 26.60.\nReview conversion-report.json. Component metadata is not a replacement for server gameplay.\nAdd required PNGs/geometries/attachables to a resource pack, run PHP host tests, then test a Bedrock client.\n';
     return {files,report};
   }
   function generate(options){
@@ -249,17 +266,20 @@ use pocketmine\\item\\ItemIdentifier;`;
     if(kind==='item'){
       if(!['basic','food','durable','armor'].includes(preset))error('Choose an item preset.');
       c['minecraft:icon']=texture;c['minecraft:max_stack_size']=number(Number(options.stack??(['armor','durable'].includes(preset)?1:64)),'stack',1,64,true);
-      if(preset==='food'){c['minecraft:food']={nutrition:6,saturation_modifier:.6};c['minecraft:use_animation']='eat';c['minecraft:use_modifiers']={use_duration:1.6,movement_modifier:.35};}
-      if(['durable','armor'].includes(preset))c['minecraft:durability']={max_durability:256};
-      if(preset==='durable')c['minecraft:damage']=5;
-      if(preset==='armor')c['minecraft:wearable']={slot:'slot.armor.head',protection:2};
+      if(preset==='food'){c['minecraft:food']={nutrition:number(Number(options.nutrition??6),'nutrition',0,100,true),saturation_modifier:number(Number(options.saturation??.6),'saturation',0,100)};c['minecraft:use_animation']='eat';c['minecraft:use_modifiers']={use_duration:1.6,movement_modifier:.35};}
+      if(['durable','armor'].includes(preset))c['minecraft:durability']={max_durability:number(Number(options.durability??256),'durability',1,1e6,true)};
+      if(preset==='durable')c['minecraft:damage']=number(Number(options.damage??5),'damage',0,32767,true);
+      if(preset==='armor')c['minecraft:wearable']={slot:options.slot??'slot.armor.head',protection:number(Number(options.protection??2),'protection',0,100,true)};
     }else{
       if(!['cube','cardinal','slab'].includes(preset))error('Choose a block preset.');
       c['minecraft:geometry']='minecraft:geometry.full_block';c['minecraft:material_instances']={'*':{texture,render_method:'opaque'}};c['minecraft:collision_box']=true;c['minecraft:selection_box']=true;
-      c['minecraft:destructible_by_mining']={seconds_to_destroy:1.5};
+      c['minecraft:destructible_by_mining']={seconds_to_destroy:1.5*number(Number(options.hardness??1),'hardness',0,100)};
+      c['minecraft:light_emission']=number(Number(options.light??0),'light',0,15,true);
       if(preset==='cardinal')description.traits={'minecraft:placement_direction':{enabled_states:['minecraft:cardinal_direction']}};
     }
     const source={format_version:'1.26.60',['minecraft:'+kind]:{description,components:c}};
+    if(options.states){if(kind!=='block'||preset==='slab')error('Additional states are available for cube/cardinal blocks; use the converter for a custom slab subclass.');description.states=stateDefinitions(parse(options.states));}
+    if(options.components){const extra=parse(options.components);if(!obj(extra))error('Extra components must be a JSON object.');if(preset==='slab')error('Use the converter for custom slab component overrides.');Object.assign(c,extra);}
     if(kind==='block'&&preset==='cardinal')source['minecraft:block'].permutations=['north','west','south','east'].map((d,i)=>({condition:"q.block_state('minecraft:cardinal_direction') == '"+d+"'",components:{'minecraft:transformation':{rotation:[0,i*90,0]}}}));
     const result=convert(source,{className:options.className??'PrismContent'}),files=result.files;
     if(kind==='block'&&preset==='slab'){
@@ -272,6 +292,15 @@ use pocketmine\\item\\ItemIdentifier;`;
     files['resource_pack/manifest.json']=json({format_version:2,header:{name:name+' resources',description:'Resources for '+id,uuid:uuid(),version:[1,0,0],min_engine_version:[1,26,60]},modules:[{type:'resources',uuid:uuid(),version:[1,0,0]}]});
     files['resource_pack/textures/'+(kind==='item'?'item_texture':'terrain_texture')+'.json']=json({resource_pack_name:name,texture_name:kind==='item'?'atlas.items':'atlas.terrain',texture_data:{[texture]:{textures:'textures/'+(kind==='item'?'items':'blocks')+'/'+texture}}});
     result.report.review.push('Required asset: resource_pack/textures/'+(kind==='item'?'items':'blocks')+'/'+texture+'.png (supply your own artwork).');
+    const classPath='src/'+(options.className??'PrismContent')+'.php';
+    if(kind==='block'){const hardness=number(Number(options.hardness??1),'hardness',0,100);files[classPath]=files[classPath].replace('new BlockBreakInfo(1.0)','new BlockBreakInfo('+hardness+')');result.report.review=result.report.review.map(note=>note.startsWith('Server break hardness is initialized')?'Server hardness is '+hardness+'. Review tool requirements, drops, mining component overrides and explosion policy.':note);
+      if(preset==='slab'){const light=number(Number(options.light??0),'light',0,15,true);files[classPath]=files[classPath].replace('new B\\DestructibleByMiningComponent(1.5)','new B\\DestructibleByMiningComponent('+(hardness*1.5)+')');files[classPath]=files[classPath].replace('BlockPresets::slab($this,',' $this->addComponent(new B\\LightEmissionComponent('+light+'));\n        BlockPresets::slab($this,');files[classPath]=files[classPath].replace(/\n}\n$/,()=> '\n    public function getLightLevel(): int { return '+light+'; }\n}\n');}
+    }
+    if(options.lore){const lore=String(options.lore).split(/\r?\n/).map(s=>text(s,'lore'));if(lore.length>16)error('Use at most 16 lore lines.');
+      // Insert through a method override for block items, or directly after item component setup.
+      if(kind==='block')files[classPath]=files[classPath].replace(/\n}\n$/,()=> '\n    public function asItem(): \\pocketmine\\item\\Item { return parent::asItem()->setLore('+value(lore)+'); }\n}\n');
+      else files[classPath]=files[classPath].replace(/parent::__construct\([^\n]+\);/,match=>match+'\n        $this->setLore('+value(lore)+');');
+    }
     files['conversion-report.json']=json(result.report);return result;
   }
   // Small uncompressed ZIP writer: UTF-8 names/content, no network or third-party runtime.
@@ -281,7 +310,7 @@ use pocketmine\\item\\ItemIdentifier;`;
     const crc=data=>{let n=0xffffffff;for(const byte of data){n^=byte;for(let k=0;k<8;k++)n=(n>>>1)^((n&1)?0xedb88320:0);}return (n^0xffffffff)>>>0;};
     for(const [path,text] of Object.entries(files)){
       if(path.startsWith('/')||path.split('/').some(p=>p==='..'))error('Unsafe archive path.');
-      const name=enc.encode(path),data=enc.encode(text),sum=crc(data),[a,v]=header(30+name.length);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint32(14,sum,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);a.set(name,30);chunks.push(a,data);
+      const name=enc.encode(path),data=text instanceof Uint8Array?text:enc.encode(text),sum=crc(data),[a,v]=header(30+name.length);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0x800,true);v.setUint32(14,sum,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,name.length,true);a.set(name,30);chunks.push(a,data);
       const [b,w]=header(46+name.length);w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint16(8,0x800,true);w.setUint32(16,sum,true);w.setUint32(20,data.length,true);w.setUint32(24,data.length,true);w.setUint16(28,name.length,true);w.setUint32(42,offset,true);b.set(name,46);central.push(b);offset+=a.length+data.length;
     }
     const start=offset;chunks.push(...central);for(const b of central)offset+=b.length;

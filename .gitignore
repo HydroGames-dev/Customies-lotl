@@ -5,3 +5,4 @@ composer.lock
 website/dist/
 website/__pycache__/
 website/preview/
+website/node_modules/

@@ -1,9 +1,9 @@
 name: Customies-Axolotl
-description: A Axolotl-MP plugin that implements support for custom blocks, items and entities.
+description: Registers custom blocks and items for Axolotl-PM.
 
 main: customiesdevs\customies\Customies
 src-namespace-prefix: customiesdevs\customies
-version: 1.8.0
+version: 1.9.0
 api: 5.51.0
 
 authors:

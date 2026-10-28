@@ -9,6 +9,7 @@ textures and interactive footprint models come from the showcase.
 
 ```text
 python -m pip install -r website/requirements.txt
+npm ci --prefix website --ignore-scripts
 python examples/CustomiesShowcase/tools/build.py --php php
 python website/build.py --downloads examples/CustomiesShowcase/dist
 python website/check.py
@@ -110,6 +111,8 @@ For host integration checks of generated PHP and the charged-item guide:
 node website/authoring.test.cjs --fixtures .compat/authoring.json
 php website/check-php.php /path/to/axolotl .compat/authoring.json
 php examples/CustomiesShowcase/tests/shapes.php /path/to/axolotl
+node website/migration.test.cjs --fixtures .compat/migration.json
+php website/check-migration.php /path/to/axolotl .compat/migration.json
 ```
 
 The reader controls use local theme/text-size preferences, system-font fallbacks,
@@ -126,3 +129,25 @@ pages and scripts when rebuilding an existing preview directory.
 `articles/protocol-updates.md` records the 1.7.0 released 26.60 host/protocol matrix and
 `articles/diagnostics.md` documents the PHP API and standalone CLI doctor; the library has no in-game commands.
 The library version in page headers/download labels comes from `plugin.yml`.
+
+## Migration Lab and design system
+
+`migration_pages.py` defines the separate Migration Lab scope. `migration-lib.js`
+parses JavaScript with pinned Acorn, translates supported AST patterns, and reads
+ZIP central directories before bounded fflate decompression. It never executes
+uploaded JavaScript. `migration-worker.js` keeps extraction/translation off the UI
+thread; `migration.js` manages cancellation, files, reports and ZIP downloads.
+Unsupported callbacks remain entirely manual. Original files and resource assets
+are preserved; generated plugins never load the originals.
+
+Install the pinned npm lockfile before building. `build.py` copies the parser,
+decompressor, Latin variable fonts and license notices into static assets. There
+are no runtime CDN requests or upload endpoints. Other writing systems use system
+font fallbacks. Limits: 32 MiB archives, 8 MiB per expanded file, 64 MiB expanded
+input, 1,500 entries, two nested archives, 256 definitions, 128 KiB per script/JSON
+and 128 MiB generated output. Encrypted/split/ZIP64 archives require external extraction.
+
+`studio.css`, `preferences.js` and `studio.js` provide section tabs, Forest/Ocean/
+Ember palettes, light/dark themes, reduced-motion-aware transitions and chapter
+tracking. `CHANGELOG.md` is the release source of truth; the build creates a
+filterable article. Migration and Showcase each have their own navigation/search.

@@ -1,13 +1,21 @@
 """Customies authoring tools; all inputs stay in the browser."""
 import html, json
 
-INTRO='''<div class="wiki-callout"><strong>Make something with Customies</strong><p>These tools run locally. Create PHP, inspect shapes and bring existing JSON into your own plugin. Target: Customies 1.8.0, Axolotl API 5.51.0 and Minecraft 26.60.</p></div>'''
+INTRO='''<div class="wiki-callout"><strong>Create, inspect, then test</strong><p>Generate reviewable PHP and resource files locally. Target: Customies 1.9.0, Axolotl API 5.51.0 and Minecraft 26.60. Inputs stay on your device.</p></div>'''
 
 def select(name,label,values):
     return f'<label>{label}<select name="{name}">'+''.join(f'<option value="{key}">{label}</option>' for key,label in values)+'</select></label>'
 
 def form(kind,fields,canvas=''):
+    if kind=='generator':fields+=GENERATOR_OPTIONS
     return f'''<form class="authoring-form" data-authoring="{kind}">{fields}<div class="authoring-actions"><button class="button primary" type="submit" disabled>Build preview</button><button type="button" class="button secondary" data-reset>Reset example</button></div><p class="authoring-status" role="status" aria-live="polite">Loading local tool…</p>{canvas}<div class="authoring-result" hidden><div class="authoring-actions"><label>Generated file<select data-files aria-label="Generated file"></select></label><button type="button" class="button secondary" data-authoring-copy>Copy file</button><button type="button" class="button secondary" data-download>Download ZIP</button></div><pre tabindex="0" data-code></pre><div data-report></div></div></form><noscript><p>Enable JavaScript to use this tool. Your input stays on your device.</p></noscript>'''
+
+GENERATOR_OPTIONS='''<label>Lore / description<textarea name="lore" rows="3" spellcheck="true">Created with Customies.</textarea></label><label>Texture PNG (optional)<input name="textureFile" type="file" accept="image/png,.png"><small>Square PNG, at most 1024 × 1024 and 1 MiB. It will be included at the atlas path.</small></label><details class="generator-options" open><summary>Properties for this pattern</summary><div class="authoring-grid">
+<label data-kind="block">Server hardness<input name="hardness" type="number" min="0" max="100" step="0.1" value="1"></label><label data-kind="block">Light level<input name="light" type="number" min="0" max="15" value="0"></label>
+<label data-presets="food">Nutrition<input name="nutrition" type="number" min="0" max="100" value="6"></label><label data-presets="food">Saturation modifier<input name="saturation" type="number" min="0" max="100" step="0.1" value="0.6"></label>
+<label data-presets="durable armor">Maximum durability<input name="durability" type="number" min="1" max="1000000" value="256"></label><label data-presets="durable">Attack points<input name="damage" type="number" min="0" max="32767" value="5"></label>
+<label data-presets="armor">Armor slot<select name="slot"><option value="slot.armor.head">Head</option><option value="slot.armor.chest">Chest</option><option value="slot.armor.legs">Legs</option><option value="slot.armor.feet">Feet</option></select></label><label data-presets="armor">Defense points<input name="protection" type="number" min="0" max="100" value="2"></label></div></details>
+<details class="generator-options" data-advanced><summary>Advanced states and components</summary><p>Use explicit state arrays and native component keys. Slabs use a fixed preset; port a custom subclass with the converter instead.</p><label data-kind="block">Additional states JSON<textarea name="states" rows="4" spellcheck="false" placeholder='{"mycontent:powered": [false, true]}'></textarea></label><label>Component overrides JSON<textarea name="components" rows="5" spellcheck="false" placeholder='{"minecraft:light_emission": 10}'></textarea></label></details>'''
 
 def scene():
     return '''<div class="shape-stage"><canvas width="800" height="480" tabindex="0" aria-label="Interactive block shape preview. Drag or use arrow keys to orbit; plus and minus zoom."></canvas><div class="shape-legend"><span class="collision-key">Collision / client mesh</span><span class="selection-key">Selection / server</span><span class="vanilla-key">Vanilla reference</span></div></div><p class="shape-hint">Drag to orbit · Arrow keys to turn · + / − to zoom · Double-click to reset. X = east, Z = south; N marks north.</p>'''

@@ -50,10 +50,12 @@ print(f'PASS: {len(documents)} pages, all internal links/anchors/resources, 139 
 
 # Library and demo content must remain separate in navigation, search and downloads.
 showcase={'showcase','showcase-install','showcase-walkthroughs','structures','gallery','showcase-downloads','showcase-validation'}
-for scope in ('customies','showcase'):
+migration={'migration','migration-tool','migration-guide','migration-support'}
+for scope in ('customies','showcase','migration'):
     records=json.loads((OUT/f'assets/search-{scope}.json').read_text(encoding='utf-8'))
     assert records and all(r['scope']==scope for r in records)
     assert all((r['url'].split('.html')[0] in showcase)==(scope=='showcase') for r in records)
+    assert all((r['url'].split('.html')[0] in migration)==(scope=='migration') for r in records)
 for name in ('index','getting-started','coding','guide','assets','performance','downloads'):
     page=(OUT/(name+'.html')).read_text(encoding='utf-8')
     assert 'data-scope="customies"' in page
@@ -91,3 +93,18 @@ for retired in ('tool-states','tool-boxes','tool-identifiers','tool-components',
 for name in ('tool-shapes','tool-rotation'):
     assert '<canvas' in (OUT/(name+'.html')).read_text(encoding='utf-8')
 print('PASS: architecture, data, maintenance, reader guides and four browser-local authoring tools.')
+for page in migration:
+    assert OUT/(page+'.html') in documents
+    assert 'data-scope="migration"' in (OUT/(page+'.html')).read_text(encoding='utf-8')
+for page in ('index','migration-tool','tool-generator','changelog'):
+    text=(OUT/(page+'.html')).read_text(encoding='utf-8')
+    assert 'aria-label="Workspace"' in text and 'id="palette-select"' in text
+assert 'data-migration' in (OUT/'migration-tool.html').read_text(encoding='utf-8')
+assert 'type="submit" disabled' in (OUT/'migration-tool.html').read_text(encoding='utf-8'),'Migration input must never submit before local handlers initialize'
+release_count=len(re.findall(r'^## \d+\.\d+\.\d+', (OUT.parents[1]/'CHANGELOG.md').read_text(encoding='utf-8'),re.M))
+assert (OUT/'changelog.html').read_text(encoding='utf-8').count('class="release-entry"')==release_count and release_count>=4
+for style in ('studio.css','authoring.css'):
+    for resource in re.findall(r"url\(['\"]?([^)'\"]+)",(OUT/'assets'/style).read_text(encoding='utf-8')):assert (OUT/'assets'/resource).exists()
+for name in ('migration-lib.js','migration-worker.js','migration.js','vendor/acorn.js','vendor/fflate.js','licenses/acorn.txt','licenses/fflate.txt','licenses/inter.txt','licenses/manrope.txt'):
+    assert (OUT/'assets'/name).exists()
+print('PASS: independent Migration Lab, archive tool, changelog, palette controls, bundled parser/ZIP tools, fonts and licenses.')

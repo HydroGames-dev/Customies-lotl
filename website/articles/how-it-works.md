@@ -13,7 +13,9 @@ runtime. Your plugin still implements gameplay in PHP.
    the identifier and item-ID mapping for conflicts.
 3. Components and traits are serialized into client definition NBT. State values
    are enumerated into runtime/palette combinations; permutations are included as
-   client conditions, not executed as PHP.
+   client conditions, not executed as PHP. The browser converter can generate PHP
+   for a limited set of state conditions; that generated code belongs to your
+   plugin and does not turn the library into a general Molang interpreter.
 4. Valid definitions are published to runtime, palette, item and saved-data
    registries. Serializer/deserializer mappings connect stable names and states
    to the host's saved-data handlers.

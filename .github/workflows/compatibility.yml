@@ -2,9 +2,9 @@ name: Axolotl protocol compatibility
 
 on:
   push:
-    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**']
+    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**', 'examples/CustomiesShowcase/tests/**', 'examples/CustomiesShowcase/resource_pack/**', 'website/authoring*', 'website/migration*', 'website/check-*.php', 'website/package*.json']
   pull_request:
-    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**']
+    paths: ['src/**', 'tests/**', 'tools/**', 'plugin.yml', '.github/workflows/compatibility.yml', 'examples/CustomiesShowcase/src/**', 'examples/CustomiesShowcase/tests/**', 'examples/CustomiesShowcase/resource_pack/**', 'website/authoring*', 'website/migration*', 'website/check-*.php', 'website/package*.json']
   workflow_dispatch:
 
 permissions:
@@ -60,7 +60,11 @@ jobs:
         run: |
           php examples/CustomiesShowcase/tests/shapes.php .compat/host
           git diff --exit-code -- website/shape-fixtures.json
+      - name: Install pinned migration parser and archive tools
+        run: npm ci --prefix website --ignore-scripts
       - name: Generated PHP classes against the host
         run: |
           node website/authoring.test.cjs --fixtures .compat/authoring.json
           php website/check-php.php .compat/host .compat/authoring.json
+          node website/migration.test.cjs --fixtures .compat/migration.json
+          php website/check-migration.php .compat/host .compat/migration.json

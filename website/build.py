@@ -4,6 +4,8 @@ import argparse, hashlib, html, json, re, shutil, subprocess
 from urllib.parse import urlsplit, unquote
 import markdown
 from reference import detail,table_descriptions
+from migration_pages import PAGES as MIGRATION_PAGES
+from site_content import HOME
 from authoring_pages import PAGES as TOOL_PAGES,LANDING as TOOLS_LANDING
 
 BASE=Path(__file__).resolve().parent
@@ -27,6 +29,19 @@ sections={m[1]:m[0] for m in re.findall(r'(^## ([^\n]+)\n.*?)(?=^## |\Z)',guide,
 def section(*names):return '\n\n'.join(sections[n] for n in names)
 def plain(value):return html.unescape(re.sub('<[^>]+>',' ',value))
 def esc(value):return html.escape(str(value),quote=True)
+
+def release_page(source):
+    controls='''<div class="release-toolbar"><label>Area<select data-release-filter><option value="all">All changes</option><option value="library">Library</option><option value="tools">Tools</option><option value="website">Website</option><option value="compatibility">Compatibility</option><option value="showcase">Showcase</option></select></label><label>Find a change<input type="search" data-release-query placeholder="Try: collision, scripts, slabs"></label><p role="status" data-release-status></p></div>'''
+    out='<p>Release changes, migration requirements and verification for this repository. The log is maintained in <a href="'+REPO+'/blob/'+REF+'/CHANGELOG.md">CHANGELOG.md</a>.</p>'+controls
+    for part in re.split(r'(?=^## )',source,flags=re.M):
+        match=re.match(r'## (\d+\.\d+\.\d+)[^\n]*',part)
+        if match:
+            version=match[1];areas=re.search(r'\*\*Areas:\*\* ([^\n]+)',part)
+            body=render(part);prefix='release-'+version.replace('.','-')+'-'
+            body=re.sub(r'id="([^"]+)"',lambda m:'id="'+prefix+m[1]+'"',body)
+            out+='<section class="release-entry" data-release-type="'+esc(areas[1].replace(',','') if areas else 'library')+'">'+body+'</section>'
+        elif part.startswith('## Maintaining'):out+=render(part)
+    return out
 def render(source):
     source=re.sub(r'^# ([^\n]+)$',r'## \1',source,flags=re.M)
     source=re.sub(r'\]\((\.\./[^)]+|traits-and-presets\.md)\)',lambda m:']('+REPO+'/blob/'+REF+'/'+str((ROOT/'docs'/m[1]).resolve().relative_to(ROOT)).replace('\\','/')+')',source)
@@ -53,6 +68,9 @@ block_source=library_section('Every block component')
 item_source=library_section('Every item component')
 core_walkthrough=(BASE/'walkthroughs.md').read_text(encoding='utf-8')
 complete_core='\n\n'.join([core('Install Customies','Library architecture'),coding_source,states_source,block_source,item_source,core('Component combinations','Your resource pack','Performance of the library','Server sizing','Debugging your content')])
+MIGRATION_KEYS=set(MIGRATION_PAGES)
+def scope_for(key):return 'migration' if key in MIGRATION_KEYS else 'showcase' if key in SHOWCASE_KEYS else 'customies'
+
 SHOWCASE_KEYS={'showcase','showcase-install','showcase-walkthroughs','structures','gallery','showcase-downloads','showcase-validation'}
 pages=[
  ('index','Customies overview','Start here','The library for your custom Minecraft content.',''),
@@ -105,6 +123,8 @@ for offset,(key,label,category,description) in enumerate(extra_articles):pages.i
 insert=next(i for i,p in enumerate(pages) if p[0]=='showcase')
 pages.insert(insert,('tools','Browser toolbox','Tools','Small local tools for authoring and reviewing Customies content.',TOOLS_LANDING))
 for offset,(key,(label,description,source)) in enumerate(TOOL_PAGES.items(),1):pages.insert(insert+offset,(key,label,'Tools',description,source))
+for key,(label,description,source) in MIGRATION_PAGES.items():pages.insert(insert,(key,label,'Migration',description,source));insert+=1
+pages.insert(insert,('changelog','Changelog','Library','Release changes, migration notes and verification.',(ROOT/'CHANGELOG.md').read_text(encoding='utf-8')))
 api=json.loads((BASE/'api-reference.json').read_text(encoding='utf-8'))
 descriptions={kind:table_descriptions(section('Every '+kind+' component')) for kind in ('block','item')}
 api_fixture=(SHOW/'src/ComponentCatalog.php').read_text(encoding='utf-8')
@@ -127,12 +147,13 @@ def viewer(identifier,hero=False):
 
 def nav(current):
     demo=current in SHOWCASE_KEYS
+    current_scope=scope_for(current)
     buckets={}
     for key,label,category,*_ in pages:
-        if key.startswith(('block-component-','item-component-')) or (key in SHOWCASE_KEYS)!=demo:continue
+        if key.startswith(('block-component-','item-component-')) or scope_for(key)!=current_scope:continue
         parent_active=(key=='block-components' and current.startswith('block-component-')) or (key=='item-components' and current.startswith('item-component-'))
         buckets.setdefault(category,[]).append((key,label,key==current or parent_active))
-    order=['Start here','Understanding Customies','Build','Tutorials','Blocks','Items','Resources','Tools','Maintenance','Server & compatibility','Library'] if not demo else list(buckets)
+    order=['Start here','Understanding Customies','Build','Tutorials','Blocks','Items','Resources','Tools','Maintenance','Server & compatibility','Library'] if current_scope=='customies' else list(buckets)
     result=''
     for category in order:
         entries=buckets.get(category,[])
@@ -150,20 +171,23 @@ def layout(key,title,description,body):
     sidebar=nav(key)
     toc=''.join(f'<a href="#{esc(identifier)}">{esc(plain(text))}</a>' for identifier,text in re.findall(r'<h2 id="([^"]+)">(.*?)</h2>',body))
     demo=key in SHOWCASE_KEYS
-    scope='showcase' if demo else 'customies'
+    scope=scope_for(key)
     brand='CustomiesShowcase' if demo else 'Customies'
     version='EXAMPLE PLUGIN '+SHOWCASE_VERSION if demo else 'LIBRARY '+LIBRARY_VERSION
-    scope_keys=([p[0] for p in pages if p[0].startswith(key.split('-component-')[0]+'-component-')] if '-component-' in key else [p[0] for p in pages if (p[0] in SHOWCASE_KEYS)==demo and '-component-' not in p[0]])
+    scope_keys=([p[0] for p in pages if p[0].startswith(key.split('-component-')[0]+'-component-')] if '-component-' in key else [p[0] for p in pages if scope_for(p[0])==scope and '-component-' not in p[0]])
     pos=scope_keys.index(key)
     prev=scope_keys[pos-1] if pos else None
     nxt=scope_keys[pos+1] if pos+1<len(scope_keys) else None
     pager=(f'<a href="{prev}.html"><small>Previous</small>{esc(PAGE_MAP[prev])}</a>' if prev else '<span></span>')+(f'<a href="{nxt}.html"><small>Next</small>{esc(PAGE_MAP[nxt])} →</a>' if nxt else '')
     dochead='' if key in ('index','showcase') else f'<header class="article-head"><p class="eyebrow">{brand.upper()} / {esc(title.upper())}</p><h1>{esc(title)}</h1><p class="lead">{meta}</p></header>'
-    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{esc(title)} · Customies</title><meta name="description" content="{meta}"><meta name="theme-color" content="#122a29"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/style.css"><script src="assets/app.js" defer></script><link rel="stylesheet" href="assets/authoring.css"><script src="assets/authoring-lib.js" defer></script><script src="assets/authoring.js" defer></script></head>
+    source_path=("website/site_content.py" if key=="index" else "CHANGELOG.md" if key=="changelog" else "website/migration_pages.py" if key in MIGRATION_KEYS else "website/authoring_pages.py" if key in TOOL_PAGES else "website/articles/"+key+".md" if (BASE/"articles"/(key+".md")).exists() else "examples/CustomiesShowcase/README.md" if demo else "website/core-guide.md")
+    tabs=''.join(f'<a href="{target}.html" {"aria-current=page" if active else ""}>{label}</a>' for target,label,active in [("index","Guide",scope=="customies" and key not in TOOL_PAGES and key not in ("tools","changelog")),("tools","Build tools",key in TOOL_PAGES or key=="tools"),("migration","Migration Lab",scope=="migration"),("changelog","Changelog",key=="changelog"),("showcase","Showcase",demo)])
+    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{esc(title)} · Customies</title><meta name="description" content="{meta}"><meta name="theme-color" content="#122a29"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><script src="assets/preferences.js"></script><link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/studio.css"><script src="assets/studio.js" defer></script><script src="assets/app.js" defer></script><link rel="stylesheet" href="assets/authoring.css"><script src="assets/authoring-lib.js" defer></script><script src="assets/authoring.js" defer></script>{"<script src='assets/migration.js' defer></script>" if key=='migration-tool' else ''}</head>
     <body data-page="{key}" data-scope="{scope}"><div id="reading-progress" aria-hidden="true"></div><a class="skip-link" href="#content">Skip to content</a>
     <header class="topbar"><a class="brand" href="{'showcase' if demo else 'index'}.html"><span class="brand-mark">C<span>◆</span></span><span>{brand}<small>{"EXAMPLE CONTENT PLUGIN" if demo else "GUIDE / WIKI / API"}</small></span></a><div class="top-actions"><span class="version">{version}</span><button id="reader-size" type="button" aria-label="Text size 100 percent; activate to change" title="Change reading text size">Aa</button><button id="theme-toggle" aria-label="Toggle dark theme" aria-pressed="false">◐</button><button class="search-trigger" type="button">Search docs <kbd>Ctrl K</kbd></button><a class="source-link" href="{REPO}/tree/{REF}">GitHub ↗</a><button class="menu-toggle" aria-expanded="false" aria-controls="navigation">Menu</button></div></header>
-    <div class="site-shell"><aside class="sidebar" id="navigation"><nav class="section-switch" aria-label="Documentation section"><a href="index.html" {"aria-current=page" if not demo else ""}>Customies Guide</a><a href="showcase.html" {"aria-current=page" if demo else ""}>CustomiesShowcase</a></nav><nav aria-label="Documentation">{sidebar}</nav><div class="sidebar-note"><span class="status-dot"></span> Built for Axolotl-PM<br><small>PHP behavior + Bedrock assets</small></div></aside>
-    <main id="content" tabindex="-1"><div class="reading-layout"><article>{dochead}{body}<nav class="page-pager" aria-label="Page navigation">{pager}</nav><footer class="article-footer">HydroGames-dev / Customies-lotl · MIT · <a href="{REPO}/blob/{REF}/{"examples/CustomiesShowcase/README.md" if demo else "website/core-guide.md"}">Section source ↗</a><br>Server and asset checks pass. Client visuals and version-specific behavior still require in-game testing.</footer></article><aside class="on-this-page" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p>{toc}<a class="edit-link" href="{REPO}/tree/{REF}/website">Improve this site ↗</a></aside></div></main></div>
+    <nav class="workspace-tabs" aria-label="Workspace"><div class="workspace-links">{tabs}</div><label class="palette-control"><span class="sr-only">Accent palette</span><select id="palette-select" aria-label="Accent palette"><option value="forest">Forest</option><option value="ocean">Ocean</option><option value="ember">Ember</option></select></label></nav>
+    <div class="site-shell"><aside class="sidebar" id="navigation"><nav class="section-switch" aria-label="Documentation section"><a href="index.html" {"aria-current=page" if scope=="customies" else ""}>Customies Guide</a><a href="showcase.html" {"aria-current=page" if demo else ""}>CustomiesShowcase</a><a href="migration.html" {"aria-current=page" if scope=="migration" else ""}>Migration Lab</a></nav><nav aria-label="Documentation">{sidebar}</nav><div class="sidebar-note"><span class="status-dot"></span> Built for Axolotl-PM<br><small>PHP behavior + Bedrock assets</small></div></aside>
+    <main id="content" tabindex="-1"><div class="reading-layout"><article>{dochead}{body}<nav class="page-pager" aria-label="Page navigation">{pager}</nav><footer class="article-footer">HydroGames-dev / Customies-lotl · MIT · <a href="{REPO}/blob/{REF}/{source_path}">Section source ↗</a><br>Compatibility checks and known limits are recorded in the changelog. Verify client visuals and prediction in-game.</footer></article><aside class="on-this-page" aria-label="On this page"><p class="eyebrow">ON THIS PAGE</p>{toc}<a class="edit-link" href="{REPO}/tree/{REF}/website">Improve this site ↗</a></aside></div></main></div>
     <dialog id="search-dialog"><div class="dialog-head"><label for="site-search">Search {brand}</label><button data-close aria-label="Close search">✕</button></div><input id="site-search" type="search" placeholder="Search this section…" autocomplete="off"><p id="search-status" role="status">Type to find guides, components and examples.</p><div id="search-results"></div></dialog>
     <dialog id="model-dialog"><div class="dialog-head"><h2 id="model-title">Geometry preview</h2><button data-close aria-label="Close model preview">✕</button></div><div id="model-content"></div></dialog>
     <button id="back-to-top" type="button" hidden aria-label="Back to top">↑</button></body></html>'''
@@ -174,7 +198,7 @@ demo_home=f'''<section class="hero"><div class="hero-copy"><p class="eyebrow">CU
 <section class="path-section"><p class="eyebrow">CHOOSE YOUR NEXT BUILD</p><h2 id="learning-paths">A clear path from idea to world.</h2><div class="path-grid"><a href="showcase-walkthroughs.html#01-your-first-powered-lamp"><span>START SMALL / 01</span><h3>A lamp that really lights up.</h3><p>Register a block, add a power state, switch the material and match server lighting.</p><b>Follow the walkthrough →</b></a><a href="coding.html#create-a-working-item"><span>ADD AN ABILITY / 02</span><h3>An item with a purpose.</h3><p>Build a working wand, then explore food, weapons, worn gear and cooldowns.</p><b>Write the PHP →</b></a><a href="structures.html"><span>THINK BIGGER / 03</span><h3>A house in your hand.</h3><p>Author hollow footprints, shared model roles and grouped multi-block behavior.</p><b>Build a structure →</b></a></div></section>
 <section class="notice"><strong>Built to be honest about the boundaries.</strong><p>This guide separates working server behavior from client-only metadata. Hardware allocations are starting estimates; synthetic benchmarks are not player-capacity guarantees.</p><a href="showcase-validation.html">Example benchmark →</a></section>'''
 
-home='''<header class="wiki-welcome"><p class="eyebrow">CUSTOMIES DOCUMENTATION</p><h1>Customies Wiki</h1><p>A practical reference for creating your own blocks, items and resource packs with the Customies library and PocketMine PHP.</p><a class="button primary" href="getting-started.html">Beginner’s guide →</a><a class="button secondary" href="coding.html">Create your first plugin →</a></header><div class="wiki-callout"><strong>Three layers, one working feature</strong><p>Customies defines client metadata. Your resource pack supplies visuals. PHP enforces gameplay. Each reference explains where the responsibility belongs.</p></div><h2 id="browse-topics">Browse the documentation</h2><div class="wiki-topics"><section><h3>Blocks</h3><p>Build a definition and connect its client and server behavior.</p><a href="blocks.html">Introduction to blocks</a><a href="block-components.html">33 block components</a><a href="block-states.html">Block states and persistence</a><a href="block-traits.html">Placement and connection traits</a><a href="block-permutations.html">Permutations and component overrides</a></section><section><h3>Items</h3><p>Choose the right base class and implement authoritative actions.</p><a href="items.html">Introduction to items</a><a href="item-components.html">42 item components</a><a href="coding.html#create-a-working-item">Create an ability item</a><a href="recipes.html">Food, tools, armor and other combinations</a></section><section><h3>Resources & operations</h3><p>Ship assets that match your PHP and measure the actual workload.</p><a href="assets.html">Resource packs and animation</a><a href="performance.html">Performance and server sizing</a><a href="troubleshooting.html">Troubleshooting and compatibility</a><a href="downloads.html">Get the Customies library</a></section></div><h2 id="guides-and-tools">Understand, build and maintain</h2><div class="wiki-topics"><section><h3>Understand the data flow</h3><a href="how-it-works.html">How Customies works internally</a><a href="data-guide.html">Data, NBT and persistence</a><a href="tutorial-data.html">Tutorial: a charged item</a></section><section><h3>Maintain your own fork</h3><a href="updating-customies.html">Update Customies yourself</a><a href="toolchain.html">Development toolchain</a><a href="tutorial-debugging.html">Diagnose a broken block</a></section><section><h3>Use the toolbox</h3><a href="tools.html">All browser tools</a><a href="tool-generator.html">Item &amp; block generator</a><a href="tool-shapes.html">Collision &amp; selection visualizer</a><a href="tool-converter.html">Mojang JSON → PHP</a><a href="tool-rotation.html">State &amp; rotation workbench</a></section></div><h2 id="how-to-use-this-wiki">How to use this wiki</h2><p>Start with installation and the complete PHP tutorial. Use the component indexes to find a feature, then open its dedicated reference for constructor parameters, defaults, serialized values, combinations and common mistakes.</p><p>Native Bedrock documentation and the PHP wrapper are different interfaces. Check the target host/client before adopting experimental metadata.</p><div class="wiki-callout"><strong>CustomiesShowcase is a separate example</strong><p>The demo plugin’s catalog, houses, assets, commands and bundle live in their own section.</p><a href="showcase.html">Explore the example plugin →</a></div><h2 id="external-references">External references</h2><p>Information architecture inspired by <a href="https://wiki.bedrock.dev/">Bedrock Wiki</a>. This is an independent Customies guide, not an official Bedrock Wiki or Microsoft site.</p><p><a href="https://learn.microsoft.com/en-us/minecraft/creator/documents/intro-block-traits?view=minecraft-bedrock-stable">Microsoft: block traits</a> · <a href="https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/blockcomponentslist?view=minecraft-bedrock-stable">Block component reference</a></p>'''
+home=HOME
 # Copy authored assets without modifying them.
 pack=SHOW/'resource_pack'
 for relative in ['textures/blocks','textures/items','textures/models','models','attachables','animations','animation_controllers','render_controllers']:
@@ -252,6 +276,7 @@ Minecraft versions; 1.26.52/1.26.60 have not been client-tested here.
 
 for key,title,category,description,source in pages:
     body=home if key=='index' else demo_home if key=='showcase' else gallery if key=='gallery' else downloadbody if key=='showcase-downloads' else render(source)
+    if key=='changelog':body=release_page(source)
     if key=='downloads' and args.downloads:body+='<p><a class="button primary" href="downloads/Customies-Axolotl.phar" download>Download Customies-Axolotl.phar ↓</a></p><p><a href="'+REPO+'/tree/'+REF+'/src">Library source ↗</a></p>'
     if key=='structures':body=viewer('prism_cottage')+body+'<h2 id="more-structures">Explore the larger prefabs</h2>'+viewer('market_hall')+viewer('grand_gateway')
     if key in ('block-components','item-components'):
@@ -277,15 +302,23 @@ for key,title,category,description,source in pages:
     search.append({'title':title,'url':key+'.html','text':re.sub(r'\s+',' ',plain(body))[:22000]})
     for anchor,label in re.findall(r'<h[23] id="([^"]+)">(.*?)</h[23]>',body):search.append({'title':title+' / '+plain(label),'url':key+'.html#'+anchor,'text':plain(label)})
 
-for record in search:record['scope']='showcase' if record['url'].split('.html')[0] in SHOWCASE_KEYS else 'customies'
-for scope in ('customies','showcase'):
+for record in search:record['scope']=scope_for(record['url'].split('.html')[0])
+for scope in ('customies','showcase','migration'):
     (OUT/f'assets/search-{scope}.json').write_text(json.dumps([r for r in search if r['scope']==scope],ensure_ascii=False),encoding='utf-8')
 (OUT/'assets/search.json').write_text(json.dumps(search,ensure_ascii=False),encoding='utf-8')
 from pygments.formatters import HtmlFormatter
 (OUT/'assets/syntax.css').write_text(HtmlFormatter(style='solarized-dark').get_style_defs('.codehilite'),encoding='utf-8')
 shutil.copy2(BASE/'api-reference.json',OUT/'assets/wrapper-api.json')
-for name in ['style.css','app.js','favicon.svg','authoring-lib.js','authoring.js','authoring.css','shape-fixtures.json']:shutil.copy2(BASE/name,OUT/'assets'/name)
+for name in ['style.css','app.js','favicon.svg','authoring-lib.js','authoring.js','authoring.css','shape-fixtures.json','studio.css','studio.js','preferences.js','migration-lib.js','migration.js','migration-worker.js']:shutil.copy2(BASE/name,OUT/'assets'/name)
+# Pinned npm dependencies are copied to the static output; there are no runtime CDNs.
+for target,source in [('vendor/acorn.js','acorn/dist/acorn.js'),('vendor/fflate.js','fflate/umd/index.js'),('fonts/inter-latin.woff2','@fontsource-variable/inter/files/inter-latin-wght-normal.woff2'),('fonts/manrope-latin.woff2','@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2'),('licenses/acorn.txt','acorn/LICENSE'),('licenses/fflate.txt','fflate/LICENSE'),('licenses/inter.txt','@fontsource-variable/inter/LICENSE'),('licenses/manrope.txt','@fontsource-variable/manrope/LICENSE')]:
+    original=BASE/'node_modules'/source
+    if not original.exists():raise SystemExit('Run npm ci --prefix website before building ('+source+')')
+    destination=OUT/'assets'/target;destination.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(original,destination)
 (OUT/'.nojekyll').write_text('')
+subprocess.run(['node',str(BASE/'migration.test.cjs'),'--fixtures',str(ROOT/'.compat/site-migration-fixtures.json')],check=True)
+(OUT/'assets/examples').mkdir(exist_ok=True)
+shutil.copy2(ROOT/'.compat/migration-test.mcaddon',OUT/'assets/examples/migration-demo.mcaddon')
 (OUT/'404.html').write_text( '<!doctype html><html lang="en"><meta charset="utf-8"><title>Page not found · Customies</title><h1>Page not found</h1><p><a href="/Customies-lotl/">Return to the Customies field guide</a></p></html>',encoding='utf-8')
 (OUT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join(f'<url><loc>https://hydrogames-dev.github.io/Customies-lotl/{key}.html</loc></url>' for key in PAGE_MAP)+'</urlset>')
 # Keep the static snapshot byte-consistent across Windows and Linux checkouts.

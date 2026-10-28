@@ -39,6 +39,8 @@ jobs:
           cache-dependency-path: website/requirements.txt
       - name: Install documentation dependencies
         run: python -m pip install -r website/requirements.txt
+      - name: Install pinned browser tools and fonts
+        run: npm ci --prefix website --ignore-scripts
       - name: Build install bundle from committed assets
         run: python examples/CustomiesShowcase/tools/build.py --php php
       - name: Generate documentation and verify output
@@ -49,6 +51,10 @@ jobs:
           node --check website/authoring-lib.js
           node --check website/authoring.js
           node website/authoring.test.cjs
+          node website/migration.test.cjs
+          node --check website/migration.js
+          node --check website/migration-worker.js
+          node --check website/studio.js
       - uses: actions/upload-pages-artifact@v4
         with:
           path: website/dist
