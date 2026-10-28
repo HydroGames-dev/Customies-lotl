@@ -30,7 +30,7 @@ $client = (new CollisionBoxComponent())->addBox($shape);
 $serverBox = $shape->toBlockAABB();
 ```
 
-Use `fromBlockAABB()` for local PocketMine block units. It and `toBlockAABB()` preserve fractional dimensions. Older `fromAABB()`/`toAxisAlignedBB()` methods use geometry pixels, not server units. The [box converter](tool-boxes.html) now exposes voxel min/max and follows the same X-mirror rule.
+Use `fromBlockAABB()` for local PocketMine block units. It and `toBlockAABB()` preserve fractional dimensions. Older `fromAABB()`/`toAxisAlignedBB()` methods use geometry pixels, not server units. The [shape visualizer](tool-shapes.html) now exposes voxel min/max and follows the same X-mirror rule.
 
 ## Updated component APIs
 

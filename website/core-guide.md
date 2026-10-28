@@ -58,7 +58,7 @@ state schemas used by saved chunks.
 | Powered lamp | Geometry, materials, light emission, Boolean state, permutation | Toggle state in `onInteract()`, match `getLightLevel()`, write updated block |
 | Small decoration | Small geometry, collision and selection boxes | Match PHP collision and targeting; visual scale does not reserve additional cells |
 | Directional machine | Cardinal/facing preset, marked material faces | Rotate asymmetric PHP collision and interaction direction |
-| Slab | Vertical-half placement, two meshes, selection/collision permutations | Match upper/lower PHP boxes |
+| Slab | `BlockPresets::slab()`, two half meshes and a full geometry | Extend `SlabBlock` for merging, boxes, support faces and two-slab drops |
 | Connected cable | Connection trait, bone visibility, per-connection boxes | Provide the resolver and matching server collision arms |
 | Crafting station | Crafting-table component, geometry, materials | Open a real crafting inventory and register any custom recipes |
 | Ability item | Icon, stack limit, cooldown, interact label | Implement `onClickAir()` / `onInteractBlock()` and server cooldown values |

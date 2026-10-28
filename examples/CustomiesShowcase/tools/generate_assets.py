@@ -153,7 +153,7 @@ def texture(name, item=False):
                 draw.line((0,y,15,y),fill=high+(255,));draw.line(((y*2)%12,y,(y*2)%12,min(15,y+4)),fill=high+(255,))
     return image
 
-write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 139 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,4,1],'min_engine_version':[1,26,60]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,4,1]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
+write(Path('manifest.json'), {'format_version':2,'header':{'name':'Customies Showcase - Prism Laboratory','description':'Original textures, models and audio for 139 Customies specimens.','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resource-pack')),'version':[1,4,2],'min_engine_version':[1,26,60]},'modules':[{'type':'resources','uuid':str(uuid.uuid5(uuid.NAMESPACE_URL,'https://github.com/HydroGames-dev/Customies-lotl/showcase/resources-module')),'version':[1,4,2]}],'metadata':{'authors':['HydroGames-dev'],'license':'MIT'}})
 animated = {'showcase_reactor_flow':'reactor', **{d['active_texture']:key for key,d in EXPANSION.items() if 'active_texture' in d}}
 segment_textures={seg[k] for d in EXPANSION.values() for seg in d['segments'] for k in ('texture','active_texture') if k in seg}
 for d in EXPANSION.values():
@@ -227,7 +227,8 @@ model('stairs',[bone('base',[-8,0,-8],[16,8,16]),bone('nw',[-8,8,-8],[8,8,8]),bo
 for half in ['bottom','top']:
     for shape,quadrants in {'none':[(0,0),(8,0)],'outer_left':[(0,0)],'outer_right':[(8,0)],'inner_left':[(0,0),(8,0),(0,8)],'inner_right':[(0,0),(8,0),(8,8)]}.items():
         bones=[bone('base',[-8,8 if half=='top' else 0,-8],[16,8,16])]
-        bones += [bone(f'quarter_{i}',[x-8,0 if half=='top' else 8,z-8],[8,8,8]) for i,(x,z) in enumerate(quadrants)]
+        # Geometry X is mirrored relative to server/voxel X, including corner handedness.
+        bones += [bone(f'quarter_{i}',[-x,0 if half=='top' else 8,z-8],[8,8,8]) for i,(x,z) in enumerate(quadrants)]
         model('stairs_'+shape+'_'+half,bones)
 model('gate_closed',[bone('panel',[-8,0,-2],[16,16,4])])
 model('gate_open',[bone('left',[-8,0,-2],[2,16,4]),bone('right',[6,0,-2],[2,16,4]),bone('top',[-6,14,-2],[12,2,4])])

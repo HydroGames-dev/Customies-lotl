@@ -209,7 +209,7 @@ outside this showcase's implementation.
 | `machine` | Place while facing each compass point | Cardinal trait, 180-degree offset, visible front panel |
 | `orienter` | Place looking up/down or horizontally | Six-facing trait and rotation permutations |
 | `face_marker` | Place against each of six faces | `minecraft:block_face` and matching rotation |
-| `slab` | Place against upper/lower side or top/bottom face | Vertical-half state, matching half-height geometry/collision |
+| `slab` | Place high/low; place another in the empty half to combine | Matching half/full collision, saved double state and two-slab drops |
 | `cable` | Place a row and connect solid neighbors | Four connection states, conditional model bones and collision boxes |
 | `corner_stairs` | Place perpendicular neighbors | Corner/cardinal/vertical-half states, explicit shape geometry and collision |
 | `totem` | Place with three free vertical cells | Atomic three-part structure; part-specific textures; grouped break |

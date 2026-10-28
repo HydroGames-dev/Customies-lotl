@@ -40,7 +40,7 @@ final class SpecimenDescriptions {
 		'machine' => ['A machine with a marked front panel.','Faces you when placed; uses four-way rotation.'],
 		'orienter' => ['A directional cube with six orientations.','Look up, down, or sideways while placing.'],
 		'face_marker' => ['Marks the face against which it was placed.','Place against any of the six block faces.'],
-		'slab' => ['A half-height building block.','Place high or low to choose its vertical half.'],
+		'slab' => ['A half-height building block.','Place high or low to choose its vertical half.','Place in the empty half to merge; doubles drop two slabs.'],
 		'cable' => ['A connecting post with four optional arms.','Join posts together or place beside solid blocks.'],
 		'corner_stairs' => ['Stairs with inner/outer corners and two halves.','Place high/low; matching halves join at corners.'],
 		'totem' => ['A three-part vertical crystal totem.','Needs three free cells; break any part to remove.'],

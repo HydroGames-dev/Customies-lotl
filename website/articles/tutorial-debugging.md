@@ -27,7 +27,7 @@ tag types and schema version. Keep logs bounded and permission-gated.
 ## 4. Compare client and PHP shapes
 
 Match model-pixel boxes against local PHP AABBs using the
-[box converter](tool-boxes.html). Check every half/direction/part. A visible stair
+[shape visualizer](tool-shapes.html). Check every half/direction/part. A visible stair
 or slab that cannot be targeted may have mismatched selection or server ray shape.
 Rotating a mesh does not rotate a manually supplied PHP box automatically.
 
@@ -35,8 +35,8 @@ Rotating a mesh does not rotate a manually supplied PHP box automatically.
 
 Confirm namespaced state names, scalar types, matching permutation order and
 whole-component replacement semantics. Verify atlas keys and geometry identifiers.
-Use the [wrapper inspector](tool-components.html) to inspect readable values, while
-remembering its example shape is not a complete native Bedrock schema.
+Use the [JSON converter](tool-converter.html) to adapt a native definition and
+review unsupported fields. It is not a complete native Bedrock schema validator.
 
 ## 6. Verify authoritative behavior
 

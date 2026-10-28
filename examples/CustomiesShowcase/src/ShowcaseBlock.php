@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace customiesdevs\showcase;
 
 use customiesdevs\customies\block\TraitBlock;
+use customiesdevs\customies\block\SlabPlacement;
 use customiesdevs\customies\block\component as B;
 use customiesdevs\customies\block\properties\{Material, Box, RenderMethod};
 use customiesdevs\customies\block\states\BlockState;
@@ -106,11 +107,7 @@ final class ShowcaseBlock extends TraitBlock {
 				}
 				break;
 			case 'slab':
-				$this->addTrait(PlacementPositionTrait::verticalHalf());
-				$this->addPermutation(new BlockPermutation("q.block_state('minecraft:vertical_half') == 'top'", new B\GeometryComponent('geometry.showcase.slab_top'), [
-					(new B\CollisionBoxComponent())->addBox(new Box(new Vector3(-8,8,-8), new Vector3(16,8,16))),
-					new B\SelectionBoxComponent(true, new Vector3(-8,8,-8), new Vector3(16,8,16))
-				]));
+				BlockPresets::slab($this, 'geometry.showcase.slab', 'geometry.showcase.slab_top', 'geometry.showcase.cube');
 				break;
 			case 'cable':
 			case 'lumen_cable':
@@ -170,6 +167,7 @@ final class ShowcaseBlock extends TraitBlock {
 	private function isCable(): bool { return in_array($this->specimen,['cable','lumen_cable'],true); }
 
 	public function deserializeState(\pocketmine\data\bedrock\block\convert\BlockStateReader $in): void {
+		if($this->specimen === 'slab'){ SlabPlacement::readState($this, $in); return; }
 		if($this->specimen !== 'corner_stairs'){ parent::deserializeState($in); return; }
 		$this->getState(PlacementDirectionTrait::CARDINAL_DIRECTION)->setCurrentValue($in->readString(PlacementDirectionTrait::CARDINAL_DIRECTION));
 		$this->getState('minecraft:corner')->setCurrentValue($in->readString('minecraft:corner'));
@@ -182,6 +180,7 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	public function place(\pocketmine\world\BlockTransaction $tx, Item $item, Block $blockReplace, Block $blockClicked, int $face, Vector3 $clickVector, ?Player $player = null): bool {
+		if($this->specimen === 'slab'){ return SlabPlacement::place($this,$tx,$item,$blockReplace,$blockClicked,$face,$clickVector,$player); }
 		$d = ExpansionBlocks::definitions()[$this->specimen] ?? [];
 		if(!isset($d['layout'])){ return parent::place($tx,$item,$blockReplace,$blockClicked,$face,$clickVector,$player); }
 		$this->applyTraitPlacement($tx,$item,$blockReplace,$blockClicked,$face,$clickVector,$player);
@@ -193,6 +192,9 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 
 	public function getSpecimen(): string { return $this->specimen; }
+	public function canBePlacedAt(Block $blockReplace, Vector3 $clickVector, int $face, bool $isClickedBlock): bool {
+		return parent::canBePlacedAt($blockReplace,$clickVector,$face,$isClickedBlock) || ($this->specimen === 'slab' && SlabPlacement::canMerge($this,$blockReplace,$clickVector,$face,$isClickedBlock));
+	}
 	public function getLightLevel(): int {
 		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::light($this); }
 		if($this->specimen === 'signal_lamp'){ return $this->getState('showcase:brightness')->getCurrentValue()*5; }
@@ -204,7 +206,13 @@ final class ShowcaseBlock extends TraitBlock {
 	}
 	public function getLightFilter(): int { return $this->specimen === 'lab_light_dampening' || $this->specimen === 'glow_flower' ? 0 : parent::getLightFilter(); }
 	public function getFrictionFactor(): float { return in_array($this->specimen, ['ice_tile', 'lab_friction'], true) ? 0.98 : parent::getFrictionFactor(); }
-	public function isSolid(): bool { return !ExpansionBlocks::has($this->specimen) && !in_array($this->specimen, ['glow_flower', 'cable', 'lumen_cable', 'spring_pad', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost(); }
+	public function isSolid(): bool { return ($this->specimen === 'slab' && SlabPlacement::isDouble($this)) || (!ExpansionBlocks::has($this->specimen) && !in_array($this->specimen, ['glow_flower', 'cable', 'lumen_cable', 'spring_pad', 'slab', 'bench', 'totem', 'rotor', 'corner_stairs'], true) && !$this->isGhost()); }
+	public function isTransparent(): bool { return $this->specimen === 'slab' ? !SlabPlacement::isDouble($this) : parent::isTransparent(); }
+	public function getSupportType(int $facing): \pocketmine\block\utils\SupportType {
+		if($this->specimen !== 'slab'){ return parent::getSupportType($facing); }
+		$top = $this->getState('minecraft:vertical_half')->getCurrentValue() === 'top';
+		return SlabPlacement::isDouble($this) || ($top && $facing === \pocketmine\math\Facing::UP) || (!$top && $facing === \pocketmine\math\Facing::DOWN) ? \pocketmine\block\utils\SupportType::FULL : \pocketmine\block\utils\SupportType::NONE;
+	}
 	public function canBeReplaced(): bool { return in_array($this->specimen, ['glow_flower', 'lab_replaceable'], true); }
 	private function isGhost(): bool { return ($this->specimen === 'phase_block' && $this->getState('showcase:phase')->getCurrentValue() === 2) || ($this->specimen === 'phase_gate' && $this->getState('showcase:open')->getCurrentValue()); }
 
@@ -212,6 +220,7 @@ final class ShowcaseBlock extends TraitBlock {
 		if(ExpansionBlocks::has($this->specimen)){ return ExpansionBlocks::collision($this); }
 		if($this->isGhost() || in_array($this->specimen, ['glow_flower', 'lab_collision_box'], true)){ return []; }
 		if($this->specimen === 'slab'){
+			if(SlabPlacement::isDouble($this)){ return [AxisAlignedBB::one()]; }
 			$y = $this->getState(PlacementPositionTrait::VERTICAL_HALF)->getCurrentValue() === 'top' ? 0.5 : 0;
 			return [new AxisAlignedBB(0,$y,0,1,$y+0.5,1)];
 		}
@@ -259,6 +268,10 @@ final class ShowcaseBlock extends TraitBlock {
 
 	public function asItem(): Item {
 		return parent::asItem()->setLore(SpecimenDescriptions::block($this->specimen));
+	}
+	public function getDropsForCompatibleTool(Item $item): array {
+		if($this->specimen === 'slab'){ return [$this->asItem()->setCount(SlabPlacement::isDouble($this) ? 2 : 1)]; }
+		return parent::getDropsForCompatibleTool($item);
 	}
 
 	public function getDrops(Item $item): array {

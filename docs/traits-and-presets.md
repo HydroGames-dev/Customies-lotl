@@ -28,13 +28,36 @@ A permutation keeps its original single-component API and accepts additional com
 
 ## Compatibility and limits
 
-Customies 1.7.0 requires Axolotl API 5.51.0 and targets released 26.60 dependencies (protocol 2225), tested on the 5.51.0 release and stable branch plus pinned protocol master. See [the compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html) for exact refs. The suite round-trips registry/join packets and checks runtime cache invalidation. Customies does not negotiate or translate protocols. No live client validation of 1.26.52/1.26.60 has been performed.
+Customies 1.8.0 requires Axolotl API 5.51.0 and targets released 26.60 dependencies (protocol 2225), tested on the 5.51.0 release and stable branch plus pinned protocol master. See [the compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html) for exact refs. The suite round-trips registry/join packets and checks runtime cache invalidation. Customies does not negotiate or translate protocols. No live client validation of 1.26.52/1.26.60 has been performed.
 
 Registration closes after the deferred startup worker snapshot. Register definitions in `onLoad()`/`onEnable()` and restart after changes. The library no longer registers in-game commands or command permissions. `php tools/doctor.php /path/to/host` checks a source checkout without starting a server.
 
 The sixteen-way placement state is available, but arbitrary-angle geometry/bone permutations must be authored separately; the existing transformation wire format uses quarter-turn rotation indices. Corner updates currently support matching block types and vertical halves; cross-identifier `blocks_to_corner_with` descriptors and tag-expression matching need further implementation. Permutations describe client rendering; arbitrary Molang is not evaluated on the server. Multi-block integrity after explosions, piston interaction, and external block edits requires live-world validation.
 
 ## Verification
+
+### Merging slabs (Customies 1.8.0)
+
+Extend `customiesdevs\customies\block\SlabBlock` and call
+`BlockPresets::slab($this, $bottomGeometry, $topGeometry)` before the parent
+constructor. Supply materials and break information. The preset supplies
+bottom/top/full client shapes and the `customies:double_slab` boolean state;
+the base class handles merging, PHP collision, targeting, support faces and
+two-item double-slab drops. A third slab places in an adjacent cell.
+
+For an existing `TraitBlock` subclass, delegate `canBePlacedAt()` and `place()`
+to `SlabPlacement` and supply matching collision, support and drops. Use
+`SlabPlacement::readState()` for deserialization: it preserves declared states
+and treats only a missing double flag as an older single slab. Malformed values
+still fail. Avoid combining this preset with multi-block topology or another
+trait supplying `minecraft:vertical_half`.
+
+The [generator](https://hydrogames-dev.github.io/Customies-lotl/tool-generator.html)
+exports a slab class and both half geometries. The
+[rotation workbench](https://hydrogames-dev.github.io/Customies-lotl/tool-rotation.html)
+compares all 40 actual corner-stair variants with PHP and vanilla collision.
+
+### Run the suites
 
 Install dependencies in an Axolotl source checkout with Composer, then run:
 

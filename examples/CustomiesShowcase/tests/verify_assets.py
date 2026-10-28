@@ -42,7 +42,7 @@ for shape,expected in json.loads((BASE/'stair-shapes.json').read_text()).items()
     for bone in models[key]['bones']:
         for cube in bone['cubes']:
             x,y,z=cube['origin'];w,h,d=cube['size']
-            actual.append([(x+8)/16,y/16,(z+8)/16,(x+w+8)/16,(y+h)/16,(z+d+8)/16])
+            actual.append([(8-x-w)/16,y/16,(z+8)/16,(8-x)/16,(y+h)/16,(z+d+8)/16])
     check(sorted(actual)==sorted(expected),f'Stair collision/model mismatch: {shape}')
 references=json.loads((BASE/'asset-references.json').read_text())
 for key in references['geometry']:

@@ -40,7 +40,7 @@ python -m pip install -r website/requirements.txt
 python website/build.py
 python website/check.py
 node --check website/app.js
-node website/tools.test.cjs
+node website/authoring.test.cjs
 ```
 
 The source-only build omits install downloads. For release downloads, first run

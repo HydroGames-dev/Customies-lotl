@@ -1,5 +1,30 @@
 # Validation - 2026-10-24
 
+## Customies 1.8.0 / Showcase 1.4.2 - 2026-10-28
+
+- Slabs merge in either placement order through `World::useItemOn()`, consume two
+  items in total, occupy one cell, save/reload as doubles and drop two slabs.
+  A third slab places adjacent. All face/height/half merge-acceptance and support
+  cases agree with vanilla; different slab types do not combine.
+- Actual corner-stair meshes, PHP collision and vanilla occupancy match in all
+  40 shape/half/direction combinations. Model X origins now use the mirrored
+  geometry-to-voxel convention. Cardinal rotation angles are unchanged.
+- The replacement tools generate classes/registration/pack scaffolding, visualize
+  collision and selection, convert supported native JSON fields and expose all
+  40 tested stair fixtures. Seven generator patterns and additional converter
+  classes load/register against the released host and pinned protocol master.
+  ZIP checksums and contents, invalid inputs and PHP string escaping are checked.
+- The packaged plugins enable with the matching pack on isolated Axolotl 5.51.0:
+  73 blocks, 3212 runtime states and 139 item entries; registration freezes, the
+  removed library command stays absent and shutdown is clean. The test used a
+  copy of the previous test world and RakNet; WebRTC transport was not exercised.
+- Desktop stair previews, a phone-sized generator, copy and ZIP download were
+  checked in a browser. Further viewport checks stopped when browser permission
+  was declined. Minecraft client rendering/prediction still needs a playtest.
+
+Run `tests/shapes.php` against the host to regenerate `website/shape-fixtures.json`.
+The compatibility workflow rejects stale fixtures and executes generated PHP.
+
 ## Customies 1.7.0 / Showcase 1.4.1 - 2026-10-28
 
 Tests target released 26.60 dependencies on Axolotl 5.51.0, the stable snapshot

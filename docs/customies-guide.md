@@ -230,7 +230,7 @@ client; arbitrary Molang is not a PHP gameplay script.
 | --- | --- | --- |
 | Four horizontal orientations | `BlockPresets::cardinal($this)` | Rotate asymmetric collision boxes too |
 | Six facing directions | `BlockPresets::facing($this)` | Match collision/interaction direction |
-| Upper/lower slab | `PlacementPositionTrait::verticalHalf()` | Half-specific collision and selection |
+| Merging upper/lower slab | `BlockPresets::slab()` | Extend `SlabBlock`; matching half/full collision, support, saved states and drops |
 | Clicked block face | `PlacementPositionTrait::blockFace()` | Face-specific model/permutations |
 | Connected cable | `BlockPresets::connections($this, $resolver)` | Connected geometry and PHP arm boxes |
 | Corner stairs | `PlacementDirectionTrait::cornerAndCardinal()` plus vertical-half trait | Five corner meshes per half, matching boxes |

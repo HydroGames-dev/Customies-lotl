@@ -59,8 +59,9 @@ inventory; adding it is not enough to make a backpack.
 
 ## 04 / Rotate a slab or corner stair
 
-Use a vertical-half placement trait for a slab. Author upper/lower models and both
-client boxes and PHP collision boxes. For stairs, add corner/cardinal placement and
+Use `BlockPresets::slab()` and the reusable `SlabBlock` base for your own slabs.
+It merges matching halves in one cell, saves the double flag and drops two slabs.
+The Showcase's shared block class delegates to `SlabPlacement` instead. For stairs, add corner/cardinal placement and
 provide five corner shapes for each half. Match neighbors only when their halves
 are compatible. [States and traits](states.html) explains the lifecycle.
 

@@ -56,3 +56,11 @@ jobs:
         run: php tests/mc2660.php .compat/host
       - name: Showcase and documentation PHP integration
         run: php examples/CustomiesShowcase/tests/guide.php .compat/host
+      - name: Slab placement and mesh collision against vanilla
+        run: |
+          php examples/CustomiesShowcase/tests/shapes.php .compat/host
+          git diff --exit-code -- website/shape-fixtures.json
+      - name: Generated PHP classes against the host
+        run: |
+          node website/authoring.test.cjs --fixtures .compat/authoring.json
+          php website/check-php.php .compat/host .compat/authoring.json

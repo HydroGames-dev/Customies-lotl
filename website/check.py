@@ -36,15 +36,15 @@ for name,count in [('block-components',33),('item-components',42)]:
     assert (OUT/(name+'.html')).read_text(encoding='utf-8').count('class="component-example"')==count
 for style in re.findall(r"url\(['\"]?([^)'\"]+)", (OUT/'assets/style.css').read_text(encoding='utf-8')):
     assert (OUT/'assets'/style).exists(),'Missing CSS resource '+style
-models=json.loads((OUT/'assets/models.json').read_text())
+models=json.loads((OUT/'assets/models.json').read_text(encoding='utf-8'))
 assert len(models['prism_cottage']['cubes'])>=96
-search=json.loads((OUT/'assets/search.json').read_text())
+search=json.loads((OUT/'assets/search.json').read_text(encoding='utf-8'))
 for record in search:
     url=urlsplit(record['url']);target=OUT/url.path
     assert target in documents
     if url.fragment:assert url.fragment in documents[target].ids
 if (OUT/'downloads').exists():
-    for line in (OUT/'downloads/SHA256SUMS.txt').read_text().splitlines():
+    for line in (OUT/'downloads/SHA256SUMS.txt').read_text(encoding='utf-8').splitlines():
         checksum,name=line.split();assert hashlib.sha256((OUT/'downloads'/name).read_bytes()).hexdigest()==checksum,'Download checksum mismatch'
 print(f'PASS: {len(documents)} pages, all internal links/anchors/resources, 139 specimens, 75 examples, 13 flipbooks, model/search data and download checksums.')
 
@@ -79,11 +79,15 @@ assert len([p for p in documents if '-component-' in p.stem])==75
 assert 'Block traits' in (OUT/'block-traits.html').read_text(encoding='utf-8')
 print('PASS: 75 complete component articles match source hashes and parameters; dedicated state/trait/item topics exist.')
 
-for name in ('how-it-works','data-guide','updating-customies','toolchain','tutorial-data','tutorial-equipment','tutorial-debugging','accessibility','tools','tool-states','tool-boxes','tool-identifiers','tool-components','tool-starter'):
+for name in ('how-it-works','data-guide','updating-customies','toolchain','tutorial-data','tutorial-equipment','tutorial-debugging','accessibility','tools','tool-generator','tool-shapes','tool-converter','tool-rotation'):
     assert OUT/(name+'.html') in documents,'Missing guide/tool: '+name
-for name in ('tools-lib.js','tools.js'):assert (OUT/'assets'/name).exists()
-for name in ('tool-states','tool-boxes','tool-identifiers','tool-components','tool-starter'):
+for name in ('authoring-lib.js','authoring.js','authoring.css','shape-fixtures.json'):assert (OUT/'assets'/name).exists()
+for name in ('tool-generator','tool-shapes','tool-converter','tool-rotation'):
     text=(OUT/(name+'.html')).read_text(encoding='utf-8')
-    assert 'data-tool=' in text and 'type="submit" disabled' in text,'Tools must wait for local initialization'
+    assert 'data-authoring=' in text and 'type="submit" disabled' in text,'Tools must wait for local initialization'
 assert (OUT/'assets/wrapper-api.json').exists()
-print('PASS: architecture, data, maintenance, reader guides and five browser-local tools.')
+for retired in ('tool-states','tool-boxes','tool-identifiers','tool-components','tool-starter'):
+    assert not (OUT/(retired+'.html')).exists(),'Retired toolbox page survived: '+retired
+for name in ('tool-shapes','tool-rotation'):
+    assert '<canvas' in (OUT/(name+'.html')).read_text(encoding='utf-8')
+print('PASS: architecture, data, maintenance, reader guides and four browser-local authoring tools.')

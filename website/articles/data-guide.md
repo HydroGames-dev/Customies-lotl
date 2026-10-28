@@ -78,6 +78,6 @@ values. Do not dump entire inventories every tick or include unrelated player
 data in a public bug report. Reproduce with a minimal item/world fixture and record
 the host, Customies and pack versions separately.
 
-Use the [state calculator](tool-states.html) to see the cost of block enums and
-the [component inspector](tool-components.html) to compare readable wrapper values.
-Those tools cannot validate a real saved NBT file or authorize inventory data.
+Use the [JSON converter's state report](tool-converter.html) to count combinations
+in a native definition, then inspect generated PHP and its manual-review notes.
+The converter cannot validate saved NBT or authorize inventory data.

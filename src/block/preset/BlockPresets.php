@@ -13,6 +13,20 @@ use pocketmine\math\Vector3;
 
 /** Apply presets in the block constructor BEFORE parent::__construct(). */
 final class BlockPresets {
+	/** Client states/geometry; delegate server merging to SlabPlacement and match PHP collision/drops. */
+	public static function slab(TraitBlock $block, string $bottomGeometry, string $topGeometry, string $doubleGeometry = 'minecraft:geometry.full_block'): void {
+		$block->addTrait(PlacementPositionTrait::verticalHalf());
+		$block->addState(\customiesdevs\customies\block\states\BlockState::bool(\customiesdevs\customies\block\SlabPlacement::DOUBLE));
+		$double = "q.block_state('customies:double_slab')";
+		$block->addComponent(new \customiesdevs\customies\block\component\GeometryComponent($bottomGeometry));
+		$block->addComponent((new \customiesdevs\customies\block\component\CollisionBoxComponent())->addBox(new \customiesdevs\customies\block\properties\Box(new Vector3(-8,0,-8), new Vector3(16,8,16))));
+		$block->addComponent(new \customiesdevs\customies\block\component\SelectionBoxComponent(true, new Vector3(-8,0,-8), new Vector3(16,8,16)));
+		$block->addPermutation(new BlockPermutation("!$double && q.block_state('minecraft:vertical_half') == 'top'", new \customiesdevs\customies\block\component\GeometryComponent($topGeometry), [
+			(new \customiesdevs\customies\block\component\CollisionBoxComponent())->addBox(new \customiesdevs\customies\block\properties\Box(new Vector3(-8,8,-8), new Vector3(16,8,16))),
+			new \customiesdevs\customies\block\component\SelectionBoxComponent(true, new Vector3(-8,8,-8), new Vector3(16,8,16))
+		]));
+		$block->addPermutation(new BlockPermutation($double, new \customiesdevs\customies\block\component\GeometryComponent($doubleGeometry), [new \customiesdevs\customies\block\component\CollisionBoxComponent(), new \customiesdevs\customies\block\component\SelectionBoxComponent()]));
+	}
 	public static function cardinal(TraitBlock $block, int $offset = 0): void {
 		$block->addTrait(PlacementDirectionTrait::cardinal($offset));
 		foreach(['north' => 0, 'west' => 90, 'south' => 180, 'east' => 270] as $face => $angle){
