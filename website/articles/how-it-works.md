@@ -8,7 +8,8 @@ runtime. Your plugin still implements gameplay in PHP.
 ## Startup: build definitions once
 
 1. The Customies plugin registers its packet listener and schedules deferred worker
-   initialization. Your dependent content plugin registers in `onEnable()`.
+   initialization. Your dependent content plugin registers definitions in `onLoad()`, before
+   plugins enable and before worlds or inventories are read.
 2. `CustomiesBlockFactory` calls your block factory, initializes traits and checks
    the identifier and item-ID mapping for conflicts.
 3. Components and traits are serialized into client definition NBT. State values
@@ -35,6 +36,12 @@ required identifier order and caches it by registration count and source entries
 It also merges the branch's required experiment flags into startup and pack
 stack metadata. The cache is not an invitation to hot-reload arbitrary definitions:
 restart and reconnect after registration changes.
+
+The `ItemRegistryPacket` path also merges current custom item/block-item
+definitions, replacing stale own entries in early snapshots and preserving
+unrelated entries. Cache comparisons use the actual entries, including same-size
+changes. This repairs what a joining client is told; it cannot restore a saved
+inventory that another plugin has already replaced with empty slots.
 
 The runtime block dictionary is updated in the same name order. Inserting a custom
 name can shift existing IDs, so its cached block translations are invalidated.

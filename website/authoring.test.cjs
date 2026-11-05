@@ -5,6 +5,7 @@ for(const [kind,presets] of [['block',['cube','cardinal','slab']],['item',['basi
   const className='Test'+preset[0].toUpperCase()+preset.slice(1),identifier='documentation:'+preset;
   const out=A.generate({kind,preset,className,identifier,name:'Prism '+preset,stack:['durable','armor'].includes(preset)?1:16});
   assert.match(out.files['plugin.yml'],/api: 5.51.0/);assert.match(out.files['src/ContentPlugin.php'],/newId\(\)/);assert.ok(!out.files['src/ContentPlugin.php'].includes('\\\\pocketmine'));
+  assert.match(out.files['src/ContentPlugin.php'],/public function onLoad\(\)/);assert.doesNotMatch(out.files['src/ContentPlugin.php'],/function onEnable\(\)/);
   const manifest=JSON.parse(out.files['resource_pack/manifest.json']);assert.match(manifest.header.uuid,/^[0-9a-f-]{36}$/);assert.notEqual(manifest.header.uuid,manifest.modules[0].uuid);
   fixtures.push({kind,preset,className,identifier,...out});
 }

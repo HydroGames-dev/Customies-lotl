@@ -31,6 +31,14 @@ Call after registration. Keep any logging or UI you add bounded and permission-g
 
 `report()` includes registration status, custom blocks, state variants, item entries and entities. Item-entry counts include block items. These are definition counts, not a world scan or a memory/TPS estimate.
 
+Since 1.9.1, `identifier_fingerprint` hashes the sorted item/block-item identifier
+list. Compare it and the `Registry ready` startup log across working and failing
+restarts. It stays stable when runtime IDs or registration order change; it does
+not hash component values or resource packs. If definitions disappear, inspect
+startup errors and dependency order before blaming client textures. Follow the
+[restart checklist](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/docs/restart-persistence.md)
+and preserve the original inventory data on a decoding failure.
+
 For blocks, `inspect()` returns the registered class, state domains and encoded definition NBT size. For items, it returns the network ID, registry version, component flag and NBT size. It reads a registered prototype, not a placed block's current values or an inventory instance. Unknown identifiers throw `InvalidArgumentException`.
 
 ## Interpret failures

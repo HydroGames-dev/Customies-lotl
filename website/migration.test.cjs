@@ -53,6 +53,8 @@ const resourceOnly=M.migrate(M.collect('Resources.mcpack',Z.zipSync(rp)));assert
 global.migrationExecuted=false;const hostile=M.script("globalThis.migrationExecuted=true; eval('throw 1');",'hostile.js');assert.equal(global.migrationExecuted,false);assert.equal(hostile.handlers.length,0);
 const escaped=M.migrate(new Map([['message.js',enc(`import {world} from '@minecraft/server';world.afterEvents.itemUse.subscribe(e=>e.source.sendMessage("'); phpinfo(); //"));`)]]),{pluginName:'EscapedMigration'});fixtures.push({pluginName:'EscapedMigration',...escaped});
 assert.match(escaped.files['plugin/src/MigrationHooks.php'],/sendMessage\('\s*\\'/);
+assert.match(converted.files['plugin/src/Main.php'],/public function onLoad\(\)/);
+assert.match(converted.files['plugin/src/Main.php'],/protected function onEnable\(\): void \{\n        \$this->getServer\(\)/);
 const binaryZip=A.zip(converted.files),roundtrip=Z.unzipSync(binaryZip);assert.deepEqual(roundtrip['resource_packs/pack_1/textures/items/migration_wand.png'],png);
 if(process.argv[2]==='--fixtures'){fs.mkdirSync(path.dirname(process.argv[3]),{recursive:true});fs.writeFileSync(process.argv[3],JSON.stringify(fixtures.map(f=>({...f,files:Object.fromEntries(Object.entries(f.files).filter(([,v])=>typeof v==='string'))})),null,2));fs.writeFileSync(path.join(path.dirname(process.argv[3]),'migration-test.mcaddon'),addon);fs.writeFileSync(path.join(path.dirname(process.argv[3]),'migration-resources.mcpack'),Z.zipSync(rp));}
 console.log('PASS: nested compressed packs, binary assets/ZIP, manifest imports, JSONC, three real hook translations, escaped PHP, no JS execution, unsupported whole callbacks, traversal, duplicates, checksum, expansion and nesting bounds.');

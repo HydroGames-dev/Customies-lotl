@@ -24,7 +24,7 @@ final class RuntimeCompatibility {
 			\pocketmine\network\mcpe\convert\BlockStateDictionary::class => ['states', 'stateDataToStateIdLookup', 'idMetaToStateIdLookupCache'],
 			\pocketmine\network\mcpe\convert\BlockTranslator::class => ['fallbackStateId', 'networkIdCache'],
 			\pocketmine\network\mcpe\protocol\serializer\ItemTypeDictionary::class => ['intToStringIdMap', 'stringToIntMap', 'itemTypes'],
-			\pocketmine\data\bedrock\item\BlockItemIdMap::class => ['itemToBlockId'],
+			\pocketmine\data\bedrock\item\BlockItemIdMap::class => ['itemToBlockId', 'blockToItemId'],
 			\pocketmine\network\mcpe\protocol\StartGamePacket::class => ['blockPalette', 'levelSettings'],
 			\pocketmine\network\mcpe\protocol\ResourcePackStackPacket::class => ['experiments']
 		];

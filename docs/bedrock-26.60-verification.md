@@ -1,5 +1,11 @@
 # Bedrock 26.60 verification · 2026-10-28
 
+Restart persistence was rechecked on 2026-11-05 for Customies 1.9.1, including
+current Axolotl stable `7831952d6a970d1700ca82742ab2ac4dbe61ff80`. See the
+[restart test record](restart-persistence.md) for the reproduced failures,
+independent server/process tests and the production/client limits. The original
+1.9.0 verification below remains a dated historical record.
+
 This record separates current upstream data, automated host tests and client tests.
 The repository targets Axolotl API 5.51.0 and protocol 2225. No newer protocol was
 found in the checked Axolotl stable and BedrockProtocol master commits.

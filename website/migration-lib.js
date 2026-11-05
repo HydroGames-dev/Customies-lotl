@@ -253,7 +253,7 @@
       const type=d.kind==='block'?'Block':'Item',id='$id'+i;return '        '+id+' = \\pocketmine\\'+d.kind+'\\'+type+'TypeIds::newId();\n        \\customiesdevs\\customies\\'+d.kind+'\\Customies'+type+'Factory::getInstance()->register'+type+'(static fn() => new '+d.className+'('+id+'), '+A.php(d.id)+');';
     }).join('\n');
     put('plugin/plugin.yml',`name: ${name}\nmain: ${ns}\\Main\nsrc-namespace-prefix: ${ns}\nversion: 1.0.0\napi: 5.51.0\nload: POSTWORLD\ndepend: [Customies-Axolotl]\n`);
-    put('plugin/src/Main.php',`<?php\ndeclare(strict_types=1);\nnamespace ${ns};\nfinal class Main extends \\pocketmine\\plugin\\PluginBase {\n    protected function onEnable(): void {\n${registration}\n        $this->getServer()->getPluginManager()->registerEvents(new MigrationHooks($this), $this);\n    }\n}\n`);
+    put('plugin/src/Main.php',`<?php\ndeclare(strict_types=1);\nnamespace ${ns};\nfinal class Main extends \\pocketmine\\plugin\\PluginBase {\n    public function onLoad(): void {\n${registration}\n    }\n    protected function onEnable(): void {\n        $this->getServer()->getPluginManager()->registerEvents(new MigrationHooks($this), $this);\n    }\n}\n`);
     const listenerMethods=handlers.map((h,i)=>{
       let guard='';if(h.filter){const fn=h.filter.kind==='item'?'matchesItem':'matchesBlock',source=h.filter.kind==='item'?'$event->getItem()':'$event->getBlock()';guard='        if(!('+h.filter.ids.map(id=>'$this->'+fn+'('+source+', '+A.php(id)+')').join(' || ')+')){ return; }\n';}
       if(h.event==='playerInteract')guard+='        if($event->getAction() !== \\pocketmine\\event\\player\\PlayerInteractEvent::RIGHT_CLICK_BLOCK){ return; }\n';

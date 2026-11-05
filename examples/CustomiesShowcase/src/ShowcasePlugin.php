@@ -23,7 +23,7 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 	private ?\WeakMap $lastInspection = null;
 	public const SPECIAL_ITEMS = ['prism_berry'=>PrismFood::class,'prism_pickaxe'=>PrismPickaxe::class,'prism_helmet'=>PrismHelmet::class,'prism_pebble'=>PrismPebble::class,'energized_ration'=>EnergizedRation::class,'prism_elixir'=>PrismElixir::class,'frost_blade'=>FrostBlade::class,'prism_chestplate'=>PrismChestplate::class,'prism_leggings'=>PrismLeggings::class,'prism_boots'=>PrismBoots::class,'moon_mochi'=>MoonMochi::class];
 
-	protected function onEnable(): void {
+	public function onLoad(): void {
 		$this->saveDefaultConfig();
 		foreach(ShowcaseBlock::PLAYABLE as $specimen){ $this->registerBlock($specimen, $specimen); }
 		foreach(ShowcaseItem::PLAYABLE as $specimen){
@@ -44,6 +44,9 @@ final class ShowcasePlugin extends PluginBase implements Listener {
 				$this->entries['lab_item_'.$key] = 'item';
 			}
 		}
+	}
+
+	protected function onEnable(): void {
 		$this->getServer()->getPluginManager()->registerEvents($this,$this);
 		$this->getLogger()->info('Registered '.count($this->entries).' specimens. Install CustomiesShowcase.mcpack on the server; /cshow kit starts the tour.');
 	}

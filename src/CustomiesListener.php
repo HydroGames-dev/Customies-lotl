@@ -4,10 +4,13 @@ declare(strict_types=1);
 namespace customiesdevs\customies;
 
 use customiesdevs\customies\block\CustomiesBlockFactory;
+use customiesdevs\customies\item\CustomiesItemFactory;
 use customiesdevs\customies\network\BlockPaletteBuilder;
+use customiesdevs\customies\network\ItemRegistryBuilder;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\ResourcePackStackPacket;
+use pocketmine\network\mcpe\protocol\ItemRegistryPacket;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
 use pocketmine\network\mcpe\protocol\types\BlockPaletteEntry;
 use pocketmine\network\mcpe\protocol\types\Experiments;
@@ -22,6 +25,12 @@ final class CustomiesListener implements Listener {
 	/** @var list<BlockPaletteEntry> */
 	private array $cachedSourcePalette = [];
 	private Experiments $experiments;
+	/** @var list<\pocketmine\network\mcpe\protocol\types\ItemTypeEntry> */
+	private array $cachedItemSource = [];
+	/** @var list<\pocketmine\network\mcpe\protocol\types\ItemTypeEntry> */
+	private array $cachedCustomItems = [];
+	/** @var list<\pocketmine\network\mcpe\protocol\types\ItemTypeEntry> */
+	private array $cachedItems = [];
 
 	public function __construct() {
 		$this->experiments = new Experiments([
@@ -32,8 +41,11 @@ final class CustomiesListener implements Listener {
 		], true);
 	}
 
+	/** @priority HIGHEST */
 	public function onDataPacketSend(DataPacketSendEvent $event): void {
-		foreach($event->getPackets() as $packet){
+		$packets = $event->getPackets();
+		$itemsChanged = false;
+		foreach($packets as $index => $packet){
 			if($packet instanceof StartGamePacket){
 				$customPalettes = CustomiesBlockFactory::getInstance()->getBlockPaletteEntries();
 				if($this->cachedPaletteSize !== count($customPalettes) || $this->cachedSourcePalette !== $packet->blockPalette){
@@ -47,9 +59,26 @@ final class CustomiesListener implements Listener {
 				}
 				$packet->levelSettings->experiments = new Experiments(array_merge($packet->levelSettings->experiments->getExperiments(), $this->experiments->getExperiments()), true);
 				$packet->blockPalette = $this->cachedBlockPalette;
+			}elseif($packet instanceof ItemRegistryPacket){
+				$source = $packet->getEntries();
+				$custom = CustomiesItemFactory::getInstance()->getItemTableEntries();
+				if($source !== $this->cachedItemSource || $custom !== $this->cachedCustomItems){
+					$this->cachedItems = ItemRegistryBuilder::build($source, $custom);
+					$this->cachedItemSource = $source;
+					$this->cachedCustomItems = $custom;
+				}
+				if($source !== $this->cachedItems){
+					// Replace the event entry, not a potentially shared/cached packet object.
+					$replacement = ItemRegistryPacket::create($this->cachedItems);
+					$replacement->senderSubId = $packet->senderSubId;
+					$replacement->recipientSubId = $packet->recipientSubId;
+					$packets[$index] = $replacement;
+					$itemsChanged = true;
+				}
 			}elseif($packet instanceof ResourcePackStackPacket) {
 				$packet->experiments = new Experiments(array_merge($packet->experiments->getExperiments(), $this->experiments->getExperiments()), true);
 			}
 		}
+		if($itemsChanged){ $event->setPackets($packets); }
 	}
 }

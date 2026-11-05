@@ -59,6 +59,17 @@ arrays, inventories or business rules you add to a subclass.
 
 ## Migrate schemas, not just numbers
 
+Register definitions in your content plugin's `onLoad()` before loading their
+saved inventories. Storage/GUI plugins must depend on that content plugin.
+Use `Item::nbtSerialize()` and `Item::nbtDeserialize()` with typed NBT; do not store
+PHP-serialized Item objects or runtime/network numeric IDs. Those IDs can change
+with plugin order and host updates. Keep the original saved data when decoding
+fails instead of overwriting it with AIR.
+
+Customies 1.9.1 repairs stale login item registries and supplies a direct
+name-only block-item fallback; it does not reconstruct already overwritten slots.
+See the [restart investigation and runnable tests](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/docs/restart-persistence.md).
+
 1. Back up the saved world, player inventories and your plugin database together.
 2. Identify an old format by identifier, schema version and expected tag types.
 3. Validate old values, convert them and write the new schema marker atomically.

@@ -101,6 +101,9 @@ final class CustomiesItemFactory {
 	public function assertCanRegister(string $identifier, int $networkId): void {
 		RegistrationGuard::assertOpen($identifier);
 		RegistrationGuard::validateIdentifier($identifier);
+		if(StringToItemParser::getInstance()->parse($identifier) !== null){
+			throw new InvalidArgumentException("Item '$identifier' already has a parser alias. Check duplicate content plugins before registering it.");
+		}
 		if($networkId < -32768 || $networkId > 32767){
 			throw new InvalidArgumentException("Item '$identifier' has network ID $networkId outside the signed 16-bit registry range.");
 		}
@@ -254,6 +257,9 @@ final class CustomiesItemFactory {
 		if(isset($this->itemTableEntries[$identifier])){ throw new InvalidArgumentException("Item already registered: " . $identifier); }
 		$itemId = $block->getIdInfo()->getBlockTypeId();
 		$this->assertCanRegister($identifier, $itemId);
+		// Some plugin inventories retain only Name/meta/NBT instead of a Block tag.
+		// Native full block-state data still goes through the block deserializer.
+		GlobalItemDataHandlers::getDeserializer()->map($identifier, static fn() => $block->asItem());
 		StringToItemParser::getInstance()->registerBlock($identifier, fn() => clone $block);
 		$entry = new ItemTypeEntry($identifier, $itemId, false, 2, new CacheableNbt(CompoundTag::create()));
 
@@ -267,5 +273,7 @@ final class CustomiesItemFactory {
 		 /** @var array<string, string> $itemToBlockIdValue */
 		$itemToBlockIdValue = $itemToBlockId->getValue($blockItemIdMap);
 		$itemToBlockId->setValue($blockItemIdMap, $itemToBlockIdValue + [$identifier => $identifier]);
+		$blockToItemId = $reflection->getProperty("blockToItemId");
+		$blockToItemId->setValue($blockItemIdMap, $blockToItemId->getValue($blockItemIdMap) + [$identifier => $identifier]);
 	}
 }

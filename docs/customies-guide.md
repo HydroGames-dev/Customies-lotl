@@ -55,7 +55,8 @@ starting a fresh test world. Do not remove registrations used by an existing wor
 without a migration plan. Identifiers are saved in block/item data.
 
 For your own plugin, declare `depend: [Customies-Axolotl]` in `plugin.yml`. Register
-definitions in `onEnable()` before Customies' deferred worker initialization runs.
+definitions in `onLoad()` before inventories are read. Set up events and world logic
+in `onEnable()`; finish registration before Customies' deferred worker snapshot.
 Source folder loading needs DevTools; PHAR installation does not.
 
 ## The three layers
@@ -138,7 +139,7 @@ final class TutorialLamp extends TraitBlock {
 
 For a plugin whose entry class is `tutorial\Main`, use this manifest and put your
 `Main extends PluginBase` class in `src/Main.php` with the registration calls below
-inside its `onEnable()` method:
+inside its `onLoad()` method:
 
 ```yaml
 name: TutorialContent
@@ -150,7 +151,7 @@ load: POSTWORLD
 depend: [Customies-Axolotl]
 ```
 
-In your `PluginBase::onEnable()`, allocate one ID outside each factory closure:
+In your `PluginBase::onLoad()`, allocate one ID outside each factory closure:
 
 ```php
 $blockId = \pocketmine\block\BlockTypeIds::newId();
@@ -203,7 +204,7 @@ final class TutorialWand extends Item implements ItemComponents {
 }
 ```
 
-Register it in `onEnable()` and add `tutorial_wand` to `textures/item_texture.json`:
+Register it in `onLoad()` and add `tutorial_wand` to `textures/item_texture.json`:
 
 ```php
 $itemId = \pocketmine\item\ItemTypeIds::newId();

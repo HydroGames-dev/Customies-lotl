@@ -1,11 +1,11 @@
 ## Minecraft 26.60 is the current target
 
-Customies 1.9.0 requires Axolotl API 5.51.0 and targets protocol 2225 with released 26.60 dependencies. This replaces the earlier development-branch target. Customies extends the host's registries and uses its codecs rather than translating client protocols.
+Customies 1.9.1 requires Axolotl API 5.51.0 and targets protocol 2225 with released 26.60 dependencies. This replaces the earlier development-branch target. Customies extends the host's registries and uses its codecs rather than translating client protocols.
 
 | CI target | Axolotl commit | Protocol source |
 | --- | --- | --- |
 | Released 5.51.0 | `f5e6a67fdf2108cf63196c06db1eb5c0d400d4c8` | Host lockfile, `64.0.0+bedrock-1.26.60` |
-| Stable snapshot | `61eb9b4e23457145efd39ae4785825d4045c765f` | Same released dependency |
+| Stable snapshot | `7831952d6a970d1700ca82742ab2ac4dbe61ff80` | Same released dependency |
 | Protocol master | Same stable host | `64eae48f05b8d1e4d474ead89711600996f1c5af` |
 
 The released dependency uses protocol source `f9d8b40da3940cef8242b0da34ba41fe49ea7364`. The host locks BedrockData `6.10.0+bedrock-1.26.60`, block-upgrade schema `5.5.0` and item-upgrade schema `1.20.0`. Tests use PHP 8.4.16. The pinned workflow is the reproducible record.

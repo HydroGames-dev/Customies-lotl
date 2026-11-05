@@ -21,10 +21,10 @@ jobs:
             host: f5e6a67fdf2108cf63196c06db1eb5c0d400d4c8
             protocol: ''
           - name: stable-26.60
-            host: 61eb9b4e23457145efd39ae4785825d4045c765f
+            host: 7831952d6a970d1700ca82742ab2ac4dbe61ff80
             protocol: ''
           - name: protocol-master-26.60
-            host: 61eb9b4e23457145efd39ae4785825d4045c765f
+            host: 7831952d6a970d1700ca82742ab2ac4dbe61ff80
             protocol: 'dev-master#64eae48f05b8d1e4d474ead89711600996f1c5af'
     name: ${{ matrix.name }} / PHP 8.4
     steps:
@@ -52,6 +52,10 @@ jobs:
         run: php tools/doctor.php .compat/host
       - name: State, cache and wire codec regressions
         run: php tests/protocol.php .compat/host
+      - name: Inventory persistence across 16 fresh processes
+        run: php tests/restarts.php .compat/host
+      - name: Native chest and player data across server restarts
+        run: python3 tests/restart-server.py .compat/host --cycles 3
       - name: Mojang 26.60 components and command removal
         run: php tests/mc2660.php .compat/host
       - name: Showcase and documentation PHP integration

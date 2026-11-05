@@ -18,7 +18,7 @@ Customies 1.9.0 targets Axolotl API 5.51.0 and Minecraft Bedrock 26.60 / protoco
 2225. The host handles protocol negotiation. This library does not translate
 arbitrary protocols or run behavior-pack JavaScript, and registers no in-game commands.
 
-Register content in `onLoad()`/`onEnable()` before the deferred worker snapshot.
+Register content in `onLoad()` before inventories or worlds using it are read. Keep event listeners and world-dependent work in `onEnable()`.
 Install the matching resource pack, restart and reconnect after definitions change.
 See the [compatibility matrix](https://hydrogames-dev.github.io/Customies-lotl/protocol-updates.html)
 and [verification record](docs/bedrock-26.60-verification.md). Automated PHP/packet/asset

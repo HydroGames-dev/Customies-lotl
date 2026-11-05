@@ -1,5 +1,13 @@
 # Validation - 2026-10-24
 
+## Customies 1.9.1 / Showcase 1.4.3 - 2026-11-05
+
+Definitions now register in `onLoad()` before inventory/world reads; listeners
+remain in `onEnable()`. All 139 specimens, state round trips, interactions,
+slab/stair checks and the library's new independent process/server restart tests
+passed. See [the restart test record](../../docs/restart-persistence.md) for
+coverage and client/production limits.
+
 ## Customies 1.8.0 / Showcase 1.4.2 - 2026-10-28
 
 - Slabs merge in either placement order through `World::useItemOn()`, consume two

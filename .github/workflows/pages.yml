@@ -4,6 +4,7 @@ on:
   push:
     branches: [master, main, feat/block-traits-presets]
     paths:
+      - 'CHANGELOG.md'
       - 'website/**'
       - 'docs/**'
       - 'src/**'
@@ -12,6 +13,7 @@ on:
       - '.github/workflows/pages.yml'
   pull_request:
     paths:
+      - 'CHANGELOG.md'
       - 'website/**'
       - 'docs/**'
       - 'src/**'

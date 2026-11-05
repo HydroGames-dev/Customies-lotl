@@ -15,12 +15,15 @@ final class Diagnostics {
 	/** Read-only support information; no player data, paths, tokens or network requests. @return array<string, mixed> */
 	public static function report(): array {
 		$blocks = CustomiesBlockFactory::getInstance()->getBlockPaletteEntries();
+		$identifiers = array_map(static fn($entry): string => $entry->getStringId(), CustomiesItemFactory::getInstance()->getItemTableEntries());
+		sort($identifiers, SORT_STRING);
 		return RuntimeCompatibility::describe() + [
 			'host' => \pocketmine\VersionInfo::NAME . ' ' . \pocketmine\VersionInfo::BASE_VERSION,
 			'registry_frozen' => RegistrationGuard::isFrozen(),
 			'custom_blocks' => count($blocks),
 			'custom_block_states' => $blocks === [] ? 0 : count(BlockPalette::getInstance()->getCustomStates()),
 			'custom_item_entries' => count(CustomiesItemFactory::getInstance()->getItemTableEntries()),
+			'identifier_fingerprint' => hash('sha256', json_encode($identifiers, JSON_THROW_ON_ERROR)),
 			'custom_entities' => count(CustomiesEntityFactory::getInstance()->getRegisteredIdentifiers())
 		];
 	}

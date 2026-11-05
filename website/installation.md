@@ -18,8 +18,8 @@ Customies uses the host protocol and does not translate older clients.
 3. Create a separate content plugin with the manifest below. The
    [generator](tool-generator.html) can create its source files, registration and
    pack scaffolding. Existing add-ons can start in the [Migration Lab](migration.html).
-4. Register content in your plugin's `onEnable()` before Customies takes the
-   deferred worker snapshot. Allocate each type ID once, outside its factory closure.
+4. Register content in your plugin's `onLoad()`, before any inventory data is read.
+   Keep listener setup and world-dependent work in `onEnable()`. Allocate each type ID once, outside its factory closure.
 5. Build/install your plugin, complete its resource pack, and add the pack to the
    server's resource stack. Restart and reconnect clients after definition changes.
 

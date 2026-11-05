@@ -4,6 +4,45 @@ Version history for this repository's published documentation branch. Library,
 website and example-plugin changes are identified separately. A passing host test
 does not establish Bedrock client rendering or prediction compatibility.
 
+## 1.9.1 · 2026-11-05
+
+**Areas:** library, showcase, tools, compatibility
+
+### Fixed
+
+- Merge current custom item/block-item definitions into early or cached login
+  item-registry packets. Replace stale own entries, preserve other entries and
+  subclient routing, and avoid duplicate definitions or mutation of shared packets.
+- Register a direct name-only custom block-item deserializer and both directions
+  of the host block/item mapping. Full stack/state NBT remains supported.
+- Reject existing parser aliases before publishing saved-item mappings, preventing
+  partial registration when an exception is caught by a content plugin.
+- Register Showcase 1.4.3 and newly generated/migrated definitions in `onLoad()`
+  before inventories/worlds are read. Event setup remains in `onEnable()`.
+
+### Diagnostics and verification
+
+- Log registration counts and a stable identifier-set fingerprint after startup;
+  expose the fingerprint through the PHP diagnostics API. No commands added.
+- Add 16-fresh-process persistence regressions with changed runtime IDs and order,
+  sparse slots, names/lore, typed nested tags, block state and 26.60 inventory/registry
+  codecs. The suite passed on released Axolotl 5.51.0 and current stable 5.51.2-dev.
+- Native server testing passed 12 independent restarts on current stable and six
+  on released 5.51.0, retaining a real chest, native world block state, synthetic
+  player-file inventory data and all Showcase definitions. No real Bedrock client
+  was connected.
+- Independently reproduce the name-only reload, early registry snapshot and
+  partial alias failures against unchanged 1.9.0. The reporter's production
+  inventory plugin/startup log was unavailable, so its exact trigger remains
+  unconfirmed; already overwritten data cannot be reconstructed by this update.
+- Pin current stable `7831952d6a970d1700ca82742ab2ac4dbe61ff80` in CI and add
+  process/server restart checks. BedrockProtocol master remains
+  `64eae48f05b8d1e4d474ead89711600996f1c5af`; the target stays 26.60 / protocol 2225.
+
+See the [restart investigation and test instructions](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/docs/restart-persistence.md).
+Sources: [Axolotl stable snapshot](https://github.com/axolotl-pm/PocketMine-MP/tree/7831952d6a970d1700ca82742ab2ac4dbe61ff80),
+[26.60 protocol snapshot](https://github.com/axolotl-pm/BedrockProtocol/tree/64eae48f05b8d1e4d474ead89711600996f1c5af).
+
 ## 1.9.0 · 2026-10-28
 
 **Areas:** library, tools, website, compatibility
