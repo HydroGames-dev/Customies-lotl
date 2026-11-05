@@ -12,7 +12,8 @@ the exact production trigger has not been established from those images alone.
   before registration. Matching Customies entries replace stale definitions;
   unrelated entries and subclient routing survive. Repeated processing does not
   duplicate definitions. The source packet remains untouched. Conflicting numeric
-  IDs are rejected with the identifiers involved rather than sent ambiguously.
+  IDs reject the affected login with the identifiers logged by the session,
+  rather than sending an ambiguous registry or crashing the server event loop.
 - **Block-item reload:** custom block items now have a direct saved-item
   deserializer as well as the normal block-state deserializer. A plugin using
   `SavedItemData` without a `Block` tag can restore the default item. Both

@@ -63,7 +63,16 @@ final class CustomiesListener implements Listener {
 				$source = $packet->getEntries();
 				$custom = CustomiesItemFactory::getInstance()->getItemTableEntries();
 				if($source !== $this->cachedItemSource || $custom !== $this->cachedCustomItems){
-					$this->cachedItems = ItemRegistryBuilder::build($source, $custom);
+					try{
+						$this->cachedItems = ItemRegistryBuilder::build($source, $custom);
+					}catch(\UnexpectedValueException $e){
+						// A malformed plugin snapshot must not crash the server's event loop.
+						$event->cancel();
+						foreach($event->getTargets() as $target){
+							$target->disconnect($e->getMessage(), 'Custom item registry conflict. Please contact the server administrator.');
+						}
+						return;
+					}
 					$this->cachedItemSource = $source;
 					$this->cachedCustomItems = $custom;
 				}

@@ -133,6 +133,11 @@ try{
 	\customiesdevs\customies\network\ItemRegistryBuilder::build([new ItemTypeEntry('foreign:conflict', $ids['restart:wand'], false, 0, new CacheableNbt(CompoundTag::create()))], $factory->getItemTableEntries());
 	throw new LogicException('Accepted conflicting numeric IDs');
 }catch(UnexpectedValueException){}
+$conflictPacket = ItemRegistryPacket::create([new ItemTypeEntry('foreign:conflict', $ids['restart:wand'], false, 0, new CacheableNbt(CompoundTag::create()))]);
+$conflictEvent = new DataPacketSendEvent([], [$conflictPacket]);
+$listener->onDataPacketSend($conflictEvent);
+verify($conflictEvent->isCancelled(), 'Conflicting plugin snapshot cancels login without throwing into the server event loop');
+verify($conflictEvent->getPackets()[0] === $conflictPacket, 'Rejected snapshot stays untouched');
 
 // Alias failure must not publish a deserializer which survives a caught exception.
 StringToItemParser::getInstance()->register('restart:alias_conflict', static fn() => \pocketmine\item\VanillaItems::STICK());

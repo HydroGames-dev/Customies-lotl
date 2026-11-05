@@ -13,6 +13,8 @@ does not establish Bedrock client rendering or prediction compatibility.
 - Merge current custom item/block-item definitions into early or cached login
   item-registry packets. Replace stale own entries, preserve other entries and
   subclient routing, and avoid duplicate definitions or mutation of shared packets.
+  Conflicting plugin snapshots cancel the affected login without crashing the
+  server event loop.
 - Register a direct name-only custom block-item deserializer and both directions
   of the host block/item mapping. Full stack/state NBT remains supported.
 - Reject existing parser aliases before publishing saved-item mappings, preventing
