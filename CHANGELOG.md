@@ -4,6 +4,45 @@ Version history for this repository's published documentation branch. Library,
 website and example-plugin changes are identified separately. A passing host test
 does not establish Bedrock client rendering or prediction compatibility.
 
+## 1.11.0 · Unreleased
+
+**Areas:** library, tools, website, compatibility
+
+### Added
+
+- Multi-version hosts. On [NetherGames PocketMine-MP](https://github.com/NetherGamesMC/PocketMine-MP),
+  which accepts 32 client protocols (Bedrock 1.20.0 to 1.26.60), Customies registers its
+  blocks and items in every client version's block and item dictionary as the host loads
+  them, including in async workers. Single-version hosts such as Axolotl are unchanged.
+  See the [multi-version record](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/multi-version/docs/multi-version.md).
+- Join packets follow each client's version: clients before 1.21.60 get custom items in
+  the StartGame item table and item components in the legacy component packet; clients
+  before 1.21.130 get one `origin`/`size` collision box. New `BedrockVersion` gates
+  `item_registry_packet` and `collision_box_list` describe both.
+- `ProtocolRegistry` (accepted protocols, their versions and per-protocol converters) and
+  `ProtocolAdapter` (per-version definition conversion). `tools/doctor.php` reports
+  `multi_protocol` and `accepted_protocols`.
+- `tests/multiversion.php` checks every accepted protocol: palette order against each
+  version's own palette file, runtime IDs, item round trips and encoded join packets.
+
+### Fixed
+
+- Older palettes on multi-version hosts are sorted by the block names their clients use.
+  NetherGames stores them under current names; sorting by those would have shifted every
+  vanilla block for older clients.
+- Block palette rebuilds reuse the host's lookup construction, keeping host aliases such
+  as NetherGames' skull fallbacks.
+- The restart probe's block and worker task classes are in their own files, so async
+  workers can load them; the server test now translates a custom block with the oldest
+  client's palette inside a worker.
+
+### Compatibility and verification
+
+- The full suite passes on NetherGames `eaa2e58156e71e7a10093cffc98b02e1023f05ee` and on
+  Axolotl stable. Tests build packets through helpers that follow either host's protocol
+  API. No Bedrock client of any version was connected; see the record for limits,
+  including resource pack `min_engine_version`.
+
 ## 1.10.0 · 2026-11-11
 
 **Areas:** library, showcase, tools, website, compatibility

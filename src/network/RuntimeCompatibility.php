@@ -5,16 +5,24 @@ namespace customiesdevs\customies\network;
 
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
+use function count;
+use function in_array;
+use function sprintf;
 
 /** Checks the host contracts Customies actually mutates; does not negotiate protocols. */
 final class RuntimeCompatibility {
 
 	/** API/codec regression targets; Minecraft rendering is a separate check. */
 	public static function getProfile(int $protocol): string {
-		return match($protocol){
+		$profile = match($protocol){
 			2225 => '26.60 (stable API target)',
 			default => 'unverified host protocol'
 		};
+		if(ProtocolRegistry::isMultiProtocol() && $protocol === ProtocolInfo::CURRENT_PROTOCOL){
+			$accepted = ProtocolRegistry::getAcceptedProtocols();
+			$profile .= sprintf('; multi-version host accepting %d protocols from %s', count($accepted), ProtocolRegistry::getMinecraftVersion($accepted[0]));
+		}
+		return $profile;
 	}
 
 	/** @return list<string> */
@@ -37,6 +45,11 @@ final class RuntimeCompatibility {
 		$constructor = class_exists(ItemTypeEntry::class) ? (new \ReflectionClass(ItemTypeEntry::class))->getConstructor() : null;
 		if($constructor === null || $constructor->getNumberOfRequiredParameters() !== 5 || $constructor->getNumberOfParameters() !== 5){
 			$errors[] = 'ItemTypeEntry requires an unsupported registry adapter';
+		}
+		// Single-protocol hosts take (name, states, meta); multi-protocol hosts add the original state of upgraded entries.
+		$entry = new \ReflectionMethod(\pocketmine\network\mcpe\convert\BlockStateDictionaryEntry::class, '__construct');
+		if(!in_array($entry->getNumberOfParameters(), [3, 4], true)){
+			$errors[] = 'BlockStateDictionaryEntry has an unsupported constructor';
 		}
 		return $errors;
 	}
@@ -64,6 +77,8 @@ final class RuntimeCompatibility {
 			'minecraft' => ProtocolInfo::MINECRAFT_VERSION_NETWORK,
 			'profile' => self::getProfile(ProtocolInfo::CURRENT_PROTOCOL),
 			'bedrock_features' => BedrockVersion::describe(),
+			'multi_protocol' => ProtocolRegistry::isMultiProtocol(),
+			'accepted_protocols' => ProtocolRegistry::getVersionTable(),
 			'contract_errors' => self::getContractErrors(),
 			'packages' => $packages,
 			'client_validation' => 'In-game rendering and prediction must be tested separately; Customies uses the host protocol.'

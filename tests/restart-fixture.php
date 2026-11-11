@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require $argv[1] . '/vendor/autoload.php';
+require_once __DIR__ . '/packets.php';
 spl_autoload_register(static function(string $class): void {
 	$prefix = 'customiesdevs\\customies\\';
 	if(str_starts_with($class, $prefix)){ require dirname(__DIR__) . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php'; }
@@ -88,10 +89,8 @@ for($slot = 0; $slot < 9; ++$slot){
 	$stack = $converter->coreItemStackToNet($contents[$slot] ?? \pocketmine\item\VanillaItems::AIR());
 	$wrappers[] = \pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper::legacy($stack);
 }
-$inventoryPacket = \pocketmine\network\mcpe\protocol\InventoryContentPacket::create(0, $wrappers, new \pocketmine\network\mcpe\protocol\types\inventory\FullContainerName(0), new \pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper(0, \pocketmine\network\mcpe\protocol\types\inventory\ItemStack::null()));
-$inventoryBytes = new \pmmp\encoding\ByteBufferWriter(); $inventoryPacket->encode($inventoryBytes);
-$decodedInventory = new \pocketmine\network\mcpe\protocol\InventoryContentPacket();
-$decodedInventory->decode(new \pmmp\encoding\ByteBufferReader($inventoryBytes->getData()));
+$inventoryPacket = testInventoryContent(0, $wrappers, new \pocketmine\network\mcpe\protocol\types\inventory\FullContainerName(0), new \pocketmine\network\mcpe\protocol\types\inventory\ItemStackWrapper(0, \pocketmine\network\mcpe\protocol\types\inventory\ItemStack::null()));
+$decodedInventory = packetRead(\pocketmine\network\mcpe\protocol\InventoryContentPacket::class, packetWrite($inventoryPacket));
 foreach($decodedInventory->items as $slot => $wrapper){
 	verify($converter->netItemStackToCore($wrapper->getItemStack())->equalsExact($contents[$slot] ?? \pocketmine\item\VanillaItems::AIR()), '26.60 inventory packet preserves occupied and empty slots');
 }
@@ -114,8 +113,7 @@ foreach($factory->getItemTableEntries() as $entry){ verify(($table[$entry->getSt
 verify(count($earlyPacket->getEntries()) + 3 === count($packet->getEntries()), 'Early cached packet stays unchanged and native entries survive');
 $listener->onDataPacketSend($event);
 verify(count($event->getPackets()[0]->getEntries()) === count($table), 'Repeat handling must not duplicate entries');
-$writer = new \pmmp\encoding\ByteBufferWriter(); $packet->encode($writer);
-$decoded = new ItemRegistryPacket(); $decoded->decode(new \pmmp\encoding\ByteBufferReader($writer->getData()));
+$decoded = packetRead(ItemRegistryPacket::class, packetWrite($packet));
 verify(count($decoded->getEntries()) === count($table), 'Repaired login registry survives the 26.60 wire codec');
 
 // Same-length snapshots must invalidate the cache; Customies must replace stale own definitions.

@@ -19,11 +19,12 @@ use pocketmine\network\mcpe\protocol\ResourcePackStackPacket;
 use pocketmine\network\mcpe\protocol\ProtocolInfo;
 use pocketmine\network\mcpe\protocol\types as T;
 
+require_once __DIR__ . '/packets.php';
+
 function roundTrip(DataPacket $packet): DataPacket {
-	$out = new ByteBufferWriter(); $packet->encode($out);
-	$copy = new ($packet::class)(); $copy->decode(new ByteBufferReader($out->getData()));
-	$reencoded = new ByteBufferWriter(); $copy->encode($reencoded);
-	check($out->getData() === $reencoded->getData(), $packet->getName() . ' wire round trip must be byte-identical');
+	$bytes = packetWrite($packet);
+	$copy = packetRead($packet::class, $bytes);
+	check($bytes === packetWrite($copy), $packet->getName() . ' wire round trip must be byte-identical');
 	return $copy;
 }
 
@@ -52,12 +53,17 @@ $settings->worldGamemode = T\GameMode::SURVIVAL; $settings->difficulty = 1;
 $settings->spawnPosition = new T\BlockPosition(0, 64, 0);
 $settings->rainLevel = 0.0; $settings->lightningLevel = 0.0; $settings->commandsEnabled = true;
 $settings->experiments = new T\Experiments(['third_party_feature' => true], true);
-$start = StartGamePacket::create(
-	1, 1, T\GameMode::SURVIVAL, new pocketmine\math\Vector3(0, 64, 0), 0.0, 0.0,
-	new T\CacheableNbt(CompoundTag::create()), $settings, 'test', 'Compatibility test', '', false,
-	new T\PlayerMovementSettings(20, true), 0, 0, '', false, 'Customies test', Ramsey\Uuid\Uuid::fromString(Ramsey\Uuid\Uuid::NIL),
-	false, false, new T\NetworkPermissions(false), null, new T\ServerTelemetryData('', '', '', ''), [], 0
-);
+$start = testCreate(StartGamePacket::class, [
+	'actorUniqueId' => 1, 'actorRuntimeId' => 1, 'playerGamemode' => T\GameMode::SURVIVAL,
+	'playerPosition' => new pocketmine\math\Vector3(0, 64, 0), 'pitch' => 0.0, 'yaw' => 0.0,
+	'playerActorProperties' => new T\CacheableNbt(CompoundTag::create()), 'levelSettings' => $settings,
+	'levelId' => 'test', 'worldName' => 'Compatibility test', 'premiumWorldTemplateId' => '', 'isTrial' => false,
+	'playerMovementSettings' => testMovementSettings(), 'currentTick' => 0, 'enchantmentSeed' => 0,
+	'multiplayerCorrelationId' => '', 'enableNewInventorySystem' => false, 'serverSoftwareVersion' => 'Customies test',
+	'worldTemplateId' => Ramsey\Uuid\Uuid::fromString(Ramsey\Uuid\Uuid::NIL), 'enableClientSideChunkGeneration' => false,
+	'blockNetworkIdsAreHashes' => false, 'networkPermissions' => new T\NetworkPermissions(false), 'serverJoinInformation' => null,
+	'serverTelemetryData' => new T\ServerTelemetryData('', '', '', ''), 'blockPalette' => [], 'blockPaletteChecksum' => 0
+]);
 $external = new T\BlockPaletteEntry('other:external', new T\CacheableNbt(CompoundTag::create()));
 $start->blockPalette = [$external];
 $listener = new CustomiesListener();
@@ -77,7 +83,7 @@ $different = new T\BlockPaletteEntry('other:replacement', new T\CacheableNbt(Com
 $changed->blockPalette = [$different];
 $listener->onDataPacketSend(new DataPacketSendEvent([], [$changed]));
 check(in_array($different, $changed->blockPalette, true) && !in_array($external, $changed->blockPalette, true), 'same-size incoming palette changes must invalidate join cache');
-$stack = ResourcePackStackPacket::create([], false, ProtocolInfo::MINECRAFT_VERSION_NETWORK, new T\Experiments(['third_party_feature' => true], true), false);
+$stack = testCreate(ResourcePackStackPacket::class, ['resourcePackStack' => [], 'mustAccept' => false, 'baseGameVersion' => ProtocolInfo::MINECRAFT_VERSION_NETWORK, 'experiments' => new T\Experiments(['third_party_feature' => true], true), 'useVanillaEditorPacks' => false]);
 $listener->onDataPacketSend(new DataPacketSendEvent([], [$stack]));
 $decodedStack = roundTrip($stack);
 check($decodedStack->experiments->getExperiments() === $decodedStart->levelSettings->experiments->getExperiments(), 'resource stack and join experiments agree');

@@ -42,8 +42,11 @@ def release_page(source):
             out+='<section class="release-entry" data-release-type="'+esc(areas[1].replace(',','') if areas else 'library')+'">'+body+'</section>'
         elif part.startswith('## Maintaining'):out+=render(part)
     return out
+# Records in docs/ that are also site pages: links between them point at the pages.
+PUBLISHED_DOCS={'bedrock-version-support.md':'bedrock-versions.html','multi-version.md':'multi-version.html'}
 def render(source):
     source=re.sub(r'^# ([^\n]+)$',r'## \1',source,flags=re.M)
+    source=re.sub(r'\]\(('+'|'.join(re.escape(k) for k in PUBLISHED_DOCS)+r')(#[^)]*)?\)',lambda m:']('+PUBLISHED_DOCS[m[1]]+(m[2] or '')+')',source)
     source=re.sub(r'\]\((\.\./[^)]+|traits-and-presets\.md)\)',lambda m:']('+REPO+'/blob/'+REF+'/'+str((ROOT/'docs'/m[1]).resolve().relative_to(ROOT)).replace('\\','/')+')',source)
     return markdown.markdown(source,extensions=['tables','fenced_code','codehilite','toc','sane_lists'],extension_configs={'codehilite':{'guess_lang':False}})
 
@@ -123,6 +126,8 @@ for offset,(key,label,category,description) in enumerate(extra_articles):pages.i
 # The dated version record stays in docs/ beside the other verification records; publish it unchanged.
 VERSION_RECORD='docs/bedrock-version-support.md'
 pages.insert(next(i for i,p in enumerate(pages) if p[0]=='protocol-updates')+1,('bedrock-versions','Bedrock version support','Server & compatibility','26.60 component coverage, server-side equivalents, version gates and the 1.26.70 preview.',(ROOT/VERSION_RECORD).read_text(encoding='utf-8')))
+MULTI_VERSION_RECORD='docs/multi-version.md'
+pages.insert(next(i for i,p in enumerate(pages) if p[0]=='bedrock-versions')+1,('multi-version','Multi-version servers','Server & compatibility','Serve Bedrock 1.20.0 to 1.26.60 clients from one NetherGames server.',(ROOT/MULTI_VERSION_RECORD).read_text(encoding='utf-8')))
 insert=next(i for i,p in enumerate(pages) if p[0]=='showcase')
 pages.insert(insert,('tools','Browser toolbox','Tools','Small local tools for authoring and reviewing Customies content.',TOOLS_LANDING))
 for offset,(key,(label,description,source)) in enumerate(TOOL_PAGES.items(),1):pages.insert(insert+offset,(key,label,'Tools',description,source))
@@ -183,7 +188,7 @@ def layout(key,title,description,body):
     nxt=scope_keys[pos+1] if pos+1<len(scope_keys) else None
     pager=(f'<a href="{prev}.html"><small>Previous</small>{esc(PAGE_MAP[prev])}</a>' if prev else '<span></span>')+(f'<a href="{nxt}.html"><small>Next</small>{esc(PAGE_MAP[nxt])} →</a>' if nxt else '')
     dochead='' if key in ('index','showcase') else f'<header class="article-head"><p class="eyebrow">{brand.upper()} / {esc(title.upper())}</p><h1>{esc(title)}</h1><p class="lead">{meta}</p></header>'
-    source_path=("website/site_content.py" if key=="index" else "CHANGELOG.md" if key=="changelog" else VERSION_RECORD if key=="bedrock-versions" else "website/migration_pages.py" if key in MIGRATION_KEYS else "website/authoring_pages.py" if key in TOOL_PAGES else "website/articles/"+key+".md" if (BASE/"articles"/(key+".md")).exists() else "examples/CustomiesShowcase/README.md" if demo else "website/core-guide.md")
+    source_path=("website/site_content.py" if key=="index" else "CHANGELOG.md" if key=="changelog" else VERSION_RECORD if key=="bedrock-versions" else MULTI_VERSION_RECORD if key=="multi-version" else "website/migration_pages.py" if key in MIGRATION_KEYS else "website/authoring_pages.py" if key in TOOL_PAGES else "website/articles/"+key+".md" if (BASE/"articles"/(key+".md")).exists() else "examples/CustomiesShowcase/README.md" if demo else "website/core-guide.md")
     tabs=''.join(f'<a href="{target}.html" {"aria-current=page" if active else ""}>{label}</a>' for target,label,active in [("index","Guide",scope=="customies" and key not in TOOL_PAGES and key not in ("tools","changelog")),("tools","Build tools",key in TOOL_PAGES or key=="tools"),("migration","Migration Lab",scope=="migration"),("changelog","Changelog",key=="changelog"),("showcase","Showcase",demo)])
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{esc(title)} · Customies</title><meta name="description" content="{meta}"><meta name="theme-color" content="#122a29"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><script src="assets/preferences.js"></script><link rel="stylesheet" href="assets/style.css"><link rel="stylesheet" href="assets/studio.css"><script src="assets/studio.js" defer></script><script src="assets/app.js" defer></script><link rel="stylesheet" href="assets/authoring.css"><script src="assets/authoring-lib.js" defer></script><script src="assets/authoring.js" defer></script>{"<script src='assets/migration.js' defer></script>" if key=='migration-tool' else ''}</head>
     <body data-page="{key}" data-scope="{scope}"><div id="reading-progress" aria-hidden="true"></div><a class="skip-link" href="#content">Skip to content</a>

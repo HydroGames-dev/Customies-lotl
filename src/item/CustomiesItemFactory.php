@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace customiesdevs\customies\item;
 
 use Closure;
+use customiesdevs\customies\network\ProtocolRegistry;
 use customiesdevs\customies\util\NBT;
 use customiesdevs\customies\util\RegistrationGuard;
 use InvalidArgumentException;
@@ -16,12 +17,15 @@ use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\ListTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\network\mcpe\convert\TypeConverter;
+use pocketmine\network\mcpe\protocol\serializer\ItemTypeDictionary;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\world\format\io\GlobalItemDataHandlers;
 use ReflectionClass;
 use function array_values;
+use function count;
+use function spl_object_id;
 
 final class CustomiesItemFactory {
 	use SingletonTrait;
@@ -71,6 +75,16 @@ final class CustomiesItemFactory {
 
 	/** @var array<string, ItemTypeEntry> */
 	private array $itemTableEntries = [];
+	/**
+	 * Item type dictionaries carrying the custom entries, by object ID. Multi-protocol hosts have one per client
+	 * item palette; custom network IDs start far above every vanilla ID, so one ID serves all of them.
+	 * @var array<int, ItemTypeDictionary>
+	 */
+	private array $dictionaries = [];
+
+	public function __construct() {
+		ProtocolRegistry::onEveryTypeConverter(fn(TypeConverter $converter) => $this->attach($converter->getItemTypeDictionary()));
+	}
 
 	/**
 	 * Get a custom item from its identifier. An exception will be thrown if the item is not registered.
@@ -107,11 +121,18 @@ final class CustomiesItemFactory {
 		if($networkId < -32768 || $networkId > 32767){
 			throw new InvalidArgumentException("Item '$identifier' has network ID $networkId outside the signed 16-bit registry range.");
 		}
-		foreach(TypeConverter::getInstance()->getItemTypeDictionary()->getEntries() as $entry){
-			if($entry->getStringId() === $identifier || $entry->getNumericId() === $networkId){
-				throw new InvalidArgumentException("Item '$identifier' conflicts with registered item '{$entry->getStringId()}' (network ID {$entry->getNumericId()}). Allocate a unique type ID.");
+		foreach($this->dictionaries as $dictionary){
+			foreach($dictionary->getEntries() as $entry){
+				if($entry->getStringId() === $identifier || $entry->getNumericId() === $networkId){
+					throw new InvalidArgumentException("Item '$identifier' conflicts with registered item '{$entry->getStringId()}' (network ID {$entry->getNumericId()}). Allocate a unique type ID.");
+				}
 			}
 		}
+	}
+
+	/** Number of distinct item type dictionaries carrying the custom entries. */
+	public function getDictionaryCount(): int {
+		return count($this->dictionaries);
 	}
 
 	/**
@@ -220,28 +241,48 @@ final class CustomiesItemFactory {
 	}
 
 	/**
-	 * Registers a custom item ID to the required mappings in the global ItemTypeDictionary instance.
-	 * This allows the item to be recognized and used within the game.
+	 * Registers a custom item ID in every item type dictionary, so each client version can resolve it.
 	 * @param string $identifier The string identifier for the item, usually in the format "namespace:item_name"
 	 * @param int $itemId The numerical ID to be assigned to the item
 	 * @param ItemTypeEntry $entry The ItemTypeEntry instance representing the item
 	 */
 	private function registerCustomItemMapping(string $identifier, int $itemId, ItemTypeEntry $entry): void {
-		$dictionary = TypeConverter::getInstance()->getItemTypeDictionary();
-		$reflection = new ReflectionClass($dictionary);
+		foreach($this->dictionaries as $dictionary){
+			self::inject($dictionary, $entry);
+		}
+	}
 
+	/** Adds every custom entry to a dictionary seen for the first time (a client version's palette loaded later). */
+	private function attach(ItemTypeDictionary $dictionary): void {
+		$key = spl_object_id($dictionary);
+		if(isset($this->dictionaries[$key])){ return; }
+		$this->dictionaries[$key] = $dictionary;
+		foreach($this->itemTableEntries as $entry){
+			self::inject($dictionary, $entry);
+		}
+	}
+
+	private static function inject(ItemTypeDictionary $dictionary, ItemTypeEntry $entry): void {
+		$reflection = new ReflectionClass($dictionary);
 		$intToString = $reflection->getProperty("intToStringIdMap");
+		$stringToInt = $reflection->getProperty("stringToIntMap");
+		$itemTypes = $reflection->getProperty("itemTypes");
 		/** @var array<int, string> $intToStringValue */
 		$intToStringValue = $intToString->getValue($dictionary);
-		$intToString->setValue($dictionary, $intToStringValue + [$itemId => $identifier]);
-
-		$stringToInt = $reflection->getProperty("stringToIntMap");
-		 /** @var array<string, int> $stringToIntValue */
+		/** @var array<string, int> $stringToIntValue */
 		$stringToIntValue = $stringToInt->getValue($dictionary);
+		$identifier = $entry->getStringId();
+		$itemId = $entry->getNumericId();
+		if(isset($stringToIntValue[$identifier])){ return; }
+		if(isset($intToStringValue[$itemId])){
+			// Registration validated the dictionaries that existed then. A client palette loaded later is checked
+			// here; failing a player's login would be worse than leaving one item out of one version.
+			\GlobalLogger::get()->error("[Customies] Item '$identifier' (network ID $itemId) conflicts with '{$intToStringValue[$itemId]}' in a client item palette; players on that version cannot use it.");
+			return;
+		}
+		$intToString->setValue($dictionary, $intToStringValue + [$itemId => $identifier]);
 		$stringToInt->setValue($dictionary, $stringToIntValue + [$identifier => $itemId]);
-
-		$itemTypes = $reflection->getProperty("itemTypes");
-		 /** @var ItemTypeEntry[] $itemTypesValue */
+		/** @var ItemTypeEntry[] $itemTypesValue */
 		$itemTypesValue = $itemTypes->getValue($dictionary);
 		$itemTypesValue[] = $entry;
 		$itemTypes->setValue($dictionary, $itemTypesValue);

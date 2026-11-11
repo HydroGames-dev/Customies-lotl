@@ -23,9 +23,15 @@ final class BedrockVersion {
 
 	/**
 	 * Feature key => first Bedrock network version that accepts it.
+	 * `item_registry_packet`: item components travel in ItemRegistryPacket entries; older clients take them from the
+	 *   legacy component packet after the biome definitions (host protocol libraries, Customies 1.21.60 port).
+	 * `collision_box_list`: collision_box carries a `boxes` list; older clients read one `origin`/`size` box
+	 *   (history-derived: Customies switched five days after 1.21.130 shipped).
 	 * `collision_box_32`: Mojang 1.26.70 collision schema raises maxItems from 16 to 32 (preview-derived).
 	 */
 	public const FEATURES = [
+		'item_registry_packet' => '1.21.60',
+		'collision_box_list' => '1.21.130',
 		'collision_box_32' => '1.26.70'
 	];
 

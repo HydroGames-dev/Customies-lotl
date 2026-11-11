@@ -18,20 +18,28 @@ jobs:
       matrix:
         include:
           - name: release-26.60
+            repo: axolotl-pm/PocketMine-MP
             host: f5e6a67fdf2108cf63196c06db1eb5c0d400d4c8
             protocol: ''
           - name: stable-26.60
+            repo: axolotl-pm/PocketMine-MP
             host: 7831952d6a970d1700ca82742ab2ac4dbe61ff80
             protocol: ''
           - name: protocol-master-26.60
+            repo: axolotl-pm/PocketMine-MP
             host: 7831952d6a970d1700ca82742ab2ac4dbe61ff80
             protocol: 'dev-master#64eae48f05b8d1e4d474ead89711600996f1c5af'
+          # Multi-version host: 32 client protocols, Bedrock 1.20.0 to 1.26.60.
+          - name: nethergames-multiversion
+            repo: NetherGamesMC/PocketMine-MP
+            host: eaa2e58156e71e7a10093cffc98b02e1023f05ee
+            protocol: ''
     name: ${{ matrix.name }} / PHP 8.4
     steps:
       - uses: actions/checkout@v6
       - uses: actions/checkout@v6
         with:
-          repository: axolotl-pm/PocketMine-MP
+          repository: ${{ matrix.repo }}
           ref: ${{ matrix.host }}
           path: .compat/host
       - uses: axolotl-pm/setup-php-action@1.0.0
@@ -60,6 +68,8 @@ jobs:
         run: php tests/mc2660.php .compat/host
       - name: Bedrock version gates
         run: php tests/versions.php .compat/host
+      - name: Multi-version registries, palette order and join packets
+        run: php -d memory_limit=2G tests/multiversion.php .compat/host
       - name: Showcase and documentation PHP integration
         run: php examples/CustomiesShowcase/tests/guide.php .compat/host
       - name: Slab placement and mesh collision against vanilla

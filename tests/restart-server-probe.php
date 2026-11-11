@@ -3,20 +3,13 @@ declare(strict_types=1);
 namespace customiesdevs\restarttest;
 
 use customiesdevs\customies\block\CustomiesBlockFactory;
-use customiesdevs\customies\block\TraitBlock;
 use customiesdevs\customies\block\traits\PlacementDirectionTrait;
 use customiesdevs\customies\item\CustomiesItemFactory;
-use pocketmine\block\{BlockIdentifier, BlockTypeIds, BlockTypeInfo, BlockBreakInfo, VanillaBlocks};
+use pocketmine\block\{BlockTypeIds, VanillaBlocks};
 use pocketmine\item\{Item, ItemIdentifier, ItemTypeIds};
 use pocketmine\nbt\tag\{CompoundTag, ListTag};
 
-final class ProbeBlock extends TraitBlock {
-	public function __construct(int $id){
-		$this->addTrait(PlacementDirectionTrait::cardinal());
-		parent::__construct(new BlockIdentifier($id), 'Restart probe', new BlockTypeInfo(BlockBreakInfo::instant()));
-	}
-}
-
+// ProbeBlock and ProtocolProbeTask live in tests/restart-probe/, one class per file, so workers can load them.
 final class RestartProbe extends \pocketmine\plugin\PluginBase {
 	private int $cycle;
 	private \pocketmine\network\mcpe\protocol\ItemRegistryPacket $earlyRegistry;
@@ -86,9 +79,20 @@ final class RestartProbe extends \pocketmine\plugin\PluginBase {
 			$fingerprintFile = $this->getServer()->getDataPath() . '/restart-fingerprint.txt';
 			if($this->cycle > 0){ $this->verify(file_get_contents($fingerprintFile) === $report['identifier_fingerprint'], 'Identifier fingerprint ignores allocation/order changes'); }
 			file_put_contents($fingerprintFile, $report['identifier_fingerprint']);
-			file_put_contents($this->getServer()->getDataPath() . '/restart-cycle.json', json_encode($this->cycle + 1, JSON_THROW_ON_ERROR));
-			$this->getLogger()->info('RESTART PASS ' . $this->cycle . ': native chest/world, saved player NBT, registry and all Showcase definitions');
-			$this->getServer()->shutdown();
+			if(!\customiesdevs\customies\network\ProtocolRegistry::isMultiProtocol()){ $this->finish('single protocol'); return; }
+			// Chunks are encoded in workers with each client's palette, created on demand there.
+			$oldest = \customiesdevs\customies\network\ProtocolRegistry::getAcceptedProtocols()[0];
+			$stateId = CustomiesBlockFactory::getInstance()->get('restart:block')->getStateId();
+			$this->getServer()->getAsyncPool()->submitTaskToWorker(new ProtocolProbeTask($oldest, $stateId, function(?string $name) use ($oldest): void {
+				$this->verify($name === 'restart:block', "Worker palette for protocol $oldest must translate the custom block, got " . var_export($name, true));
+				$this->finish('worker palette for protocol ' . $oldest);
+			}), 0);
 		}), 5);
+	}
+
+	private function finish(string $protocols): void {
+		file_put_contents($this->getServer()->getDataPath() . '/restart-cycle.json', json_encode($this->cycle + 1, JSON_THROW_ON_ERROR));
+		$this->getLogger()->info('RESTART PASS ' . $this->cycle . ': native chest/world, saved player NBT, registry, all Showcase definitions and ' . $protocols);
+		$this->getServer()->shutdown();
 	}
 }

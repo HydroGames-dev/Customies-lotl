@@ -76,7 +76,12 @@ Axolotl moves to that Minecraft version, so content keeps loading on 26.60 hosts
 
 | Gate | From | Effect |
 | --- | --- | --- |
+| `item_registry_packet` | 1.21.60 | Older clients take item components from the legacy component packet |
+| `collision_box_list` | 1.21.130 | Older clients receive one `origin`/`size` collision box |
 | `collision_box_32` | 1.26.70 | `CollisionBoxComponent::getMaxBoxes()` rises from 16 to 32 |
+
+The first two only matter on [multi-version servers](multi-version.md), where clients older
+than the host connect; each client's version decides how its packets are converted.
 
 `CollisionBoxComponent::MAX_BOXES` stays 16 for existing callers. `tools/doctor.php`
 lists every gate and whether it is active under `bedrock_features`. Gates taken from

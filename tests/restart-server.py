@@ -19,8 +19,8 @@ data = Path(tempfile.mkdtemp(prefix='customies-server-restarts-')).resolve()
 (data/'pocketmine.yml').write_text('settings:\n  language: eng\n  async-workers: 2\n  enable-dev-builds: true\ntransport:\n  name: raknet\nconsole:\n  enable-input: false\nanonymous-statistics:\n  enabled: false\nauto-updater:\n  enabled: false\n', encoding='utf-8')
 subprocess.run([php, '-dphar.readonly=0', str(root/'examples/CustomiesShowcase/tools/build.php'), str(data/'plugins')], check=True, capture_output=True)
 builder = data/'build-probe.php'
-builder.write_text('<?php\n$p = new Phar($argv[1]); $p->setStub("<?php __HALT_COMPILER();"); $p->addFromString("plugin.yml", "name: RestartProbe\\nmain: customiesdevs\\\\restarttest\\\\RestartProbe\\nsrc-namespace-prefix: customiesdevs\\\\restarttest\\nversion: 1.0.0\\napi: 5.51.0\\ndepend: [Customies-Axolotl, CustomiesShowcase]\\n"); $p->addFile($argv[2], "src/RestartProbe.php");', encoding='utf-8')
-subprocess.run([php, '-dphar.readonly=0', str(builder), str(data/'plugins/RestartProbe.phar'), str(root/'tests/restart-server-probe.php')], check=True, capture_output=True)
+builder.write_text('<?php\n$p = new Phar($argv[1]); $p->setStub("<?php __HALT_COMPILER();"); $p->addFromString("plugin.yml", "name: RestartProbe\\nmain: customiesdevs\\\\restarttest\\\\RestartProbe\\nsrc-namespace-prefix: customiesdevs\\\\restarttest\\nversion: 1.0.0\\napi: 5.51.0\\ndepend: [Customies-Axolotl, CustomiesShowcase]\\n"); $p->addFile($argv[2], "src/RestartProbe.php"); foreach(array_slice($argv, 3) as $f){ $p->addFile($f, "src/" . basename($f)); }', encoding='utf-8')
+subprocess.run([php, '-dphar.readonly=0', str(builder), str(data/'plugins/RestartProbe.phar'), str(root/'tests/restart-server-probe.php'), *map(str, sorted((root/'tests/restart-probe').glob('*.php')))], check=True, capture_output=True)
 print('Isolated restart test data:', data, flush=True)
 for cycle in range(args.cycles):
     # Explicit plugin path: Axolotl's default is relative to cwd, not --data.
