@@ -37,6 +37,22 @@ does not establish Bedrock client rendering or prediction compatibility.
   (server ticks) and converts it to seconds. Previously the field was dropped and
   the block was generated with a zero mining time.
 
+### Upgrading from 1.9.1
+
+- Replace the Customies PHAR and restart. The target is still Axolotl API 5.51.0 /
+  protocol 2225, and existing content needs no code changes.
+- `CollisionBoxComponent::MAX_BOXES` is still 16. Code that checks the limit itself
+  should call `CollisionBoxComponent::getMaxBoxes()`, which follows the host
+  version. The overflow message now names the limit and host version, so code that
+  matches the old message text must be updated.
+- For custom blocks that take part in redstone, add `RedstoneConductivityComponent`
+  with the value Axolotl computes (`isFullCube() && !isTransparent()`), and implement
+  `pocketmine\block\utils\RedstoneSignalEmitter` on blocks that wire should connect to.
+- Convert format 1.26.70 packs that use `base_time_to_destroy` again: 1.9.x output
+  gave those blocks a zero mining time. Packs at earlier formats are unaffected.
+- Showcase users: install Showcase 1.5.0 with resource pack 1.5.0 and reconnect
+  clients so they download the new pack version.
+
 ### Compatibility and verification
 
 - Rechecked Axolotl stable `7831952d6a970d1700ca82742ab2ac4dbe61ff80` (unchanged

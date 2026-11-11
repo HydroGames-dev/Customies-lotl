@@ -48,7 +48,7 @@ The other components added in Mojang's 1.26.60 schemas, `vibration_properties`, 
 
 `BedrockVersion` reads the host's Minecraft network version. Gated behavior switches on only when Axolotl moves to that version: from 1.26.70, `CollisionBoxComponent::getMaxBoxes()` rises from 16 to 32. `MAX_BOXES` stays 16, and `tools/doctor.php` lists every gate under `bedrock_features`.
 
-No Axolotl build supports 1.26.70 yet. Preview 1.26.70.23 also adds collision shape identifiers behind the VoxelShape experiment and the experimental `jukebox_playlist_source` component; neither is supported. Format 1.26.70 replaces `seconds_to_destroy` with `base_time_to_destroy` in server ticks, which the converter accepts and converts at 20 ticks per second. Run `php tools/component-coverage.php /path/to/bedrock-samples origin/preview --strict` to compare Mojang's newest schemas with Customies; the [version support record](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/docs/bedrock-version-support.md) has the full checklist.
+No Axolotl build supports 1.26.70 yet. Preview 1.26.70.23 also adds collision shape identifiers behind the VoxelShape experiment and the experimental `jukebox_playlist_source` component; neither is supported. Format 1.26.70 replaces `seconds_to_destroy` with `base_time_to_destroy` in server ticks, which the converter accepts and converts at 20 ticks per second. Run `php tools/component-coverage.php /path/to/bedrock-samples origin/preview --strict` to compare Mojang's newest schemas with Customies; the [Bedrock version support](bedrock-versions.html) page has the full checklist.
 
 ## Verification and boundaries
 

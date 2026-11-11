@@ -72,7 +72,9 @@ Known component fields become constructor calls. Supported state comparisons
 become server collision, selection, light and friction conditions. Y-axis quarter
 turns rotate PHP boxes too; scale, translation, other axes and custom pivots need
 your own physical implementation. Legacy collision objects are normalized to
-arrays in the exported 1.26.60 JSON.
+arrays in the exported 1.26.60 JSON. Format 1.26.70 mining times in server ticks
+become seconds, and components that only describe server behavior are listed for
+manual PHP work; see the [support matrix](migration-support.html#bedrock-2660-and-12670-definitions).
 
 Resource-pack files are copied unchanged. Behavior JSON is not installed as a
 resource pack. If the source has no resource manifest, add the required pack yourself.
@@ -121,6 +123,22 @@ infer arbitrary business logic or provide a Script API compatibility runtime.
 | Resource-only pack | Preserved assets and a manual integration scaffold |
 | Encrypted/split/ZIP64 archive | Rejected with an explanation; extract it with your own tools |
 | Entity JSON, recipes, loot tables, mcfunction | Preserved as reference; gameplay needs manual PHP |
+
+## Bedrock 26.60 and 1.26.70 definitions
+
+Customies 1.10.0 handles these version-specific block fields. Generated PHP targets
+Bedrock 26.60 hosts; see [Bedrock version support](bedrock-versions.html).
+
+| Definition data | Result |
+| --- | --- |
+| `minecraft:redstone_conductivity` | `RedstoneConductivityComponent` with both flags. Keep `redstone_conductor` equal to Axolotl's rule: full, non-transparent cubes conduct |
+| `destructible_by_mining.base_time_to_destroy` (format 1.26.70, server ticks) | Converted to seconds at 20 ticks per second. Supplying it with `seconds_to_destroy` is rejected |
+| `vibration_properties`, `neighbor_change`, `enchantment_power_transmitter` (26.60) | Not sent to clients. The review entry names the PHP equivalent, such as `onNearbyBlockChange()` |
+| `jukebox_playlist_source` (1.26.70 preview) | Not converted; 26.60 hosts and clients do not support it |
+| More than 16 collision boxes | Rejected for 26.60. 1.26.70 hosts accept 32 |
+
+Projects converted with Customies 1.9.x from format 1.26.70 packs that use
+`base_time_to_destroy` received a zero mining time. Convert them again.
 
 ## Script hooks
 
