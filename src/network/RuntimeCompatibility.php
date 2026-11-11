@@ -63,6 +63,7 @@ final class RuntimeCompatibility {
 			'protocol' => ProtocolInfo::CURRENT_PROTOCOL,
 			'minecraft' => ProtocolInfo::MINECRAFT_VERSION_NETWORK,
 			'profile' => self::getProfile(ProtocolInfo::CURRENT_PROTOCOL),
+			'bedrock_features' => BedrockVersion::describe(),
 			'contract_errors' => self::getContractErrors(),
 			'packages' => $packages,
 			'client_validation' => 'In-game rendering and prediction must be tested separately; Customies uses the host protocol.'

@@ -42,6 +42,10 @@ registered content works with its actual data/conversion pipeline.
 
 1. Read the official reference/schema for the target version and compare canonical
    host definitions. Distinguish behavior-pack JSON from the network wrapper shape.
+   `php tools/component-coverage.php /path/to/bedrock-samples [ref] --strict` lists
+   schema components that Customies neither wraps nor classifies as server-side.
+   Client limits that change with a Minecraft version belong in a `BedrockVersion`
+   gate, so content keeps working on hosts that have not updated yet.
 2. Add or update typed PHP fields and constructor defaults without silently changing
    existing caller behavior. Check actual NBT tag types, nested lists and constants.
 3. Review item property mappings where the host expects legacy/parallel properties.
@@ -66,6 +70,8 @@ a passing export does not prove native engine support.
 php tests/run.php /path/to/axolotl-test
 php tools/doctor.php /path/to/axolotl-test
 php tests/protocol.php /path/to/axolotl-test
+php tests/mc2660.php /path/to/axolotl-test
+php tests/versions.php /path/to/axolotl-test
 php examples/CustomiesShowcase/tests/guide.php /path/to/axolotl-test
 python examples/CustomiesShowcase/tests/verify_assets.py
 python examples/CustomiesShowcase/tools/build.py --php /path/to/server/php

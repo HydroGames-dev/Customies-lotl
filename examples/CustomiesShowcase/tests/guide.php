@@ -19,4 +19,4 @@ check(count($player->effects->recorded)===1 && $player->effects->recorded[0]->ge
 foreach(['blocks','items'] as $method){
 	foreach(customiesdevs\showcase\ComponentCatalog::$method() as $key=>$_){ check(str_contains($guide,'| `'.$key.'` |'),'Guide component coverage: '.$key); }
 }
-echo "PASS: all guide PHP examples load/register and execute; all 75 components documented.\n";
+echo 'PASS: all guide PHP examples load/register and execute; all '.(count(customiesdevs\showcase\ComponentCatalog::blocks()) + count(customiesdevs\showcase\ComponentCatalog::items()))." components documented.\n";

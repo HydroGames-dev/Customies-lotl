@@ -46,6 +46,11 @@ foreach([...ShowcaseBlock::PLAYABLE, ...array_map(static fn($key) => 'lab_'.$key
 	}
 }
 
+// Axolotl computes wire connections server-side, treating full non-transparent cubes as conductors.
+// The client conductivity specimen must declare the same value or prediction and server state diverge.
+$conductor = CustomiesBlockFactory::getInstance()->get('showcase:lab_block_redstone_conductivity');
+check(($conductor->isFullCube() && !$conductor->isTransparent()) === ComponentCatalog::blocks()['redstone_conductivity']->isRedstoneConductor(), 'Redstone conductivity specimen must match the server wire rule');
+
 // Bedrock's selection-box vectors are FloatTag lists, even when supplied as whole pixels.
 foreach(CustomiesBlockFactory::getInstance()->getBlockPaletteEntries() as $entry){
 	$root = $entry->getStates()->getRoot();

@@ -107,6 +107,7 @@ final class SpecimenDescriptions {
 		'placement_filter' => ['Declares placement on top of stone only.','The lab does not enforce this rule server-side.'],
 		'precipitation_interactions' => ['Declares rain obstruction and snow accumulation.','Server weather behavior is not implemented.'],
 		'random_offset' => ['Declares small horizontal model offsets.','No matching server position randomization.'],
+		'redstone_conductivity' => ['Conducts redstone; wire may step down over it.','Matches the server rule for full opaque cubes.'],
 		'replaceable' => ['Marks this specimen as replaceable.','A new block may replace it on the server too.'],
 		'selection_box' => ['A centered selection box measuring 12 pixels.','Compare the cursor outline with the full cube.'],
 		'sound' => ['Uses the stone block sound identifier.','A block-sound metadata example.'],

@@ -146,6 +146,12 @@
                     ],
                     "return_type": "self",
                     "documentation": "/**\n\t * Adds multiple collision boxes.\n\t * @param Box[] $boxes\n\t * An array of collision boxes to add.\n\t * @throws \\InvalidArgumentException If any element in the array is not an instance of Box.\n\t */"
+                },
+                {
+                    "name": "getMaxBoxes",
+                    "parameters": [],
+                    "return_type": "int",
+                    "documentation": "/**\n\t * Maximum boxes the running host's clients accept: 16 on Bedrock 26.60, 32 from 1.26.70.\n\t * The limit follows the host version, so content written for 26.60 keeps loading after an update.\n\t */"
                 }
             ],
             "constants": {
@@ -156,7 +162,7 @@
                 "enabled": false
             },
             "source": "src/block/component/CollisionBoxComponent.php",
-            "source_sha256": "56f78cf460d5a7c299797b9dd99641ede700802aa66578bbc40c72981271c0c2",
+            "source_sha256": "6fd4b86626369130bf7a51fb214891fef3af5d86031d9f199c28ea92bcd38181",
             "constructor": "\tpublic function __construct(bool $enabled = true) {\n\t\t$this->enabled = $enabled;\n\t}\n"
         },
         "connection_rule": {
@@ -1249,6 +1255,50 @@
             "source": "src/block/component/RandomOffsetComponent.php",
             "source_sha256": "4953838db90a68f1226bffcd20d6eefcc26c6932487fa9f1e88aaef217d67e2c",
             "constructor": "\tpublic function __construct(\n\t\t?Vector3 $min = null,\n\t\t?Vector3 $max = null,\n\t\t?Vector3 $steps = null\n\t) {\n\t\t$this->min = $min ?? new Vector3(0.0, 0.0, 0.0);\n\t\t$this->max = $max ?? new Vector3(0.0, 0.0, 0.0);\n\t\t$this->steps = $steps ?? new Vector3(0, 0, 0);\n\t}\n"
+        },
+        "redstone_conductivity": {
+            "class": "customiesdevs\\customies\\block\\component\\RedstoneConductivityComponent",
+            "name": "minecraft:redstone_conductivity",
+            "parameters": [
+                {
+                    "name": "redstoneConductor",
+                    "type": "bool",
+                    "required": false,
+                    "default": false,
+                    "default_constant": null,
+                    "description": "Whether the block can be powered by redstone. Mojang's default is false."
+                },
+                {
+                    "name": "allowsWireToStepDown",
+                    "type": "bool",
+                    "required": false,
+                    "default": true,
+                    "default_constant": null,
+                    "description": "Whether redstone wire can stair-step downward on this block. Mojang's default is true."
+                }
+            ],
+            "methods": [
+                {
+                    "name": "isRedstoneConductor",
+                    "parameters": [],
+                    "return_type": "bool",
+                    "documentation": ""
+                },
+                {
+                    "name": "allowsWireToStepDown",
+                    "parameters": [],
+                    "return_type": "bool",
+                    "documentation": ""
+                }
+            ],
+            "constants": [],
+            "serialized_example": {
+                "allowsWireToStepDown": true,
+                "redstoneConductor": true
+            },
+            "source": "src/block/component/RedstoneConductivityComponent.php",
+            "source_sha256": "d2e9d568d99d4261d2665191c4afebef10a07d4e0b16f660fd3ba76f28933b5a",
+            "constructor": "\tpublic function __construct(\n\t\tprivate bool $redstoneConductor = false,\n\t\tprivate bool $allowsWireToStepDown = true\n\t) {}\n"
         },
         "replaceable": {
             "class": "customiesdevs\\customies\\block\\component\\ReplaceableComponent",

@@ -47,6 +47,7 @@ $collision->addBoxes([$box]);
 check(count($collision->getValue()['boxes']) === 3, 'bulk append must preserve earlier boxes');
 rejects2660(static fn() => $collision->addBoxes([$box, 'invalid']), 'accepted invalid box list');
 check(count($collision->getValue()['boxes']) === 3, 'invalid bulk append must be atomic');
+check(B\CollisionBoxComponent::getMaxBoxes() === 16 && customiesdevs\customies\network\BedrockVersion::getCollisionBoxLimit() === 16, '26.60 clients accept at most sixteen collision boxes');
 $limit = (new B\CollisionBoxComponent())->addBoxes(array_fill(0, 16, $box));
 rejects2660(static fn() => $limit->addBox($box), 'accepted more than sixteen boxes');
 check(count($limit->getValue()['boxes']) === 16, 'overflow must preserve the valid box list');
@@ -66,6 +67,24 @@ foreach(pocketmine\network\mcpe\cache\StaticPacketCache::getInstance()->getBlock
 	$canonicalChecked = true; break;
 }
 check($canonicalChecked, '26.60 fixture must contain a real collision definition');
+
+// Redstone conductivity: the wrapper must equal every vanilla definition the host networks, field names and tag types included.
+$nativeConductivity = 0;
+foreach(pocketmine\network\mcpe\cache\StaticPacketCache::getInstance()->getBlockPaletteEntries() as $entry){
+	$root = $entry->getStates()->getRoot();
+	$componentSets = [$root->getCompoundTag('components')];
+	foreach($root->getListTag('permutations') ?? [] as $permutation){ $componentSets[] = $permutation->getCompoundTag('components'); }
+	foreach($componentSets as $componentSet){
+		$native = $componentSet?->getCompoundTag('minecraft:redstone_conductivity');
+		if($native === null){ continue; }
+		$wrapper = NBT::getTagType((new B\RedstoneConductivityComponent($native->getByte('redstoneConductor') === 1, $native->getByte('allowsWireToStepDown') === 1))->getValue());
+		check($wrapper->equals($native), 'redstone conductivity must match the native definition of ' . $entry->getName());
+		++$nativeConductivity;
+	}
+}
+check($nativeConductivity > 0, '26.60 fixture must contain native redstone conductivity definitions');
+$defaultConductivity = NBT::getTagType((new B\RedstoneConductivityComponent())->getValue());
+check($defaultConductivity->getByte('redstoneConductor') === 0 && $defaultConductivity->getByte('allowsWireToStepDown') === 1, 'redstone conductivity defaults must follow Mojang: not a conductor, wire may step down');
 
 $metadata = NBT::getTagType((new B\BlockEntityComponent(true, 9, true, '箱子'))->getValue());
 check($metadata->getTag('entity_storage') instanceof ByteTag && $metadata->getByte('entity_storage') === 1, 'entity storage flag must be a byte');
@@ -95,10 +114,13 @@ $factory->registerBlock(static function() use($updateType, $collision): TraitBlo
 	$b = new TraitBlock(new BlockIdentifier($updateType), '26.60 fixture', new BlockTypeInfo(BlockBreakInfo::instant()));
 	$b->addComponent($collision);
 	$b->addComponent(new B\BlockEntityComponent(true, 9, true, 'container.test.title'));
+	$b->addComponent(new B\RedstoneConductivityComponent(true, false));
 	$b->addPermutation(new customiesdevs\customies\block\permutations\BlockPermutation('true', new B\CollisionBoxComponent(false)));
 	return $b;
 }, 'test:update2660');
 $published = array_values(array_filter($factory->getBlockPaletteEntries(), static fn($entry) => $entry->getName() === 'test:update2660'))[0]->getStates()->getRoot();
 check(count($published->getCompoundTag('components')->getCompoundTag('minecraft:collision_box')->getListTag('boxes')) === 3, 'factory must publish every collision box');
 check(count($published->getListTag('permutations')->getValue()[0]->getCompoundTag('components')->getCompoundTag('minecraft:collision_box')->getListTag('boxes')) === 0, 'disabled permutation must keep an empty list');
-echo 'PASS: 26.60 commands removed, canonical collision NBT, min/max mirroring, fractional bounds, block-entity fields, bone visibility and custom item sounds.', PHP_EOL;
+$publishedConductivity = $published->getCompoundTag('components')->getCompoundTag('minecraft:redstone_conductivity');
+check($publishedConductivity !== null && $publishedConductivity->getByte('redstoneConductor') === 1 && $publishedConductivity->getByte('allowsWireToStepDown') === 0, 'factory must publish redstone conductivity with native field names');
+echo 'PASS: 26.60 commands removed, canonical collision NBT, min/max mirroring, fractional bounds, block-entity fields, bone visibility, custom item sounds and native redstone conductivity (', $nativeConductivity, ' vanilla definitions).', PHP_EOL;

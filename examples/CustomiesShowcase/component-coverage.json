@@ -28,6 +28,7 @@
         "placement_filter": "minecraft:placement_filter",
         "precipitation_interactions": "minecraft:precipitation_interactions",
         "random_offset": "minecraft:random_offset",
+        "redstone_conductivity": "minecraft:redstone_conductivity",
         "replaceable": "minecraft:replaceable",
         "selection_box": "minecraft:selection_box",
         "sound": "minecraft:sound",

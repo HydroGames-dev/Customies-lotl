@@ -302,7 +302,7 @@ a different shape. Include every occupied cell, with part zero at `[0,0,0]`.
 
 Names below are catalog keys; their PHP classes live in
 [`src/block/component`](../src/block/component). The constructor examples for all
-33 are in [`ComponentCatalog::blocks()`](../examples/CustomiesShowcase/src/ComponentCatalog.php).
+34 are in [`ComponentCatalog::blocks()`](../examples/CustomiesShowcase/src/ComponentCatalog.php).
 The last column identifies the additional PHP responsibility; it is not a claim
 that all laboratory specimens implement that behavior.
 
@@ -336,6 +336,7 @@ that all laboratory specimens implement that behavior.
 | `placement_filter` | Allowed faces and supporting block descriptors | Enforce placement checks in PHP too |
 | `precipitation_interactions` | Rain/snow behavior metadata | Host weather behavior requires corresponding server support |
 | `random_offset` | Client visual placement jitter | Do not let visual jitter imply server collision moved too |
+| `redstone_conductivity` | Whether the block conducts power and lets wire step down | Axolotl 5.51 treats full, non-transparent cubes as conductors; declare the same value |
 | `replaceable` | Client replaceability | Match `canBeReplaced()` |
 | `selection_box` | Client targeting box | Keep server ray selection compatible; separate from collision |
 | `sound` | Sound group metadata | Supply/verify sound assets and host sounds |

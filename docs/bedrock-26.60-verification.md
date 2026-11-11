@@ -6,6 +6,11 @@ current Axolotl stable `7831952d6a970d1700ca82742ab2ac4dbe61ff80`. See the
 independent server/process tests and the production/client limits. The original
 1.9.0 verification below remains a dated historical record.
 
+On 2026-11-11, Customies 1.10.0 was checked against Mojang's released 1.26.60.5
+schemas (`15701fa`), which replace the incomplete `46ba6ea` snapshot listed below,
+and the 1.26.70.23 preview. Coverage, server-side components and version gates are
+in the [Bedrock version support record](bedrock-version-support.md).
+
 This record separates current upstream data, automated host tests and client tests.
 The repository targets Axolotl API 5.51.0 and protocol 2225. No newer protocol was
 found in the checked Axolotl stable and BedrockProtocol master commits.

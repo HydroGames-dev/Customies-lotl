@@ -28,7 +28,7 @@
   }
   function boxes(v,path='collision'){
     if(v===false)return []; if(v===true||v===undefined)return [bounds({})];
-    const list=Array.isArray(v)?v:[v];if(list.length>16)error(path+': at most 16 boxes.');return list.map((b,i)=>bounds(b,path+'['+i+']'));
+    const list=Array.isArray(v)?v:[v];if(list.length>16)error(path+': at most 16 boxes on Bedrock 26.60 (1.26.70 hosts allow 32).');return list.map((b,i)=>bounds(b,path+'['+i+']'));
   }
   function rotate(b,direction='north'){
     let [x,y,z,xx,yy,zz]=b;const turns=['north','west','south','east'].indexOf(direction);if(turns<0)error('Choose a cardinal direction.');
@@ -92,7 +92,10 @@
           }return 'new B\\MaterialInstancesComponent(['+material.join(', ')+'])';
         }
         case 'minecraft:transformation':{fields(['rotation','rotation_pivot','scale','scale_pivot','translation']);const r=vector(v.rotation??[0,0,0],path);if(r.some(x=>x%90!==0))error(path+': this wrapper requires quarter-turn rotations.');return 'new B\\TransformationComponent('+[r,vector(v.rotation_pivot??[0,0,0],path),vector(v.scale??[1,1,1],path),vector(v.scale_pivot??[0,0,0],path),vector(v.translation??[0,0,0],path)].map(vec).join(', ')+')';}
-        case 'minecraft:destructible_by_mining':if(typeof v==='boolean'){if(!v){notes.push(path+': unbreakable client metadata is not representable by this wrapper; add server policy manually.');return null;}return 'new B\\DestructibleByMiningComponent()';}fields(['seconds_to_destroy']);return 'new B\\DestructibleByMiningComponent('+n(v.seconds_to_destroy??0,0)+')';
+        case 'minecraft:destructible_by_mining':if(typeof v==='boolean'){if(!v){notes.push(path+': unbreakable client metadata is not representable by this wrapper; add server policy manually.');return null;}return 'new B\\DestructibleByMiningComponent()';}fields(['seconds_to_destroy','base_time_to_destroy']);
+          // Format 1.26.70 replaces seconds_to_destroy with base_time_to_destroy in server ticks (20 per second).
+          if(v.base_time_to_destroy!==undefined){if(v.seconds_to_destroy!==undefined)error(path+': use either seconds_to_destroy or base_time_to_destroy, not both.');const seconds=n(v.base_time_to_destroy,0)/20;notes.push(path+': base_time_to_destroy ('+v.base_time_to_destroy+' ticks, format 1.26.70) converted to '+seconds+' seconds; set matching PHP hardness.');return 'new B\\DestructibleByMiningComponent('+seconds+')';}
+          return 'new B\\DestructibleByMiningComponent('+n(v.seconds_to_destroy??0,0)+')';
         case 'minecraft:destructible_by_explosion':if(typeof v==='boolean'){if(!v){notes.push(path+': explosion immunity needs custom server handling.');return null;}return 'new B\\DestructibleByExplosionComponent()';}fields(['explosion_resistance']);return 'new B\\DestructibleByExplosionComponent('+n(v.explosion_resistance??0,0)+')';
         case 'minecraft:map_color':if(obj(v))fields(['color']);return 'new B\\MapColorComponent('+value(obj(v)?v.color:v)+')';
         case 'minecraft:flammable':if(typeof v==='boolean')return v?'new B\\FlammableComponent()':null;fields(['catch_chance_modifier','destroy_chance_modifier','lava_flammable']);return 'new B\\FlammableComponent('+n(v.catch_chance_modifier??5,0,1e6,true)+', '+n(v.destroy_chance_modifier??20,0,1e6,true)+', '+value(v.lava_flammable??false)+')';
@@ -102,6 +105,11 @@
         case 'minecraft:replaceable':return 'new B\\ReplaceableComponent()';
         case 'minecraft:flower_pottable':return 'new B\\FlowerPottableComponent()';
         case 'minecraft:entity_fall_on':fields(['minimum_fall_distance']);return 'new B\\EntityFallOnComponent('+n(v.minimum_fall_distance??0,0)+')';
+        case 'minecraft:redstone_conductivity':fields(['redstone_conductor','allows_wire_to_step_down']);notes.push(path+': Axolotl computes wire states itself and treats full, non-transparent cubes as conductors; keep redstone_conductor equal to that.');return 'new B\\RedstoneConductivityComponent('+value(bool(v.redstone_conductor??false,path))+', '+value(bool(v.allows_wire_to_step_down??true,path))+')';
+        case 'minecraft:vibration_properties':notes.push(path+': Bedrock 26.60 sculk vibration behavior. Axolotl has no vibration system and clients do not receive it; not converted.');return null;
+        case 'minecraft:neighbor_change':notes.push(path+': Bedrock 26.60 custom-component event filter. Override onNearbyBlockChange() in PHP instead (Axolotl does not report which side changed); not converted.');return null;
+        case 'minecraft:enchantment_power_transmitter':notes.push(path+': Bedrock 26.60 enchanting-table power. Axolotl only counts bookshelves through air gaps, so this needs host support; not converted.');return null;
+        case 'minecraft:jukebox_playlist_source':notes.push(path+': Bedrock 1.26.70 preview component (Upcoming Creator Features); 26.60 hosts and clients do not support it; not converted.');return null;
       }
     }else{
       const toggles={'minecraft:allow_off_hand':'AllowOffHandComponent','minecraft:can_destroy_in_creative':'CanDestroyInCreativeComponent','minecraft:glint':'GlintComponent','minecraft:hand_equipped':'HandEquippedComponent','minecraft:liquid_clipped':'LiquidClippedComponent','minecraft:should_despawn':'ShouldDespawnComponent','minecraft:stacked_by_data':'StackedByDataComponent'};
@@ -256,7 +264,7 @@ use pocketmine\\item\\ItemIdentifier;`;
     const title=kind==='block'?'Block':'Item',factory='\\customiesdevs\\customies\\'+kind+'\\Customies'+title+'Factory';
     const files={'plugin.yml':`name: ${cls}Plugin\nmain: ${ns}\\ContentPlugin\nsrc-namespace-prefix: ${ns}\nversion: 1.0.0\napi: 5.51.0\nload: POSTWORLD\ndepend: [Customies-Axolotl]\n`,['src/'+cls+'.php']:code,'src/ContentPlugin.php':`<?php\ndeclare(strict_types=1);\nnamespace ${ns};\nfinal class ContentPlugin extends \\pocketmine\\plugin\\PluginBase {\n    public function onLoad(): void {\n        $id = \\pocketmine\\${kind}\\${title}TypeIds::newId();\n        ${factory}::getInstance()->register${title}(static fn() => new ${cls}($id), ${php(id)});\n    }\n}\n`,'source.json':json(input)};
     const report={kind,identifier:id,class:ns+'\\'+cls,state_combinations:stateProduct,converted_components:components.length,review:notes};
-    files['conversion-report.json']=json(report);files['README.txt']='Target: Customies 1.9.1, Axolotl API 5.51.0, Minecraft 26.60.\nReview conversion-report.json. Component metadata is not a replacement for server gameplay.\nAdd required PNGs/geometries/attachables to a resource pack, run PHP host tests, then test a Bedrock client.\n';
+    files['conversion-report.json']=json(report);files['README.txt']='Target: Customies 1.10.0, Axolotl API 5.51.0, Minecraft 26.60.\nReview conversion-report.json. Component metadata is not a replacement for server gameplay.\nAdd required PNGs/geometries/attachables to a resource pack, run PHP host tests, then test a Bedrock client.\n';
     return {files,report};
   }
   function generate(options){

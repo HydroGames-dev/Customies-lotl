@@ -38,6 +38,18 @@ foreach($fixtures as $fixture){
 				check($copy->calculateIntercept(new \pocketmine\math\Vector3(1-$cx,66,1-$cz),new \pocketmine\math\Vector3(1-$cx,63,1-$cz))===null,'Rotated selection does not leave a phantom target');
 			}
 		}
+		if($fixture['preset']==='adapters'){
+			$conductivity=$block->getComponent('minecraft:redstone_conductivity');
+			check($conductivity instanceof \customiesdevs\customies\block\component\RedstoneConductivityComponent && $conductivity->isRedstoneConductor() && !$conductivity->allowsWireToStepDown(),'Converted redstone conductivity keeps both JSON flags');
+		}
+		if($fixture['preset']==='mining_ticks'){
+			check($block->getComponent('minecraft:destructible_by_mining')?->getValue()['value']===1.5,'1.26.70 base_time_to_destroy ticks must publish as seconds');
+		}
+		if($fixture['preset']==='server_only'){
+			foreach(['vibration_properties','neighbor_change','enchantment_power_transmitter','jukebox_playlist_source'] as $name){
+				check(!$block->hasComponent('minecraft:'.$name),'Server-only component minecraft:'.$name.' must not be sent to clients');
+			}
+		}
 		if($fixture['preset']==='converted'){
 			check($block->getLightLevel()===0 && $block->getCollisionBoxes()[0]->maxY===.5,'Converted block base physics');
 			$block->getState('documentation:lit')->setCurrentValue(true);

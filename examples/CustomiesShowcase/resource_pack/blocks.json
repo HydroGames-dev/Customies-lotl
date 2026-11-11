@@ -276,6 +276,10 @@
     "sound": "stone",
     "textures": "showcase_lab_block_random_offset"
   },
+  "showcase:lab_block_redstone_conductivity": {
+    "sound": "stone",
+    "textures": "showcase_lab_block_redstone_conductivity"
+  },
   "showcase:lab_block_replaceable": {
     "sound": "stone",
     "textures": "showcase_lab_block_replaceable"

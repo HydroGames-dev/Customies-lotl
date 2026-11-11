@@ -82,7 +82,7 @@ final class RestartProbe extends \pocketmine\plugin\PluginBase {
 			foreach($event->getPackets()[0]->getEntries() as $entry){ $table[$entry->getStringId()] = $entry->getNumericId(); }
 			foreach(CustomiesItemFactory::getInstance()->getItemTableEntries() as $entry){ $this->verify(($table[$entry->getStringId()] ?? null) === $entry->getNumericId(), 'Real packet event repairs early registry'); }
 			$report = \customiesdevs\customies\util\Diagnostics::report();
-			$this->verify($report['registry_frozen'] && $report['custom_item_entries'] === 142 && $report['custom_blocks'] === 74, 'Full Showcase and probe definitions exist');
+			$this->verify($report['registry_frozen'] && $report['custom_item_entries'] === 143 && $report['custom_blocks'] === 75, 'Full Showcase and probe definitions exist');
 			$fingerprintFile = $this->getServer()->getDataPath() . '/restart-fingerprint.txt';
 			if($this->cycle > 0){ $this->verify(file_get_contents($fingerprintFile) === $report['identifier_fingerprint'], 'Identifier fingerprint ignores allocation/order changes'); }
 			file_put_contents($fingerprintFile, $report['identifier_fingerprint']);

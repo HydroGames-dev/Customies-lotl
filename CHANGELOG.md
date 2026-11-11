@@ -4,6 +4,51 @@ Version history for this repository's published documentation branch. Library,
 website and example-plugin changes are identified separately. A passing host test
 does not establish Bedrock client rendering or prediction compatibility.
 
+## 1.10.0 · 2026-11-11
+
+**Areas:** library, showcase, tools, website, compatibility
+
+### Added
+
+- `RedstoneConductivityComponent`, the only block component Mojang's 26.60 host
+  networks for vanilla data-driven blocks that Customies did not wrap. It sends the
+  processed client fields `redstoneConductor` and `allowsWireToStepDown`; defaults
+  follow Mojang (not a conductor, wire may step down). Showcase 1.5.0 (resource
+  pack 1.5.0, 140 specimens) adds a laboratory specimen whose value matches
+  Axolotl's server wire rule; reinstall the pack so clients fetch the new version.
+- `BedrockVersion` gates keyed on the host's network version. `collision_box_32`
+  raises `CollisionBoxComponent::getMaxBoxes()` from 16 to 32 once the host runs
+  1.26.70; on 26.60 hosts nothing changes. `MAX_BOXES` stays 16, limit errors name the
+  host version, and `tools/doctor.php` reports every gate under `bedrock_features`.
+- `tools/component-coverage.php` compares Mojang's newest block and item component
+  schemas with the wrapped components, including from sparse clones and the preview
+  branch. `--strict` fails on unclassified new components.
+- A [Bedrock version support record](https://github.com/HydroGames-dev/Customies-lotl/blob/feat/block-traits-presets/docs/bedrock-version-support.md)
+  with 26.60 coverage, server-side equivalents, Axolotl 5.51 redstone notes, 1.26.70
+  preview status and an update checklist.
+
+### Changed
+
+- The authoring and migration converter translates `minecraft:redstone_conductivity`.
+  It reports specific PHP guidance for `vibration_properties`, `neighbor_change` and
+  `enchantment_power_transmitter` (26.60) and `jukebox_playlist_source` (1.26.70
+  preview) instead of a generic manual-work note, and does not send them to clients.
+- The converter accepts format 1.26.70 `destructible_by_mining.base_time_to_destroy`
+  (server ticks) and converts it to seconds. Previously the field was dropped and
+  the block was generated with a zero mining time.
+
+### Compatibility and verification
+
+- Rechecked Axolotl stable `7831952d6a970d1700ca82742ab2ac4dbe61ff80` (unchanged
+  protocol 2225), Mojang bedrock-samples 1.26.60.5 `15701fa` and preview 1.26.70.23
+  `4301426`. No host supports 1.26.70 yet; 1.26.70 support is limited to the gates
+  and converter handling above.
+- Every block wrapper with a vanilla counterpart in the host's
+  `data_driven_blocks.nbt` matches its field names and tag types. `tests/mc2660.php`
+  compares redstone conductivity against all 96 vanilla definitions; the new
+  `tests/versions.php` covers version parsing and the 1.26.70 gate. No Bedrock client
+  was connected.
+
 ## 1.9.1 · 2026-11-05
 
 **Areas:** library, showcase, tools, compatibility

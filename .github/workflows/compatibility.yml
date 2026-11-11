@@ -58,6 +58,8 @@ jobs:
         run: python3 tests/restart-server.py .compat/host --cycles 3
       - name: Mojang 26.60 components and command removal
         run: php tests/mc2660.php .compat/host
+      - name: Bedrock version gates
+        run: php tests/versions.php .compat/host
       - name: Showcase and documentation PHP integration
         run: php examples/CustomiesShowcase/tests/guide.php .compat/host
       - name: Slab placement and mesh collision against vanilla

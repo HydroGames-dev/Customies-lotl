@@ -30,9 +30,9 @@ for path,doc in documents.items():
         assert target.exists(),f'{path.name}: broken resource {raw}'
         if url.fragment and target.suffix=='.html':assert unquote(url.fragment) in documents[target].ids,f'{path.name}: broken anchor {raw}'
 gallery=(OUT/'gallery.html').read_text(encoding='utf-8')
-assert gallery.count('class="asset-card"')==139,'Catalog count drift'
+assert gallery.count('class="asset-card"')==140,'Catalog count drift'
 assert gallery.count('class="flipbook-card"')==13,'Animation count drift'
-for name,count in [('block-components',33),('item-components',42)]:
+for name,count in [('block-components',34),('item-components',42)]:
     assert (OUT/(name+'.html')).read_text(encoding='utf-8').count('class="component-example"')==count
 for style in re.findall(r"url\(['\"]?([^)'\"]+)", (OUT/'assets/style.css').read_text(encoding='utf-8')):
     assert (OUT/'assets'/style).exists(),'Missing CSS resource '+style
@@ -46,7 +46,7 @@ for record in search:
 if (OUT/'downloads').exists():
     for line in (OUT/'downloads/SHA256SUMS.txt').read_text(encoding='utf-8').splitlines():
         checksum,name=line.split();assert hashlib.sha256((OUT/'downloads'/name).read_bytes()).hexdigest()==checksum,'Download checksum mismatch'
-print(f'PASS: {len(documents)} pages, all internal links/anchors/resources, 139 specimens, 75 examples, 13 flipbooks, model/search data and download checksums.')
+print(f'PASS: {len(documents)} pages, all internal links/anchors/resources, 140 specimens, 76 examples, 13 flipbooks, model/search data and download checksums.')
 
 # Library and demo content must remain separate in navigation, search and downloads.
 showcase={'showcase','showcase-install','showcase-walkthroughs','structures','gallery','showcase-downloads','showcase-validation'}
@@ -66,7 +66,7 @@ print('PASS: independent Customies/CustomiesShowcase navigation, search indexes,
 
 # Reflected documentation must track the actual wrapper sources.
 api=json.loads((OUT.parent/'api-reference.json').read_text(encoding='utf-8'))
-for kind,expected in [('block',33),('item',42)]:
+for kind,expected in [('block',34),('item',42)]:
     assert len(api[kind])==expected
     for key,entry in api[kind].items():
         source=OUT.parents[1]/entry['source']
@@ -77,9 +77,9 @@ for kind,expected in [('block',33),('item',42)]:
         assert all(heading in text for heading in ('Constructor parameters','PHP usage','Serialized wrapper value','Server behavior','Combining this component','Verify before shipping'))
         for parameter in entry['parameters']:assert parameter['name'] in text
         for method in entry.get('methods',[]):assert method['name'] in text
-assert len([p for p in documents if '-component-' in p.stem])==75
+assert len([p for p in documents if '-component-' in p.stem])==76
 assert 'Block traits' in (OUT/'block-traits.html').read_text(encoding='utf-8')
-print('PASS: 75 complete component articles match source hashes and parameters; dedicated state/trait/item topics exist.')
+print('PASS: 76 complete component articles match source hashes and parameters; dedicated state/trait/item topics exist.')
 
 for name in ('how-it-works','data-guide','updating-customies','toolchain','tutorial-data','tutorial-equipment','tutorial-debugging','accessibility','tools','tool-generator','tool-shapes','tool-converter','tool-rotation'):
     assert OUT/(name+'.html') in documents,'Missing guide/tool: '+name

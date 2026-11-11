@@ -43,6 +43,7 @@ final class ComponentCatalog {
 			'placement_filter' => new B\PlacementFilterComponent([new PlacementCondition([AllowedFace::UP], [BlockDescriptor::fromArray(['name' => 'minecraft:stone'])])]),
 			'precipitation_interactions' => new B\PrecipitationInteractionsComponent(),
 			'random_offset' => new B\RandomOffsetComponent(new Vector3(-0.1, 0, -0.1), new Vector3(0.1, 0, 0.1), new Vector3(0.1, 0, 0.1)),
+			'redstone_conductivity' => new B\RedstoneConductivityComponent(redstoneConductor: true),
 			'replaceable' => new B\ReplaceableComponent(),
 			'selection_box' => new B\SelectionBoxComponent(true, new Vector3(-6, 0, -6), new Vector3(12, 12, 12)),
 			'sound' => new B\SoundComponent('stone'),

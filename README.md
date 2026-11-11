@@ -14,8 +14,10 @@ is a library dependency; CustomiesShowcase is an optional example project.
 
 ## Current target
 
-Customies 1.9.0 targets Axolotl API 5.51.0 and Minecraft Bedrock 26.60 / protocol
-2225. The host handles protocol negotiation. This library does not translate
+Customies 1.10.0 targets Axolotl API 5.51.0 and Minecraft Bedrock 26.60 / protocol
+2225. Version-dependent limits follow the host's Minecraft version; see the
+[Bedrock version support record](docs/bedrock-version-support.md) for 26.60
+coverage and the 1.26.70 preview. The host handles protocol negotiation. This library does not translate
 arbitrary protocols or run behavior-pack JavaScript, and registers no in-game commands.
 
 Register content in `onLoad()` before inventories or worlds using it are read. Keep event listeners and world-dependent work in `onEnable()`.

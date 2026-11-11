@@ -334,6 +334,9 @@
     "showcase_lab_block_random_offset": {
       "textures": "textures/blocks/showcase_lab_block_random_offset"
     },
+    "showcase_lab_block_redstone_conductivity": {
+      "textures": "textures/blocks/showcase_lab_block_redstone_conductivity"
+    },
     "showcase_lab_block_replaceable": {
       "textures": "textures/blocks/showcase_lab_block_replaceable"
     },

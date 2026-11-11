@@ -23,7 +23,7 @@ support; those clients have not been tested here.
 
 ## Descriptions and lore
 
-Every one of the 139 specimens has purpose-specific lore. Playable examples explain
+Every one of the 140 specimens has purpose-specific lore. Playable examples explain
 how to use them and give key values; laboratory examples explain their metadata
 and identify behavior that needs additional server support. The same descriptions
 appear in creative inventory, command kits, block drops, and inspector output.
